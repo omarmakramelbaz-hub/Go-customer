@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+
+        <!-- App Metadata -->
+        <key>CFBundleDevelopmentRegion</key>
+        <string>$(DEVELOPMENT_LANGUAGE)</string>
+        <key>CFBundleDisplayName</key>
+        <string>Fasakhansta</string>
+        <key>CFBundleExecutable</key>
+        <string>$(EXECUTABLE_NAME)</string>
+        <key>CFBundleIdentifier</key>
+        <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+        <key>CFBundleInfoDictionaryVersion</key>
+        <string>6.0</string>
+        <key>CFBundleName</key>
+        <string>Fasakhansta</string>
+        <key>CFBundlePackageType</key>
+        <string>APPL</string>
+        <key>CFBundleShortVersionString</key>
+        <string>$(FLUTTER_BUILD_NAME)</string>
+        <key>CFBundleSignature</key>
+        <string>????</string>
+        <key>CFBundleVersion</key>
+        <string>$(FLUTTER_BUILD_NUMBER)</string>
+
+        <!-- iOS Platform Requirements -->
+        <key>LSRequiresIPhoneOS</key>
+        <true/>
+        <!-- Launch Screen -->
+        <key>UILaunchStoryboardName</key>
+        <string>LaunchScreen</string>
+
+        <!-- UI Configuration -->
+        <key>UIMainStoryboardFile</key>
+        <string>Main</string>
+        <key>UISupportedInterfaceOrientations</key>
+        <array>
+            <string>UIInterfaceOrientationPortrait</string>
+            <string>UIInterfaceOrientationLandscapeLeft</string>
+            <string>UIInterfaceOrientationLandscapeRight</string>
+        </array>
+        <key>UISupportedInterfaceOrientations~ipad</key>
+        <array>
+            <string>UIInterfaceOrientationPortrait</string>
+            <string>UIInterfaceOrientationPortraitUpsideDown</string>
+            <string>UIInterfaceOrientationLandscapeLeft</string>
+            <string>UIInterfaceOrientationLandscapeRight</string>
+        </array>
+        <key>UIStatusBarHidden</key>
+        <false/>
+        <key>UIViewControllerBasedStatusBarAppearance</key>
+        <false/>
+        <key>UIApplicationSupportsIndirectInputEvents</key>
+        <true/>
+        <key>CADisableMinimumFrameDurationOnPhone</key>
+        <true/>
+
+        <!-- Background Modes -->
+        <key>UIBackgroundModes</key>
+        <array>
+            <string>fetch</string>
+            <string>location</string>
+            <string>audio</string>
+            <string>remote-notification</string>
+        </array>
+
+        <!-- Security and Networking -->
+        <key>NSAppTransportSecurity</key>
+        <dict>
+            <key>NSAllowsArbitraryLoads</key>
+            <true/>
+        </dict>
+
+        <!-- Permissions Usage Descriptions -->
+        <key>NSFaceIDUsageDescription</key>
+        <string>Authentication is required for secure access using Face ID.</string>
+
+        <key>NSBluetoothAlwaysUsageDescription</key>
+        <string>This app needs Bluetooth access to connect to nearby devices for printing and location-based features.</string>
+
+        <key>NSCameraUsageDescription</key>
+        <string>This app requires access to your camera to capture photos for projects, tasks, and profile images.</string>
+
+        <key>NSMicrophoneUsageDescription</key>
+        <string>This app uses your microphone when recording or scanning text via the camera.</string>
+
+        <key>NSMotionUsageDescription</key>
+        <string>This app uses motion data to enhance barcode scanning functionality.</string>
+
+        <key>NSPhotoLibraryUsageDescription</key>
+        <string>This app needs access to your photo library to choose or edit profile images.</string>
+
+        <key>NSPhotoLibraryAddUsageDescription</key>
+        <string>This app needs permission to save edited or new photos to your library.</string>
+
+        <!-- Location Permissions -->
+        <key>NSLocationWhenInUseUsageDescription</key>
+        <string>This app needs your location to show data and features relevant to your area.</string>
+        <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+        <string>This app needs your location to show data and features relevant to your area.</string>
+        <key>NSLocationAlwaysUsageDescription</key>
+        <string>This app needs your location to show data and features relevant to your area.</string>
+
+        <key>NSBonjourServices</key>
+        <array>
+            <string>_dartVmService._tcp</string>
+            <string>_dartobservatory._tcp</string>
+        </array>
+        <key>NSAppleMusicUsageDescription</key>
+        <string>This app needs access to your Apple Music library to play music.</string>
+
+        <key>NSCalendarsUsageDescription</key>
+        <string>This app needs access to your calendar to create events.</string>
+        <key>NSContactsUsageDescription</key>
+        <string>This app needs access to contacts to connect with friends.</string>
+        <key>NSLocalNetworkUsageDescription</key>
+        <string>This app uses local network access for Flutter debugging features such as hot reload and DevTools during development.</string>
+        <key>NSRemindersUsageDescription</key>
+        <string>This app needs access to your reminders to create reminders.</string>
+        <key>NSSupportsLiveActivities</key>
+        <true/>
+        <key>NSSupportsLiveActivitiesFrequentUpdates</key>
+        <true/>
+
+        <!-- Social Auth Configuration -->
+        <key>CFBundleURLTypes</key>
+        <array>
+            <!-- Google Sign-in -->
+            <dict>
+                <key>CFBundleTypeRole</key>
+                <string>Editor</string>
+                <key>CFBundleURLSchemes</key>
+                <array>
+                    <string>com.googleusercontent.apps.224648167390-mn9e3ukrrdukvudoepad5o3vlv3pej46</string>
+                </array>
+            </dict>
+            <!-- Facebook Sign-in -->
+            <dict>
+                <key>CFBundleURLSchemes</key>
+                <array>
+                    <string>fb997704678612295</string>
+                </array>
+            </dict>
+        </array>
+        <key>FacebookAppID</key>
+        <string>997704678612295</string>
+        <key>FacebookClientToken</key>
+        <string>1cc9db59ede1d8747925fa27d7528160</string>
+        <key>FacebookDisplayName</key>
+        <string>Fasakhansta</string>
+        <key>LSApplicationQueriesSchemes</key>
+        <array>
+            <string>fbapi</string>
+            <string>fb-messenger-share-api</string>
+            <string>fbauth2</string>
+            <string>fbshareextension</string>
+        </array>
+
+    </dict>
+</plist>

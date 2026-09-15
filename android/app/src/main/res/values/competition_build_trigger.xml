@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Build trigger for the competition UI/API integration review. -->
+    <string name="competition_build_trigger">2026-08-29</string>
+</resources>

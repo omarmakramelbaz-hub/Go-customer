@@ -1,0 +1,148 @@
+name: faskhaninja
+description: "A new Flutter project."
+publish_to: 'none'
+
+#android
+version: 1.0.54+56
+
+#ios
+#version: 2.0.6+56
+
+environment:
+  sdk: ^3.6.0
+#  sdk: ^3.9.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+  bot_toast: ^4.1.3
+  country_picker: ^2.0.27
+  hive_flutter: ^1.1.0
+  hive: ^2.2.3
+  provider: ^6.1.5+1
+  timeago: ^3.7.1
+  flutter_svg: ^2.2.3
+  intl: ^0.20.2
+  pinput: ^6.0.2
+  cached_network_image: ^3.4.1
+  loading_animation_widget: ^1.3.0
+  shimmer: ^3.0.0
+  carousel_slider: ^5.1.1
+  smooth_page_indicator: ^2.0.1
+  photo_view: ^0.15.0
+  image_picker: ^1.2.1
+  dio: ^5.9.1
+  http: ^1.6.0
+  path: ^1.9.1
+  pretty_dio_logger: ^1.4.0
+  logger: ^2.6.2
+  internet_connection_checker_plus: ^2.9.1+2
+  url_launcher: ^6.3.2
+  custom_timer: ^0.2.3
+  flutter_staggered_grid_view: ^0.7.0
+  timeline_tile: ^2.0.0
+  flutter_html: ^3.0.0
+  flutter_svg_provider: ^1.0.7
+  geolocator: ^14.0.2
+  geocoding: ^4.0.0
+  google_maps_flutter: ^2.9.0
+  location: ^8.0.1
+  skeletonizer: ^2.1.2
+  googleapis: ^15.0.0
+  googleapis_auth: ^2.0.0
+  firebase_core: ^4.4.0
+  flutter_local_notifications: ^19.5.0
+  firebase_messaging: ^16.0.4
+  cloud_firestore: ^6.1.0
+  collection: ^1.18.0
+  uuid: ^4.5.2
+  grouped_list: ^6.0.0
+  flutter_inappwebview: ^6.1.5
+#  webview_flutter: ^4.13.1
+#  webview_flutter_android: ^4.10.11
+#  webview_flutter_wkwebview: ^3.23.5
+  flutter_polyline_points: ^2.0.0
+  defer_pointer: ^0.0.2
+  pusher_channels_flutter: ^2.6.0
+#  nested: ^1.0.0
+  upgrader: ^12.5.0
+  local_auth: ^3.0.0
+  percent_indicator: ^4.2.5
+  video_player: ^2.9.2
+
+  sign_in_with_apple: ^7.0.1
+  google_sign_in: ^6.2.1
+  flutter_facebook_auth: ^7.1.2
+  live_activities: ^2.4.6
+  permission_handler: ^12.0.1
+#  pay: ^3.3.0
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/langs/
+    - assets/images/
+    - assets/svg/
+    - assets/gif/
+    - assets/global_icon/
+    - assets/
+    - assets/map_styles/
+    - assets/images/delivery_bike.png
+    - assets/payment/
+    - assets/splash_video/
+
+  fonts:
+    - family: Roboto
+      fonts:
+        - asset: assets/font/Roboto/Roboto-Regular.ttf
+          weight: 400
+        - asset: assets/font/Roboto/Roboto-Medium.ttf
+          weight: 500
+        - asset: assets/font/Roboto/Roboto-Bold.ttf
+          weight: 700
+        - asset: assets/font/Roboto/Roboto-Black.ttf
+          weight: 900
+    - family: Tajawal
+      fonts:
+        - asset: assets/font/Tajawal/Tajawal-Regular.ttf
+          weight: 400
+        - asset: assets/font/Tajawal/Tajawal-Medium.ttf
+          weight: 500
+        - asset: assets/font/Tajawal/Tajawal-Bold.ttf
+          weight: 700
+        - asset: assets/font/Tajawal/Tajawal-Black.ttf
+          weight: 900
+
+
+#flutter_launcher_icons:
+#  image_path: "assets/images/logo.png"
+#
+#  android: "launcher_icon"
+#  min_sdk_android: 21
+#
+#  ios: true
+#  remove_alpha_ios: true
+#  adaptive_icon_foreground: "assets/images/logo.png"
+#  adaptive_icon_background: "assets/images/logo.png"
+
+#flutter_native_splash:
+#  color: "#e85504"
+#  image: assets/images/transparent.png
+#  android_12:
+#    color: "#e85504"
+#    image: assets/images/transparent.png
+#  android: true
+#  ios: true
+#  color_android: "#e85504"
+#  color_ios: "#e85504"

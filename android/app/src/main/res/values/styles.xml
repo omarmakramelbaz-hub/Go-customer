@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Native launch surface. Flutter keeps this visible until the opening
+         video texture is initialized, preventing a second plain-color splash. -->
+    <style name="LaunchTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowBackground">@color/splashBackground</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:forceDarkAllowed">false</item>
+        <item name="android:windowFullscreen">false</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">false</item>
+        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+    </style>
+
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    </style>
+
+    <!-- Approximate the top of the first frame of opening_hq.mp4. -->
+    <color name="splashBackground">#3788B6</color>
+    <color name="primaryColor">#FD7201</color>
+</resources>

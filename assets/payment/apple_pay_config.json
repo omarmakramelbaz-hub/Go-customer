@@ -1,0 +1,26 @@
+{
+    "provider": "apple_pay",
+    "data": {
+        "merchantIdentifier": "merchant.com.faskhaninja.clients",
+        "displayName": "Faskha Ninja",
+        "merchantCapabilities": [
+            "3DS",
+            "debit",
+            "credit"
+        ],
+        "supportedNetworks": [
+            "amex",
+            "visa",
+            "masterCard"
+        ],
+        "countryCode": "EG",
+        "currencyCode": "EGP",
+        "requiredBillingContactFields": [
+            "email",
+            "name",
+            "phoneNumber",
+            "postalAddress"
+        ],
+        "requiredShippingContactFields": []
+    }
+}
