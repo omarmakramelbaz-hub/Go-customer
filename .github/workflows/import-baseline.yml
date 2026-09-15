@@ -25,6 +25,8 @@ jobs:
             --exclude='README.md' \
             --exclude='android/app/FaskhaNinja-keystore.jks' \
             --exclude='android/key.properties' \
+            --exclude='fire.json' \
+            --exclude='lib/helpers/networking/faskhaninja-020cf2bdb60e.json' \
             /tmp/fasakhansta-customer/ ./
 
       - name: Preserve standalone identity notes
@@ -35,6 +37,7 @@ jobs:
           The original Fasakhansta Customer repository remains unchanged and continues to include Go Drive.
           Standalone target: Go Drive / com.fasakhansta.godrive.customer
           Primary feature: lib/view/layout/request_delegate
+          Service-account credentials and signing keys are intentionally excluded from source control.
           EOF
 
       - name: Commit imported baseline
