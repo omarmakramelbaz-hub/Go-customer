@@ -1,6 +1,9 @@
 name: Import Go Drive baseline
 
 on:
+  push:
+    paths:
+      - '.github/workflows/import-baseline.yml'
   workflow_dispatch:
 
 permissions:
