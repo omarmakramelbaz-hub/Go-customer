@@ -1,9 +1,6 @@
 name: Import Go Drive baseline
 
 on:
-  push:
-    paths:
-      - '.github/workflows/import-baseline.yml'
   workflow_dispatch:
 
 permissions:
@@ -20,8 +17,15 @@ jobs:
 
       - name: Clone Fasakhansta Customer baseline
         run: |
+          rm -rf /tmp/fasakhansta-customer
           git clone --depth 1 https://github.com/omarmakramelbaz-hub/fasakhansta-customer.git /tmp/fasakhansta-customer
-          rsync -a --delete --exclude='.git/' --exclude='.github/' --exclude='README.md' /tmp/fasakhansta-customer/ ./
+          rsync -a \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            --exclude='README.md' \
+            --exclude='android/app/FaskhaNinja-keystore.jks' \
+            --exclude='android/key.properties' \
+            /tmp/fasakhansta-customer/ ./
 
       - name: Preserve standalone identity notes
         run: |
@@ -44,5 +48,3 @@ jobs:
             git commit -m 'Import Flutter baseline for standalone Go Drive customer'
             git push origin HEAD:main
           fi
-
-# trigger: baseline-import-v1
