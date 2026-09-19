@@ -5,13 +5,15 @@ import '../../../helpers/hive/hive_methods.dart';
 import '../../../helpers/routes/app_routers_import.dart';
 import '../../../helpers/theme/app_colors.dart';
 import '../../../helpers/translation/all_translation.dart';
-import '../../custom_widgets/go_drive_brand.dart';
-import '../my_account/screen/my_account_screen.dart';
 import '../auth/screen/login_screen.dart';
-import '../request_delegate/screen/request_delegate_screen.dart';
+import '../favorite/screen/favorite_screen.dart';
+import '../home/screen/go_services_home_screen.dart';
+import '../my_account/screen/my_account_screen.dart';
 import '../notifications/controller/notifications_controller.dart';
 import '../notifications/screen/notifications_screen.dart';
 import '../request_delegate/screen/delegats_orders_screen.dart';
+import '../wallet/controller/wallet_controller.dart';
+import '../wallet/screen/wallet_screen.dart';
 import 'controller/bottom_navigation_controller.dart';
 
 class BottomNavigationBarScreen extends StatelessWidget {
@@ -21,18 +23,35 @@ class BottomNavigationBarScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => ChangeNotifierProvider(
     create: (_) => BottomNavigationController(),
-    child: const _GoDriveShell(),
+    child: const _GoServicesShell(),
   );
 }
 
-class _GoDriveShell extends StatefulWidget {
-  const _GoDriveShell();
+class _GoServicesShell extends StatefulWidget {
+  const _GoServicesShell();
+
   @override
-  State<_GoDriveShell> createState() => _GoDriveShellState();
+  State<_GoServicesShell> createState() => _GoServicesShellState();
 }
 
-class _GoDriveShellState extends State<_GoDriveShell> {
+class _GoServicesShellState extends State<_GoServicesShell> {
   final Set<int> _visited = {0};
+
+  void _openNotifications() {
+    if (HiveMethods.getToken() == null) {
+      NamedNavigatorImpl.push(LoginScreen.routeName);
+      return;
+    }
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => ChangeNotifierProvider(
+          create: (_) => NotificationsController()..getNotifications(),
+          child: const NotificationsScreen(),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,127 +59,107 @@ class _GoDriveShellState extends State<_GoDriveShell> {
     final ar = context.languageCode == 'ar';
     final authenticated = HiveMethods.getToken() != null;
     _visited.add(nav.screenIndex);
+
     return PopScope(
       canPop: nav.screenIndex == 0,
       onPopInvokedWithResult: (didPop, _) {
         if (!didPop) nav.updateIndex(0);
       },
       child: Scaffold(
+        backgroundColor: const Color(0xFFF6F7F9),
         body: IndexedStack(
           index: nav.screenIndex,
           children: [
-            authenticated
-                ? const RequestDelegateScreen(showBackButton: false)
-                : const _GuestHome(),
+            GoServicesHomeScreen(onOpenNotifications: _openNotifications),
             if (_visited.contains(1) && authenticated)
               const DelegateOrdersScreen()
             else
               const SizedBox.shrink(),
             if (_visited.contains(2) && authenticated)
               ChangeNotifierProvider(
-                create: (_) => NotificationsController()..getNotifications(),
-                child: const NotificationsScreen(),
+                create: (_) => WalletController()
+                  ..initialWallet()
+                  ..getWallet(),
+                child: const WalletScreen(),
               )
             else
               const SizedBox.shrink(),
-            if (_visited.contains(3))
+            if (_visited.contains(3) && authenticated)
+              const FavoriteScreen()
+            else
+              const SizedBox.shrink(),
+            if (_visited.contains(4))
               const MyAccountScreen()
             else
               const SizedBox.shrink(),
           ],
         ),
-        bottomNavigationBar: NavigationBar(
-          selectedIndex: nav.screenIndex,
-          backgroundColor: Colors.white,
-          indicatorColor: const Color(0xFFFFE8D8),
-          onDestinationSelected: (index) {
-            if (!authenticated && (index == 1 || index == 2)) {
-              NamedNavigatorImpl.push(LoginScreen.routeName);
-              return;
-            }
-            nav.updateIndex(index);
-          },
-          destinations: [
-            NavigationDestination(
-              icon: const Icon(Icons.delivery_dining_outlined),
-              selectedIcon: Icon(
-                Icons.delivery_dining,
-                color: AppColors.mainAppColor,
+        bottomNavigationBar: NavigationBarTheme(
+          data: NavigationBarThemeData(
+            height: 72,
+            backgroundColor: Colors.white,
+            indicatorColor: const Color(0xFFFFE9DA),
+            labelTextStyle: WidgetStateProperty.resolveWith((states) {
+              final selected = states.contains(WidgetState.selected);
+              return TextStyle(
+                color:
+                    selected ? AppColors.mainAppColor : const Color(0xFF626A72),
+                fontSize: 11,
+                fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+              );
+            }),
+          ),
+          child: NavigationBar(
+            selectedIndex: nav.screenIndex,
+            onDestinationSelected: (index) {
+              if (!authenticated && (index == 1 || index == 2 || index == 3)) {
+                NamedNavigatorImpl.push(LoginScreen.routeName);
+                return;
+              }
+              nav.updateIndex(index);
+            },
+            destinations: [
+              NavigationDestination(
+                icon: const Icon(Icons.home_outlined),
+                selectedIcon: Icon(
+                  Icons.home_rounded,
+                  color: AppColors.mainAppColor,
+                ),
+                label: ar ? 'الرئيسية' : 'Home',
               ),
-              label: ar ? 'اطلب مندوب' : 'Book',
-            ),
-            NavigationDestination(
-              icon: const Icon(Icons.receipt_long_outlined),
-              label: ar ? 'طلباتي' : 'Orders',
-            ),
-            NavigationDestination(
-              icon: const Icon(Icons.notifications_none_rounded),
-              label: ar ? 'الإشعارات' : 'Notifications',
-            ),
-            NavigationDestination(
-              icon: const Icon(Icons.person_outline_rounded),
-              label: ar ? 'حسابي' : 'Account',
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _GuestHome extends StatelessWidget {
-  const _GuestHome();
-
-  @override
-  Widget build(BuildContext context) {
-    final ar = context.languageCode == 'ar';
-    return Scaffold(
-      backgroundColor: const Color(0xFFF7F8FA),
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              children: [
-                const GoDriveBrand(size: 48),
-                const SizedBox(height: 24),
-                Image.asset(
-                  'assets/images/deliveryRiderV2.png',
-                  height: 190,
-                  fit: BoxFit.contain,
+              NavigationDestination(
+                icon: const Icon(Icons.receipt_long_outlined),
+                selectedIcon: Icon(
+                  Icons.receipt_long_rounded,
+                  color: AppColors.mainAppColor,
                 ),
-                const SizedBox(height: 24),
-                Text(
-                  ar ? 'محتاج توصل حاجة؟' : 'Need something delivered?',
-                  style: const TextStyle(
-                    fontSize: 25,
-                    fontWeight: FontWeight.w800,
-                  ),
+                label: ar ? 'طلباتي' : 'Orders',
+              ),
+              NavigationDestination(
+                icon: const Icon(Icons.account_balance_wallet_outlined),
+                selectedIcon: Icon(
+                  Icons.account_balance_wallet_rounded,
+                  color: AppColors.mainAppColor,
                 ),
-                const SizedBox(height: 12),
-                Text(
-                  ar
-                      ? 'حدّد الاستلام والتسليم، اطلب مندوب، وتابع طلبك خطوة بخطوة.'
-                      : 'Choose pickup and drop-off, request a courier, and track your delivery.',
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 16, height: 1.6),
+                label: ar ? 'المحفظة' : 'Wallet',
+              ),
+              NavigationDestination(
+                icon: const Icon(Icons.favorite_border_rounded),
+                selectedIcon: Icon(
+                  Icons.favorite_rounded,
+                  color: AppColors.mainAppColor,
                 ),
-                const SizedBox(height: 24),
-                FilledButton.icon(
-                  style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.mainAppColor,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 32,
-                      vertical: 16,
-                    ),
-                  ),
-                  onPressed: () =>
-                      NamedNavigatorImpl.push(LoginScreen.routeName),
-                  icon: const Icon(Icons.delivery_dining),
-                  label: Text(ar ? 'اطلب مندوب' : 'Request a courier'),
+                label: ar ? 'المفضلة' : 'Favorites',
+              ),
+              NavigationDestination(
+                icon: const Icon(Icons.person_outline_rounded),
+                selectedIcon: Icon(
+                  Icons.person_rounded,
+                  color: AppColors.mainAppColor,
                 ),
-              ],
-            ),
+                label: ar ? 'حسابي' : 'Account',
+              ),
+            ],
           ),
         ),
       ),
