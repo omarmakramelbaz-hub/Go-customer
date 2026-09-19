@@ -7,6 +7,7 @@ import '../../../../helpers/theme/app_colors.dart';
 import '../../../../helpers/translation/all_translation.dart';
 import '../../auth/controller/auth_controller.dart';
 import '../../request_delegate/screen/request_delegate_screen.dart';
+import '../widgets/service_photo_sprite.dart';
 
 class GoServicesHomeScreen extends StatefulWidget {
   const GoServicesHomeScreen({
@@ -40,6 +41,7 @@ class _GoServicesHomeScreenState extends State<GoServicesHomeScreen> {
       enSubtitle: 'Pickup and delivery',
       icon: Icons.delivery_dining_rounded,
       accent: Color(0xFFFF6500),
+      imageIndex: 0,
       isDelivery: true,
     ),
     _ServiceItem(
@@ -49,6 +51,7 @@ class _GoServicesHomeScreenState extends State<GoServicesHomeScreen> {
       enSubtitle: 'Repair and maintenance',
       icon: Icons.home_repair_service_rounded,
       accent: Color(0xFF327FE7),
+      imageIndex: 1,
     ),
     _ServiceItem(
       arTitle: 'سباك',
@@ -57,6 +60,7 @@ class _GoServicesHomeScreenState extends State<GoServicesHomeScreen> {
       enSubtitle: 'Plumbing services',
       icon: Icons.plumbing_rounded,
       accent: Color(0xFF0B9BB5),
+      imageIndex: 2,
     ),
     _ServiceItem(
       arTitle: 'نقاش',
@@ -65,6 +69,7 @@ class _GoServicesHomeScreenState extends State<GoServicesHomeScreen> {
       enSubtitle: 'Painting and finishing',
       icon: Icons.format_paint_rounded,
       accent: Color(0xFF8B5CF6),
+      imageIndex: 3,
     ),
     _ServiceItem(
       arTitle: 'فني تركيب بلاط',
@@ -73,6 +78,7 @@ class _GoServicesHomeScreenState extends State<GoServicesHomeScreen> {
       enSubtitle: 'Tile installation',
       icon: Icons.grid_view_rounded,
       accent: Color(0xFF5C6BC0),
+      imageIndex: 4,
     ),
     _ServiceItem(
       arTitle: 'فني تركيب رخام',
@@ -81,6 +87,7 @@ class _GoServicesHomeScreenState extends State<GoServicesHomeScreen> {
       enSubtitle: 'Marble installation',
       icon: Icons.square_foot_rounded,
       accent: Color(0xFF8D6E63),
+      imageIndex: 5,
     ),
     _ServiceItem(
       arTitle: 'حداد',
@@ -89,6 +96,7 @@ class _GoServicesHomeScreenState extends State<GoServicesHomeScreen> {
       enSubtitle: 'Metal work and repair',
       icon: Icons.construction_rounded,
       accent: Color(0xFF455A64),
+      imageIndex: 6,
     ),
     _ServiceItem(
       arTitle: 'كهربائي',
@@ -97,6 +105,7 @@ class _GoServicesHomeScreenState extends State<GoServicesHomeScreen> {
       enSubtitle: 'Electrical services',
       icon: Icons.electrical_services_rounded,
       accent: Color(0xFFF2A900),
+      imageIndex: 7,
     ),
     _ServiceItem(
       arTitle: 'فني تركيب وصيانة الدش',
@@ -105,6 +114,7 @@ class _GoServicesHomeScreenState extends State<GoServicesHomeScreen> {
       enSubtitle: 'Satellite install and repair',
       icon: Icons.satellite_alt_rounded,
       accent: Color(0xFF1565C0),
+      imageIndex: 8,
     ),
     _ServiceItem(
       arTitle: 'نجار أثاث',
@@ -113,6 +123,7 @@ class _GoServicesHomeScreenState extends State<GoServicesHomeScreen> {
       enSubtitle: 'Furniture carpentry',
       icon: Icons.carpenter_rounded,
       accent: Color(0xFFA56A2A),
+      imageIndex: 9,
     ),
     _ServiceItem(
       arTitle: 'فني تكييف',
@@ -121,6 +132,7 @@ class _GoServicesHomeScreenState extends State<GoServicesHomeScreen> {
       enSubtitle: 'AC installation and repair',
       icon: Icons.ac_unit_rounded,
       accent: Color(0xFF29A3E8),
+      imageIndex: 10,
     ),
     _ServiceItem(
       arTitle: 'عامل بناء',
@@ -129,6 +141,7 @@ class _GoServicesHomeScreenState extends State<GoServicesHomeScreen> {
       enSubtitle: 'Building and site work',
       icon: Icons.engineering_rounded,
       accent: Color(0xFFE67E22),
+      imageIndex: 11,
     ),
     _ServiceItem(
       arTitle: 'ميكانيكي سيارات',
@@ -137,6 +150,7 @@ class _GoServicesHomeScreenState extends State<GoServicesHomeScreen> {
       enSubtitle: 'Car repair and service',
       icon: Icons.car_repair_rounded,
       accent: Color(0xFF37474F),
+      imageIndex: 12,
     ),
     _ServiceItem(
       arTitle: 'كهربائي سيارات',
@@ -145,6 +159,7 @@ class _GoServicesHomeScreenState extends State<GoServicesHomeScreen> {
       enSubtitle: 'Automotive electrical',
       icon: Icons.electric_car_rounded,
       accent: Color(0xFF546E7A),
+      imageIndex: 12,
     ),
     _ServiceItem(
       arTitle: 'كوافير رجالي',
@@ -153,6 +168,7 @@ class _GoServicesHomeScreenState extends State<GoServicesHomeScreen> {
       enSubtitle: 'Men grooming',
       icon: Icons.content_cut_rounded,
       accent: Color(0xFF263238),
+      imageIndex: 13,
     ),
     _ServiceItem(
       arTitle: 'كوافيرة سيدات',
@@ -161,6 +177,7 @@ class _GoServicesHomeScreenState extends State<GoServicesHomeScreen> {
       enSubtitle: 'Women beauty and hair',
       icon: Icons.face_retouching_natural_rounded,
       accent: Color(0xFFE4487C),
+      imageIndex: 13,
     ),
     _ServiceItem(
       arTitle: 'خياط',
@@ -169,6 +186,7 @@ class _GoServicesHomeScreenState extends State<GoServicesHomeScreen> {
       enSubtitle: 'Tailoring and alterations',
       icon: Icons.checkroom_rounded,
       accent: Color(0xFFB98638),
+      imageIndex: 14,
     ),
     _ServiceItem(
       arTitle: 'عامل نظافة',
@@ -177,6 +195,7 @@ class _GoServicesHomeScreenState extends State<GoServicesHomeScreen> {
       enSubtitle: 'Home and office cleaning',
       icon: Icons.cleaning_services_rounded,
       accent: Color(0xFF00A6A6),
+      imageIndex: 15,
     ),
     _ServiceItem(
       arTitle: 'عاملة نظافة',
@@ -185,6 +204,7 @@ class _GoServicesHomeScreenState extends State<GoServicesHomeScreen> {
       enSubtitle: 'Home and office cleaning',
       icon: Icons.cleaning_services_rounded,
       accent: Color(0xFF7CB342),
+      imageIndex: 15,
     ),
   ];
 
@@ -1010,9 +1030,9 @@ class _GoServicesHomeScreenState extends State<GoServicesHomeScreen> {
               itemCount: filtered.length,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 3,
-                mainAxisSpacing: 11,
+                mainAxisSpacing: 12,
                 crossAxisSpacing: 11,
-                childAspectRatio: .88,
+                childAspectRatio: .68,
               ),
               itemBuilder: (_, index) => _serviceCard(filtered[index]),
             ),
@@ -1082,59 +1102,69 @@ class _GoServicesHomeScreenState extends State<GoServicesHomeScreen> {
         onTap: () => _openService(service),
         borderRadius: BorderRadius.circular(20),
         child: Container(
-          padding: const EdgeInsets.fromLTRB(7, 11, 7, 8),
+          padding: const EdgeInsets.fromLTRB(7, 7, 7, 8),
           decoration: BoxDecoration(
+            color: Colors.white,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
               color: service.isDelivery
-                  ? AppColors.mainAppColor.withOpacity(.42)
+                  ? AppColors.mainAppColor.withOpacity(.55)
                   : _line,
-              width: service.isDelivery ? 1.25 : 1,
+              width: service.isDelivery ? 1.35 : 1,
             ),
             boxShadow: const [
               BoxShadow(
-                color: Color(0x09000000),
-                blurRadius: 12,
-                offset: Offset(0, 4),
+                color: Color(0x0C000000),
+                blurRadius: 14,
+                offset: Offset(0, 5),
               ),
             ],
           ),
           child: Column(
             children: [
-              Container(
-                width: 47,
-                height: 47,
-                decoration: BoxDecoration(
-                  color: service.accent.withOpacity(.10),
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Icon(service.icon, color: service.accent, size: 25),
+              _ServiceSpritePhoto(
+                index: service.imageIndex,
+                badgeIcon: service.icon,
+                badgeColor: service.accent,
+                highlight: service.isDelivery,
               ),
-              const SizedBox(height: 9),
-              Text(
-                _ar ? service.arTitle : service.enTitle,
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: _ink,
-                  fontSize: 11.5,
-                  fontWeight: FontWeight.w900,
-                  height: 1.25,
+              const SizedBox(height: 8),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 2),
+                child: Text(
+                  _ar ? service.arTitle : service.enTitle,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: _ink,
+                    fontSize: 11.4,
+                    fontWeight: FontWeight.w900,
+                    height: 1.23,
+                  ),
                 ),
               ),
               const Spacer(),
               Align(
-                alignment:
-                    _ar ? Alignment.centerLeft : Alignment.centerRight,
-                child: Icon(
-                  _ar
-                      ? Icons.arrow_back_ios_new_rounded
-                      : Icons.arrow_forward_ios_rounded,
-                  size: 12,
-                  color: service.isDelivery
-                      ? AppColors.mainAppColor
-                      : const Color(0xFFAFB6BC),
+                alignment: _ar ? Alignment.centerLeft : Alignment.centerRight,
+                child: Container(
+                  width: 24,
+                  height: 24,
+                  decoration: BoxDecoration(
+                    color: service.isDelivery
+                        ? AppColors.mainAppColor
+                        : const Color(0xFFF3F5F6),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    _ar
+                        ? Icons.arrow_back_ios_new_rounded
+                        : Icons.arrow_forward_ios_rounded,
+                    size: 11,
+                    color: service.isDelivery
+                        ? Colors.white
+                        : const Color(0xFF9AA2A9),
+                  ),
                 ),
               ),
             ],
@@ -1651,6 +1681,101 @@ class _GoHeroBackgroundPainter extends CustomPainter {
   }
 }
 
+class _ServiceSpritePhoto extends StatelessWidget {
+  const _ServiceSpritePhoto({
+    required this.index,
+    required this.badgeIcon,
+    required this.badgeColor,
+    required this.highlight,
+  });
+
+  final int index;
+  final IconData badgeIcon;
+  final Color badgeColor;
+  final bool highlight;
+
+  @override
+  Widget build(BuildContext context) {
+    final column = index % 4;
+    final row = index ~/ 4;
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final cellWidth = constraints.maxWidth;
+        final cellHeight = cellWidth * (120 / 180);
+
+        return SizedBox(
+          width: cellWidth,
+          height: cellHeight,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(15),
+            child: Stack(
+              clipBehavior: Clip.hardEdge,
+              children: [
+                Positioned(
+                  left: -column * cellWidth,
+                  top: -row * cellHeight,
+                  width: cellWidth * 4,
+                  height: cellHeight * 4,
+                  child: Image.memory(
+                    goServiceSpriteBytes,
+                    fit: BoxFit.fill,
+                    gaplessPlayback: true,
+                    filterQuality: FilterQuality.high,
+                  ),
+                ),
+                Positioned.fill(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.transparent,
+                          Colors.black.withOpacity(.05),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: 6,
+                  right: 6,
+                  child: Container(
+                    width: 27,
+                    height: 27,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(.94),
+                      borderRadius: BorderRadius.circular(9),
+                      border: Border.all(
+                        color: highlight
+                            ? AppColors.mainAppColor.withOpacity(.28)
+                            : Colors.white.withOpacity(.55),
+                      ),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Color(0x1F000000),
+                          blurRadius: 8,
+                          offset: Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: Icon(
+                      badgeIcon,
+                      size: 15,
+                      color: badgeColor,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
 class _ServiceItem {
   const _ServiceItem({
     required this.arTitle,
@@ -1659,6 +1784,7 @@ class _ServiceItem {
     required this.enSubtitle,
     required this.icon,
     required this.accent,
+    required this.imageIndex,
     this.isDelivery = false,
   });
 
@@ -1668,5 +1794,6 @@ class _ServiceItem {
   final String enSubtitle;
   final IconData icon;
   final Color accent;
+  final int imageIndex;
   final bool isDelivery;
 }
