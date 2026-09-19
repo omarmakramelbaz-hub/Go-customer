@@ -411,7 +411,7 @@ class _GoServicesHomeScreenState extends State<GoServicesHomeScreen> {
               SliverToBoxAdapter(child: _premium()),
               SliverToBoxAdapter(child: _offers()),
               SliverToBoxAdapter(child: _trustStrip()),
-              const SliverToBoxAdapter(child: SizedBox(height: 26)),
+              const SliverToBoxAdapter(child: SizedBox(height: 54)),
             ],
           ),
         ),
@@ -528,7 +528,7 @@ class _GoServicesHomeScreenState extends State<GoServicesHomeScreen> {
       },
       borderRadius: BorderRadius.circular(18),
       child: Container(
-        constraints: const BoxConstraints(maxWidth: 145),
+        constraints: const BoxConstraints(minWidth: 158, maxWidth: 178),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -704,80 +704,71 @@ class _GoServicesHomeScreenState extends State<GoServicesHomeScreen> {
 
   Widget _hero() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 17),
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 18),
       child: InkWell(
         onTap: _openDelivery,
         borderRadius: BorderRadius.circular(28),
         child: Container(
-          height: 224,
+          height: 222,
           clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(28),
             gradient: const LinearGradient(
               begin: Alignment.centerRight,
               end: Alignment.centerLeft,
-              colors: [Color(0xFF122838), Color(0xFF06101A)],
+              colors: [Color(0xFF123047), Color(0xFF07131D)],
+            ),
+            border: Border.all(
+              color: const Color(0xFF1E4158),
+              width: .8,
             ),
             boxShadow: const [
               BoxShadow(
-                color: Color(0x24000000),
-                blurRadius: 20,
-                offset: Offset(0, 9),
+                color: Color(0x26000000),
+                blurRadius: 22,
+                offset: Offset(0, 10),
               ),
             ],
           ),
           child: Stack(
             children: [
-              Positioned(
-                left: -20,
-                top: 12,
-                bottom: 0,
-                width: 205,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: RadialGradient(
-                      center: Alignment.center,
-                      radius: .72,
-                      colors: [
-                        AppColors.mainAppColor.withOpacity(.28),
-                        Colors.transparent,
-                      ],
+              Positioned.fill(
+                child: IgnorePointer(
+                  child: CustomPaint(
+                    painter: _GoHeroBackgroundPainter(
+                      accent: AppColors.mainAppColor,
                     ),
                   ),
                 ),
               ),
-              Positioned(
-                left: -2,
-                bottom: 0,
-                width: 190,
-                height: 196,
-                child: Image.asset(
-                  'assets/images/deliveryRiderV2.png',
-                  fit: BoxFit.contain,
-                  filterQuality: FilterQuality.high,
-                ),
+              const Positioned(
+                left: 10,
+                top: 18,
+                bottom: 14,
+                width: 168,
+                child: _GoCourierHeroArt(),
               ),
               Positioned(
-                left: 152,
+                left: 155,
                 top: 0,
                 bottom: 0,
-                width: 86,
+                width: 92,
                 child: DecoratedBox(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
                         Colors.transparent,
-                        const Color(0xFF0A1721).withOpacity(.94),
+                        Color(0xF20A1823),
                       ],
                     ),
                   ),
                 ),
               ),
               Positioned(
-                right: 19,
-                top: 22,
-                bottom: 18,
-                width: 190,
+                right: 18,
+                top: 20,
+                bottom: 17,
+                width: 196,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -804,12 +795,12 @@ class _GoServicesHomeScreenState extends State<GoServicesHomeScreen> {
                     Text(
                       _ar ? 'طلباتك .. في أمان' : 'Your delivery is in safe hands',
                       style: TextStyle(
-                        color: Colors.white.withOpacity(.68),
+                        color: Colors.white.withOpacity(.70),
                         fontSize: 11.5,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 11),
                     Row(
                       children: [
                         _heroProof(Icons.star_rounded, _ar ? 'موثوق' : 'Trusted'),
@@ -821,11 +812,18 @@ class _GoServicesHomeScreenState extends State<GoServicesHomeScreen> {
                     ),
                     const Spacer(),
                     Container(
-                      height: 45,
-                      padding: const EdgeInsets.symmetric(horizontal: 18),
+                      height: 46,
+                      padding: const EdgeInsets.symmetric(horizontal: 19),
                       decoration: BoxDecoration(
                         color: AppColors.mainAppColor,
                         borderRadius: BorderRadius.circular(15),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.mainAppColor.withOpacity(.26),
+                            blurRadius: 14,
+                            offset: const Offset(0, 5),
+                          ),
+                        ],
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -842,7 +840,7 @@ class _GoServicesHomeScreenState extends State<GoServicesHomeScreen> {
                           const Icon(
                             Icons.arrow_back_rounded,
                             color: Colors.white,
-                            size: 19,
+                            size: 20,
                           ),
                         ],
                       ),
@@ -1337,6 +1335,232 @@ class _GoServicesHomeScreenState extends State<GoServicesHomeScreen> {
         ),
       ),
     );
+  }
+}
+
+class _GoCourierHeroArt extends StatelessWidget {
+  const _GoCourierHeroArt();
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        Positioned(
+          left: 8,
+          right: 8,
+          top: 10,
+          bottom: 10,
+          child: Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: RadialGradient(
+                colors: [
+                  const Color(0xFFFF6A00).withOpacity(.28),
+                  const Color(0xFFFF6A00).withOpacity(.06),
+                  Colors.transparent,
+                ],
+                stops: const [0, .55, 1],
+              ),
+            ),
+          ),
+        ),
+        Positioned(
+          left: 18,
+          bottom: 30,
+          child: Container(
+            width: 122,
+            height: 122,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: const Color(0xFF0F2534),
+              border: Border.all(
+                color: const Color(0xFFFF7A17).withOpacity(.58),
+                width: 1.3,
+              ),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x4A000000),
+                  blurRadius: 18,
+                  offset: Offset(0, 9),
+                ),
+              ],
+            ),
+            child: const Icon(
+              Icons.delivery_dining_rounded,
+              color: Color(0xFFFF6A00),
+              size: 82,
+            ),
+          ),
+        ),
+        Positioned(
+          right: 8,
+          top: 18,
+          child: _HeroBadge(
+            icon: Icons.inventory_2_rounded,
+            size: 42,
+          ),
+        ),
+        Positioned(
+          left: 1,
+          top: 45,
+          child: _HeroBadge(
+            icon: Icons.location_on_rounded,
+            size: 38,
+          ),
+        ),
+        Positioned(
+          right: 13,
+          bottom: 17,
+          child: _HeroBadge(
+            icon: Icons.bolt_rounded,
+            size: 36,
+          ),
+        ),
+        Positioned(
+          left: 34,
+          bottom: 7,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFF6A00),
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x33000000),
+                  blurRadius: 10,
+                  offset: Offset(0, 4),
+                ),
+              ],
+            ),
+            child: const Text(
+              'GO',
+              style: TextStyle(
+                color: Colors.white,
+                fontFamily: 'Roboto',
+                fontStyle: FontStyle.italic,
+                fontSize: 15,
+                fontWeight: FontWeight.w900,
+                letterSpacing: -.4,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _HeroBadge extends StatelessWidget {
+  const _HeroBadge({
+    required this.icon,
+    required this.size,
+  });
+
+  final IconData icon;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: const Color(0xFF173246).withOpacity(.96),
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: Colors.white.withOpacity(.16),
+        ),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x30000000),
+            blurRadius: 10,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Icon(
+        icon,
+        color: const Color(0xFFFFA45C),
+        size: size * .48,
+      ),
+    );
+  }
+}
+
+class _GoHeroBackgroundPainter extends CustomPainter {
+  const _GoHeroBackgroundPainter({required this.accent});
+
+  final Color accent;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final route = Paint()
+      ..color = Colors.white.withOpacity(.075)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.2
+      ..strokeCap = StrokeCap.round;
+
+    final glow = Paint()
+      ..color = accent.withOpacity(.13)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 8
+      ..strokeCap = StrokeCap.round;
+
+    final path = Path()
+      ..moveTo(size.width * .03, size.height * .80)
+      ..cubicTo(
+        size.width * .10,
+        size.height * .56,
+        size.width * .24,
+        size.height * .68,
+        size.width * .29,
+        size.height * .43,
+      )
+      ..cubicTo(
+        size.width * .34,
+        size.height * .22,
+        size.width * .42,
+        size.height * .34,
+        size.width * .48,
+        size.height * .12,
+      );
+
+    canvas.drawPath(path, glow);
+    canvas.drawPath(path, route);
+
+    final dotPaint = Paint()..color = accent.withOpacity(.72);
+    for (final p in [
+      Offset(size.width * .04, size.height * .80),
+      Offset(size.width * .29, size.height * .43),
+      Offset(size.width * .48, size.height * .12),
+    ]) {
+      canvas.drawCircle(p, 3.5, dotPaint);
+      canvas.drawCircle(
+        p,
+        7.2,
+        Paint()..color = accent.withOpacity(.10),
+      );
+    }
+
+    final speed = Paint()
+      ..color = Colors.white.withOpacity(.055)
+      ..strokeWidth = 1.3
+      ..strokeCap = StrokeCap.round;
+
+    for (var i = 0; i < 5; i++) {
+      final y = size.height * (.22 + (i * .095));
+      canvas.drawLine(
+        Offset(size.width * .03, y),
+        Offset(size.width * (.13 + i * .012), y),
+        speed,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _GoHeroBackgroundPainter oldDelegate) {
+    return oldDelegate.accent != accent;
   }
 }
 
