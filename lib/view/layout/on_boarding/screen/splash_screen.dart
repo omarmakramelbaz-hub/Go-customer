@@ -11,6 +11,9 @@ import '../../../../helpers/theme/app_colors.dart';
 import '../../../../helpers/translation/all_translation.dart';
 import '../../../custom_widgets/go_drive_brand.dart';
 import '../../auth/controller/auth_controller.dart';
+import '../../auth/screen/login_screen.dart';
+import '../../auth/screen/create_new_account_screen.dart';
+import '../../bottom_navigation/bottom_navigation_bar_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
