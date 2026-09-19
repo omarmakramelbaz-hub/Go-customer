@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import '../model/location_info/location_info.dart';
@@ -8,7 +9,10 @@ import '../model/routes_modifiers.dart';
 
 class RoutesService {
   final String baseUrl = 'https://routes.googleapis.com/directions/v2:computeRoutes';
-  final String apiKey = 'AIzaSyDI7A2tkrafFzygQdLqrog0VLeF2JeejeQ';
+  static const String _webApiKey = String.fromEnvironment('MAPS_WEB_API_KEY');
+  final String apiKey = kIsWeb && _webApiKey.isNotEmpty
+      ? _webApiKey
+      : 'AIzaSyDI7A2tkrafFzygQdLqrog0VLeF2JeejeQ';
   Future<RoutesModel> fetchRoutes({
     required LocationInfoModel origin,
     required LocationInfoModel destination,
