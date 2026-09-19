@@ -43,6 +43,7 @@ class _SelectLocationFromMapScreenState
   static const _muted = Color(0xFF8D939C);
   static const _border = Color(0xFFE8EBEF);
   static const _softOrange = Color(0xFFFFF4E8);
+  static const double _locationZoom = 17.2;
 
   bool _isArabic(BuildContext context) => context.languageCode == 'ar';
 
@@ -125,11 +126,16 @@ class _SelectLocationFromMapScreenState
         return;
       }
 
-      final position = await Geolocator.getCurrentPosition();
+      final position = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+        ),
+      );
       await _updateLocation(
         position.latitude,
         position.longitude,
         updateController: false,
+        focusCamera: true,
       );
     } catch (e) {
       log('Failed to get location: $e');
@@ -142,6 +148,7 @@ class _SelectLocationFromMapScreenState
     double lat,
     double lng, {
     bool updateController = true,
+    bool focusCamera = false,
   }) async {
     if (!mounted) return;
 
@@ -156,7 +163,14 @@ class _SelectLocationFromMapScreenState
 
     if (gmc != null) {
       await gmc!.animateCamera(
-        CameraUpdate.newLatLng(LatLng(lat, lng)),
+        focusCamera
+            ? CameraUpdate.newCameraPosition(
+                CameraPosition(
+                  target: LatLng(lat, lng),
+                  zoom: _locationZoom,
+                ),
+              )
+            : CameraUpdate.newLatLng(LatLng(lat, lng)),
       );
     }
 
@@ -235,10 +249,18 @@ class _SelectLocationFromMapScreenState
                           },
                           initialCameraPosition: CameraPosition(
                             target: LatLng(currentLat!, currentLng!),
-                            zoom: 13.5,
+                            zoom: _locationZoom,
                           ),
                           onMapCreated: (mapController) {
                             gmc = mapController;
+                            mapController.moveCamera(
+                              CameraUpdate.newCameraPosition(
+                                CameraPosition(
+                                  target: LatLng(currentLat!, currentLng!),
+                                  zoom: _locationZoom,
+                                ),
+                              ),
+                            );
                           },
                         ),
                       ),
