@@ -40,11 +40,12 @@ jobs:
       - name: Upload downloadable web build
         uses: actions/upload-artifact@v4
         with:
-          name: go-drive-web
+          name: go-drive-web-${{ github.run_attempt }}
           path: build/web
           retention-days: 14
       - uses: actions/upload-pages-artifact@v3
         with:
+          name: github-pages-${{ github.run_attempt }}
           path: build/web
   deploy:
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
@@ -62,3 +63,5 @@ jobs:
           enablement: true
       - id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          artifact_name: github-pages-${{ github.run_attempt }}
