@@ -3,9 +3,9 @@ part of 'notification_helper.dart';
 Future<void> scheduleNotification(String title, String subtitle, String data) async {
   var rng = math.Random();
   var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
-    'faskhaninja_channel_sound_id',
-    'FaskhaNinja Notifications (Sound)',
-    channelDescription: 'This channel is used for FaskhaNinja app notifications with sound',
+    'go_drive_channel_sound_id',
+    'Go Drive Notifications (Sound)',
+    channelDescription: 'This channel is used for Go Drive app notifications with sound',
     importance: Importance.high,
     priority: Priority.high,
     colorized: true,

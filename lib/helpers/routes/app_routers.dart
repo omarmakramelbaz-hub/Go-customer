@@ -3,8 +3,8 @@ part of 'app_routers_import.dart';
 class NamedNavigatorImpl {
   static GlobalKey<NavigatorState> navigatorState = GlobalKey<NavigatorState>();
 
-  static final BuildContext context = navigatorState.currentContext!;
-  static final NavigatorState currentState = navigatorState.currentState!;
+  static BuildContext get context => navigatorState.currentContext!;
+  static NavigatorState get currentState => navigatorState.currentState!;
 
   static bool _isGuestProtectedRoute(String screen) {
     return screen == RestaurantDetailsScreen.routeName ||
@@ -13,7 +13,12 @@ class NamedNavigatorImpl {
         screen == WalletScreen.routeName;
   }
 
-  static Future push(String screen, {bool replace = false, bool clean = false, Object? arguments}) {
+  static Future push(
+    String screen, {
+    bool replace = false,
+    bool clean = false,
+    Object? arguments,
+  }) {
     log('screen ======> $screen');
 
     if (GuestAccessGuard.isGuest && _isGuestProtectedRoute(screen)) {
@@ -22,7 +27,11 @@ class NamedNavigatorImpl {
     }
 
     if (clean) {
-      return currentState.pushNamedAndRemoveUntil(screen, (route) => false, arguments: arguments);
+      return currentState.pushNamedAndRemoveUntil(
+        screen,
+        (route) => false,
+        arguments: arguments,
+      );
     } else if (replace) {
       return currentState.pushReplacementNamed(screen, arguments: arguments);
     } else {
@@ -39,51 +48,130 @@ class NamedNavigatorImpl {
   }
 
   static Route<dynamic>? onGenerateRoute(RouteSettings settings) {
+    final resolved = GoDriveRoutePolicy.resolve(
+      settings.name,
+      signedIn: HiveMethods.getToken() != null,
+    );
+    settings = RouteSettings(
+      name: resolved,
+      arguments: resolved == settings.name ? settings.arguments : null,
+    );
+    if (kIsWeb &&
+        Firebase.apps.isEmpty &&
+        (resolved == ChatScreen.routeName ||
+            resolved == AdminChatScreen.routeName)) {
+      return MaterialPageRoute(
+        settings: settings,
+        builder: (context) => Scaffold(
+          appBar: AppBar(
+            title: Text(context.languageCode == 'ar' ? 'المحادثة' : 'Chat'),
+          ),
+          body: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Text(
+                context.languageCode == 'ar'
+                    ? 'المحادثة غير متاحة حاليًا في نسخة المعاينة. يمكنك الاتصال بالمندوب من تفاصيل الطلب.'
+                    : 'Chat is unavailable in this preview. You can call your courier from the order details.',
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
     dynamic args;
     if (settings.arguments != null) args = settings.arguments;
     switch (settings.name) {
       case ZoomImageScreen.routeName:
-        return MaterialPageRoute(builder: (_) => ZoomImageScreen(args: args));
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => ZoomImageScreen(args: args),
+        );
       case SplashScreen.routeName:
-        return MaterialPageRoute(builder: (_) => const SplashScreen());
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const SplashScreen(),
+        );
       case BottomNavigationBarScreen.routeName:
-        return MaterialPageRoute(builder: (_) => const BottomNavigationBarScreen());
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const BottomNavigationBarScreen(),
+        );
       case OnBoardingScreen.routeName:
-        return MaterialPageRoute(builder: (_) => const OnBoardingScreen());
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const LoginScreen(),
+        );
       case LoginScreen.routeName:
-        return MaterialPageRoute(builder: (_) => const LoginScreen());
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const LoginScreen(),
+        );
       case RegisterScreen.routeName:
-        return MaterialPageRoute(builder: (_) => const RegisterScreen());
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const RegisterScreen(),
+        );
       case VerificationCodeScreen.routeName:
-        return MaterialPageRoute(builder: (_) => const VerificationCodeScreen());
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const VerificationCodeScreen(),
+        );
       case SocialAuthPhoneScreen.routeName:
-        return MaterialPageRoute(builder: (_) => SocialAuthPhoneScreen(socialAuthData: args));
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => SocialAuthPhoneScreen(socialAuthData: args),
+        );
       case CreateNewAccountScreen.routeName:
-        return MaterialPageRoute(builder: (_) => const CreateNewAccountScreen());
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const CreateNewAccountScreen(),
+        );
       case ShareLocationScreen.routeName:
-        return MaterialPageRoute(builder: (_) => const ShareLocationScreen());
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const ShareLocationScreen(),
+        );
       case RestaurantsScreen.routeName:
         return MaterialPageRoute(
-          builder: (_) =>
-              ChangeNotifierProvider(create: (_) => RestaurantsController(), child: const RestaurantsScreen()),
+          settings: settings,
+          builder: (_) => ChangeNotifierProvider(
+            create: (_) => RestaurantsController(),
+            child: const RestaurantsScreen(),
+          ),
         );
       case RestaurantDetailsScreen.routeName:
         return MaterialPageRoute(
+          settings: settings,
           builder: (_) => ChangeNotifierProvider(
             create: (_) => RestaurantsController(),
             child: RestaurantDetailsScreen(args: args),
           ),
         );
       case ProductDetailsScreen.routeName:
-        return MaterialPageRoute(builder: (_) => ProductDetailsScreen(args: args));
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => ProductDetailsScreen(args: args),
+        );
       case AccountInformationScreen.routeName:
-        return MaterialPageRoute(builder: (_) => AccountInformationScreen(args: args));
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => AccountInformationScreen(args: args),
+        );
       case PersonalInformationScreen.routeName:
-        return MaterialPageRoute(builder: (_) => const PersonalInformationScreen());
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const PersonalInformationScreen(),
+        );
       case RequestAgainScreen.routeName:
-        return MaterialPageRoute(builder: (_) => RequestAgainScreen(args: args));
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => RequestAgainScreen(args: args),
+        );
       case TrackingYourOrderScreen.routeName:
         return MaterialPageRoute(
+          settings: settings,
           builder: (_) => MultiProvider(
             providers: [
               ChangeNotifierProvider(create: (_) => OrdersController()),
@@ -94,39 +182,71 @@ class NamedNavigatorImpl {
         );
       case ChatScreen.routeName:
         return MaterialPageRoute(
+          settings: settings,
           builder: (_) => ChangeNotifierProvider(
             create: (_) => ChatController(),
             child: ChatScreen(args: args),
           ),
         );
       case ServiceRatingScreen.routeName:
-        return MaterialPageRoute(builder: (_) => ServiceRatingScreen(args: args));
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => ServiceRatingScreen(args: args),
+        );
       case CartScreen.routeName:
-        return MaterialPageRoute(builder: (_) => const CartScreen());
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const CartScreen(),
+        );
       // case PaymentScreen.routeName:
-      //   return MaterialPageRoute(
+      //   return MaterialPageRoute(settings: settings,
       //     builder: (_) => const PaymentScreen(),
       //   );
       case FavoriteScreen.routeName:
-        return MaterialPageRoute(builder: (_) => const FavoriteScreen());
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const FavoriteScreen(),
+        );
       case AddressScreen.routeName:
-        return MaterialPageRoute(builder: (_) => const AddressScreen());
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const AddressScreen(),
+        );
       case HelpScreen.routeName:
-        return MaterialPageRoute(builder: (_) => const HelpScreen());
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const HelpScreen(),
+        );
       case TermsAndConditionsScreen.routeName:
-        return MaterialPageRoute(builder: (_) => const TermsAndConditionsScreen());
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const TermsAndConditionsScreen(),
+        );
       case PrivacyPolicyScreen.routeName:
-        return MaterialPageRoute(builder: (_) => const PrivacyPolicyScreen());
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const PrivacyPolicyScreen(),
+        );
       case ContactUsScreen.routeName:
-        return MaterialPageRoute(builder: (_) => const ContactUsScreen());
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const ContactUsScreen(),
+        );
       // case ConfirmAddressScreen.routeName:
-      //   return MaterialPageRoute(builder: (_) => const ConfirmAddressScreen());
+      //   return MaterialPageRoute(settings: settings, builder: (_) => const ConfirmAddressScreen());
       case AddAddressScreen.routeName:
-        return MaterialPageRoute(builder: (_) => AddAddressScreen(args: args));
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => AddAddressScreen(args: args),
+        );
       case UpdateAddressScreen.routeName:
-        return MaterialPageRoute(builder: (_) => UpdateAddressScreen(args: args));
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => UpdateAddressScreen(args: args),
+        );
       case SearchScreen.routeName:
         return MaterialPageRoute(
+          settings: settings,
           builder: (_) => MultiProvider(
             providers: [
               ChangeNotifierProvider(
@@ -134,17 +254,26 @@ class NamedNavigatorImpl {
                   ..initialLastSearch()
                   ..getLastSearch(),
               ),
-              ChangeNotifierProvider(create: (context) => RestaurantsController()),
+              ChangeNotifierProvider(
+                create: (context) => RestaurantsController(),
+              ),
             ],
             child: const SearchScreen(),
           ),
         );
       case ChooseAddressFromMapScreen.routeName:
-        return MaterialPageRoute(builder: (_) => ChooseAddressFromMapScreen(args: args));
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => ChooseAddressFromMapScreen(args: args),
+        );
       case AddAddressFromCartScreen.routeName:
-        return MaterialPageRoute(builder: (_) => const AddAddressFromCartScreen());
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const AddAddressFromCartScreen(),
+        );
       case ExecuteTheOrderScreen.routeName:
         return MaterialPageRoute(
+          settings: settings,
           builder: (_) => ChangeNotifierProvider(
             create: (context) => MyAccountController(),
             child: ExecuteTheOrderScreen(args: args),
@@ -153,6 +282,7 @@ class NamedNavigatorImpl {
 
       case WalletScreen.routeName:
         return MaterialPageRoute(
+          settings: settings,
           builder: (_) => MultiProvider(
             providers: [
               ChangeNotifierProvider(
@@ -170,30 +300,56 @@ class NamedNavigatorImpl {
           ),
         );
       case OrderOTPScreen.routeName:
-        return MaterialPageRoute(builder: (_) => const OrderOTPScreen());
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const OrderOTPScreen(),
+        );
       case YourOrderSuccessfullyCompletedScreen.routeName:
         return MaterialPageRoute(
+          settings: settings,
           builder: (_) => ChangeNotifierProvider(
             create: (context) => OrdersController(),
             child: YourOrderSuccessfullyCompletedScreen(args: args),
           ),
         );
       case RegisterAsVendorScreen.routeName:
-        return MaterialPageRoute(builder: (_) => const RegisterAsVendorScreen());
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const RegisterAsVendorScreen(),
+        );
       case RegisterAsDeliveryScreen.routeName:
-        return MaterialPageRoute(builder: (_) => const RegisterAsDeliveryScreen());
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const RegisterAsDeliveryScreen(),
+        );
       case ContractDeliveryScreen.routeName:
-        return MaterialPageRoute(builder: (_) => ContractDeliveryScreen(args: args));
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => ContractDeliveryScreen(args: args),
+        );
       case ContractVendorScreen.routeName:
-        return MaterialPageRoute(builder: (_) => ContractVendorScreen(args: args));
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => ContractVendorScreen(args: args),
+        );
       case CustomPaymentWebViewScreen.routeName:
-        return MaterialPageRoute(builder: (_) => CustomPaymentWebViewScreen(args: args));
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => CustomPaymentWebViewScreen(args: args),
+        );
       case RequestDelegateScreen.routeName:
-        return MaterialPageRoute(builder: (_) => const RequestDelegateScreen());
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const RequestDelegateScreen(),
+        );
       case ChooseDeliveryDelegateScreen.routeName:
-        return MaterialPageRoute(builder: (_) => const ChooseDeliveryDelegateScreen());
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const ChooseDeliveryDelegateScreen(),
+        );
       case DelegateOrdersScreen.routeName:
         return MaterialPageRoute(
+          settings: settings,
           builder: (_) => ChangeNotifierProvider(
             create: (context) => RequestDelegateController(),
             child: const DelegateOrdersScreen(),
@@ -201,36 +357,70 @@ class NamedNavigatorImpl {
         );
       case AdminChatScreen.routeName:
         return MaterialPageRoute(
+          settings: settings,
           builder: (_) => ChangeNotifierProvider(
             create: (context) => AdminChatController(),
             child: AdminChatScreen(args: args),
           ),
         );
       case TrackingDelegateOrderScreen.routeName:
-        return MaterialPageRoute(builder: (_) => TrackingDelegateOrderScreen(args: args));
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => TrackingDelegateOrderScreen(args: args),
+        );
       case SelectLocationFromMapScreen.routeName:
-        return MaterialPageRoute(builder: (_) => SelectLocationFromMapScreen(args: args));
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => SelectLocationFromMapScreen(args: args),
+        );
       case SearchPlaceScreen.routeName:
-        return MaterialPageRoute(builder: (_) => const SearchPlaceScreen());
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const SearchPlaceScreen(),
+        );
       case ShowDelegateOnMapScreen.routeName:
-        return MaterialPageRoute(builder: (_) => ShowDelegateOnMapScreen(args: args));
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => ShowDelegateOnMapScreen(args: args),
+        );
       case ProductInCartDetailsScreen.routeName:
-        return MaterialPageRoute(builder: (_) => ProductInCartDetailsScreen(args: args));
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => ProductInCartDetailsScreen(args: args),
+        );
       case MapScreen.routeName:
-        return MaterialPageRoute(builder: (_) => MapScreen(args: args));
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => MapScreen(args: args),
+        );
       case ChangePasswordCheckCodeScreen.routeName:
-        return MaterialPageRoute(builder: (_) => ChangePasswordCheckCodeScreen(args: args));
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => ChangePasswordCheckCodeScreen(args: args),
+        );
       case ResetPasswordScreen.routeName:
-        return MaterialPageRoute(builder: (_) => ResetPasswordScreen(args: args));
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => ResetPasswordScreen(args: args),
+        );
       case CheckMobileHasAccount.routeName:
-        return MaterialPageRoute(builder: (_) => const CheckMobileHasAccount());
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const CheckMobileHasAccount(),
+        );
       case DrawRestaurantScreen.routeName:
         return MaterialPageRoute(
-          builder: (_) =>
-              ChangeNotifierProvider(create: (context) => HomeController(), child: const DrawRestaurantScreen()),
+          settings: settings,
+          builder: (_) => ChangeNotifierProvider(
+            create: (context) => HomeController(),
+            child: const DrawRestaurantScreen(),
+          ),
         );
       default:
-        return MaterialPageRoute(builder: (_) => const BottomNavigationBarScreen());
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const BottomNavigationBarScreen(),
+        );
     }
   }
 }

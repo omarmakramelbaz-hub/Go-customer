@@ -1,4 +1,4 @@
-package com.smartvision.faskhanista
+package com.fasakhansta.godrive.customer
 
 import android.app.Notification
 import android.app.PendingIntent

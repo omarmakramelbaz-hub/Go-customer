@@ -1,4 +1,4 @@
-package com.smartvision.faskhanista
+package com.fasakhansta.godrive.customer
 
 import android.app.NotificationChannel
 import android.app.NotificationManager

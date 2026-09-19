@@ -62,6 +62,12 @@ class _DelegateOrdersScreenState extends State<DelegateOrdersScreen> {
   }
 
   @override
+  void dispose() {
+    _pusherController.removeEventListener('shipping.updated', _handleShippingUpdated);
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Consumer<RequestDelegateController>(
       builder: (context, requestDelegateController, _) {

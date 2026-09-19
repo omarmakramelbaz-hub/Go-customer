@@ -5,7 +5,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
-import '../notification_helper/firebase_options.dart';
 import '../notification_helper/notification_helper.dart';
 import '../translation/all_translation.dart';
 import '../utils/date_methods.dart';
@@ -16,7 +15,7 @@ Future<void> initServices() async {
   // The web Firebase options are not configured in this project, and
   // initializing Firebase here would throw before the first screen renders.
   if (!kIsWeb) {
-    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+    await Firebase.initializeApp();
     await FirebaseNotifications.setUpFirebase();
   }
 

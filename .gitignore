@@ -43,3 +43,18 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Go Drive configuration and signing are provisioned per app.
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+android/key.properties
+android/app/*.jks
+firebase.json
+
+# Never bundle server credentials or signing material.
+fire.json
+*service-account*.json
+lib/helpers/networking/*-*.json
+*.p12
+*.mobileprovision
+*.keystore

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../helpers/extension/string_extension.dart';
-import '../../../../helpers/images/app_images.dart';
 import '../../../../helpers/pusher_service/pusher_controller.dart';
 import '../../../../helpers/routes/app_routers_import.dart';
 import '../../../../helpers/theme/app_colors.dart';
@@ -12,7 +11,7 @@ import '../../../../helpers/translation/all_translation.dart';
 import '../../../../helpers/translation/main_app_bloc.dart';
 import '../../../custom_widgets/custom_app_bar/custom_app_bar.dart';
 import '../../../custom_widgets/custom_form_field/custom_form_field.dart';
-import '../../../custom_widgets/custom_image/custom_image.dart';
+import '../../../custom_widgets/go_drive_brand.dart';
 import '../../../custom_widgets/validation/validation_mixin.dart';
 import '../../bottom_navigation/bottom_navigation_bar_screen.dart';
 import '../controller/auth_controller.dart';
@@ -69,12 +68,7 @@ class _RegisterScreenState extends State<RegisterScreen> with ValidationMixin {
               showLang: true,
               centerTitle: false,
               height: 70,
-              title: const CustomImage(
-                path: AppImages.appLogo,
-                type: ImageType.asset,
-                height: 52,
-                radius: 12,
-              ),
+              title: const GoDriveBrand(),
               appBarColor: Colors.white,
             ),
             body: SafeArea(
@@ -313,10 +307,7 @@ class _RegisterScreenState extends State<RegisterScreen> with ValidationMixin {
           height: 54,
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [
-                AppColors.mainAppColor,
-                const Color(0xFFFF8B25),
-              ],
+              colors: [AppColors.mainAppColor, const Color(0xFFFF8B25)],
             ),
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
@@ -468,20 +459,20 @@ class _RegisterScreenState extends State<RegisterScreen> with ValidationMixin {
     if (!_formKey.currentState!.validate()) return;
 
     context.read<AuthController>().login(
-          onHaveIdANDToken: (id, token) {
-            context.read<PusherController>().initPusher(
-                  channelName: 'private-user.$id',
-                  userId: id,
-                  token: token,
-                );
-          },
-          onFirstTime: () =>
-              NamedNavigatorImpl.push(CreateNewAccountScreen.routeName),
-          mobile: _mobileEC.text.removeZero(),
-          password: _passwordEC.text,
-          onSuccess: (register, mobileVerifiedAt) {
-            NamedNavigatorImpl.push(BottomNavigationBarScreen.routeName);
-          },
+      onHaveIdANDToken: (id, token) {
+        context.read<PusherController>().initPusher(
+          channelName: 'private-user.$id',
+          userId: id,
+          token: token,
         );
+      },
+      onFirstTime: () =>
+          NamedNavigatorImpl.push(CreateNewAccountScreen.routeName),
+      mobile: _mobileEC.text.removeZero(),
+      password: _passwordEC.text,
+      onSuccess: (register, mobileVerifiedAt) {
+        NamedNavigatorImpl.push(BottomNavigationBarScreen.routeName);
+      },
+    );
   }
 }

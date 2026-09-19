@@ -9,7 +9,7 @@ import '../utils/logger.dart';
 class DeliveryActivityPushHandler {
   static final LiveActivities _liveActivities = LiveActivities();
 
-  static const String _appGroupId = 'group.faskhaninja.liveactivities';
+  static const String _appGroupId = 'group.com.fasakhansta.godrive.customer.liveactivities';
 
   static Future<void> handlePushData(Map<String, dynamic> payload) async {
     log('LiveActivityPush raw payload: ${jsonEncode(payload)}');

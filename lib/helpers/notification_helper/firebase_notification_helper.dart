@@ -249,7 +249,7 @@ class FirebaseNotifications {
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   log('FIREBASE INIT');
   DartPluginRegistrant.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await Firebase.initializeApp();
   _traceImmediateFcmReceipt(message, source: 'onBackgroundMessage');
   _printFirstNotificationPayload(message, source: 'onBackgroundMessage');
   _printNotificationPayload(message, source: 'onBackgroundMessage');

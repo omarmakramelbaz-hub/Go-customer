@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 import '../../../../helpers/extension/string_extension.dart';
 import '../../../../helpers/extensions/extensions.dart';
 import '../../../../helpers/hive/hive_methods.dart';
-import '../../../../helpers/images/app_images.dart';
 import '../../../../helpers/pusher_service/pusher_controller.dart';
 import '../../../../helpers/routes/app_routers_import.dart';
 import '../../../../helpers/theme/app_colors.dart';
@@ -14,7 +13,7 @@ import '../../../../helpers/translation/all_translation.dart';
 import '../../../../helpers/translation/main_app_bloc.dart';
 import '../../../custom_widgets/custom_app_bar/custom_app_bar.dart';
 import '../../../custom_widgets/custom_form_field/custom_form_field.dart';
-import '../../../custom_widgets/custom_image/custom_image.dart';
+import '../../../custom_widgets/go_drive_brand.dart';
 import '../../../custom_widgets/validation/validation_mixin.dart';
 import '../../bottom_navigation/bottom_navigation_bar_screen.dart';
 import '../controller/auth_controller.dart';
@@ -67,12 +66,7 @@ class _LoginScreenState extends State<LoginScreen> with ValidationMixin {
             backgroundColor: const Color(0xFFF7F8FA),
             appBar: CustomAppBar(
               centerTitle: false,
-              title: const CustomImage(
-                path: AppImages.appLogo,
-                type: ImageType.asset,
-                height: 52,
-                radius: 12,
-              ),
+              title: const GoDriveBrand(),
               appBarColor: Colors.white,
               showLang: true,
             ),
@@ -243,9 +237,11 @@ class _LoginScreenState extends State<LoginScreen> with ValidationMixin {
           const SizedBox(height: 8),
           _primaryLoginButton(context),
           const SizedBox(height: 18),
-          _socialDivider(context),
-          const SizedBox(height: 12),
-          const SocialLoginRowWidget(),
+          if (SocialLoginRowWidget.isAvailable) ...[
+            _socialDivider(context),
+            const SizedBox(height: 12),
+            const SocialLoginRowWidget(),
+          ],
           const SizedBox(height: 12),
           _accountCreationCard(context),
         ],
@@ -263,10 +259,7 @@ class _LoginScreenState extends State<LoginScreen> with ValidationMixin {
           height: 54,
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [
-                AppColors.mainAppColor,
-                const Color(0xFFFF8B25),
-              ],
+              colors: [AppColors.mainAppColor, const Color(0xFFFF8B25)],
             ),
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
@@ -488,8 +481,10 @@ class _LoginScreenState extends State<LoginScreen> with ValidationMixin {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(13),
                   ),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 10,
+                  ),
                 ),
                 child: Icon(
                   Icons.arrow_forward_rounded,
@@ -509,32 +504,32 @@ class _LoginScreenState extends State<LoginScreen> with ValidationMixin {
     if (!_formKey.currentState!.validate()) return;
 
     context.read<AuthController>().login(
-          onHaveIdANDToken: (id, token) {
-            context.read<PusherController>().initPusher(
-                  channelName: 'private-user.$id',
-                  userId: id,
-                  token: token,
-                );
-          },
-          onFirstTime: () {
-            NamedNavigatorImpl.push(CreateNewAccountScreen.routeName);
-          },
-          mobile: _mobileEC.text.removeZero(),
-          password: _passwordEC.text,
-          onSuccess: (register, mobileVerifiedAt) {
-            HiveMethods.updateIsVisitor(false);
-            if (register == 0 && mobileVerifiedAt != null) {
-              NamedNavigatorImpl.push(
-                BottomNavigationBarScreen.routeName,
-                replace: true,
-              );
-            } else {
-              NamedNavigatorImpl.push(
-                BottomNavigationBarScreen.routeName,
-                clean: true,
-              );
-            }
-          },
+      onHaveIdANDToken: (id, token) {
+        context.read<PusherController>().initPusher(
+          channelName: 'private-user.$id',
+          userId: id,
+          token: token,
         );
+      },
+      onFirstTime: () {
+        NamedNavigatorImpl.push(CreateNewAccountScreen.routeName);
+      },
+      mobile: _mobileEC.text.removeZero(),
+      password: _passwordEC.text,
+      onSuccess: (register, mobileVerifiedAt) {
+        HiveMethods.updateIsVisitor(false);
+        if (register == 0 && mobileVerifiedAt != null) {
+          NamedNavigatorImpl.push(
+            BottomNavigationBarScreen.routeName,
+            replace: true,
+          );
+        } else {
+          NamedNavigatorImpl.push(
+            BottomNavigationBarScreen.routeName,
+            clean: true,
+          );
+        }
+      },
+    );
   }
 }

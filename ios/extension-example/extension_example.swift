@@ -27,7 +27,7 @@ struct LiveActivitiesAppAttributes: ActivityAttributes, Identifiable {
 }
 
 
-let sharedDefault = UserDefaults(suiteName: "group.faskhaninja.liveactivities")!
+let sharedDefault = UserDefaults(suiteName: "group.com.fasakhansta.godrive.customer.liveactivities")!
 
 
 func firstString(for keys: [String], defaultValue: String = "") -> String {
@@ -141,7 +141,7 @@ func deliveryData(prefix: String? = nil) -> DeliveryLiveData {
     )
     let restaurant = firstString(
         for: scopedKeys(prefix: prefix, keys: ["restaurant_name", "restaurantName", "restaurant"]),
-        defaultValue: "Fasakhansta"
+        defaultValue: "Go Drive"
     )
     let orderId = firstString(
         for: scopedKeys(prefix: prefix, keys: ["order_id", "orderId"]),

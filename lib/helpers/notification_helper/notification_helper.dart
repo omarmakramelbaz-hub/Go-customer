@@ -19,7 +19,6 @@ import '../../view/layout/request_delegate/screen/request_delegate_screen.dart';
 import '../../view/layout/wallet/screen/wallet_screen.dart';
 import '../delivery_activity/delivery_activity_push_handler.dart';
 import '../routes/app_routers_import.dart';
-import 'firebase_options.dart';
 
 part 'firebase_notification_helper.dart';
 part 'local_notification.dart';

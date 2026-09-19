@@ -11,7 +11,6 @@ class PusherController with ChangeNotifier {
 
   final String appId = '2002846';
   final String apiKEY = '0f818db2b7622218a22a';
-  final String secret = '804b44dfbb09822e5245';
   final String apiCLUSTER = 'mt1';
   final Map<String, List<void Function(PusherEvent event)>> _eventListeners = {};
 
@@ -36,9 +35,6 @@ class PusherController with ChangeNotifier {
             // log('Pusher connected. Fetching socket ID...');
 
             _subscribeToChannel(channelName, userId, token);
-            subscribeToPublicChannel('resturant.updated');
-            subscribeToPublicChannel('product.updated');
-            subscribeToPublicChannel('coupon.wheel.updated');
           }
         },
         onError: (message, code, e) {
@@ -59,9 +55,6 @@ class PusherController with ChangeNotifier {
 
       await _pusher.connect();
       _subscribeToChannel(channelName, userId, token);
-      subscribeToPublicChannel('resturant.updated');
-      subscribeToPublicChannel('product.updated');
-      subscribeToPublicChannel('coupon.wheel.updated');
     } catch (e) {
       // log('Error during Pusher initialization: $e');
     }

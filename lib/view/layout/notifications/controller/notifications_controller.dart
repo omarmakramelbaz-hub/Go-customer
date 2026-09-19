@@ -6,33 +6,48 @@ import '../../../../helpers/networking/urls.dart';
 import '../model/notifications_model.dart';
 
 class NotificationsController extends ChangeNotifier {
+  static bool isGoDriveNotification(NotificationsModel notification) {
+    final data = notification.data?.data;
+    if (data?.notificationType == 1) return data?.orderType == 'shipping';
+    return data?.resturantId == null || data?.resturantId == 0;
+  }
+
   void addNotificationToTop(NotificationsModel notification) {
+    if (!isGoDriveNotification(notification)) return;
     if (HiveMethods.isNotificationHidden(notification.id)) return;
     _notifications.insert(0, notification);
     notifyListeners();
   }
 
   void initialNotifications() {
-    _notificationsResponse = ApiResponse(state: ResponseState.sleep, data: null);
+    _notificationsResponse = ApiResponse(
+      state: ResponseState.sleep,
+      data: null,
+    );
     _notifications = [];
     notifyListeners();
   }
 
-  ApiResponse _notificationsResponse =
-      ApiResponse(state: ResponseState.sleep, data: null);
+  ApiResponse _notificationsResponse = ApiResponse(
+    state: ResponseState.sleep,
+    data: null,
+  );
   ApiResponse get notificationsResponse => _notificationsResponse;
 
   List<NotificationsModel> _notifications = [];
   List<NotificationsModel> get notifications => _notifications;
 
   Future<void> getNotifications() async {
-    _notificationsResponse =
-        ApiResponse(state: ResponseState.loading, data: null);
+    _notificationsResponse = ApiResponse(
+      state: ResponseState.loading,
+      data: null,
+    );
     _notifications = [];
     notifyListeners();
 
-    _notificationsResponse =
-        await ApiHelper.instance.get(Urls.userNotifications);
+    _notificationsResponse = await ApiHelper.instance.get(
+      Urls.userNotifications,
+    );
 
     if (_notificationsResponse.state == ResponseState.complete) {
       final Iterable iterable = _notificationsResponse.data['data'];
@@ -40,6 +55,7 @@ class NotificationsController extends ChangeNotifier {
 
       _notifications = iterable
           .map((e) => NotificationsModel.fromJson(e))
+          .where(isGoDriveNotification)
           .where((notification) {
             final id = notification.id;
             return id == null || id.isEmpty || !hiddenIds.contains(id);
@@ -62,8 +78,10 @@ class NotificationsController extends ChangeNotifier {
     }
 
     _notifications = [];
-    _notificationsResponse =
-        ApiResponse(state: ResponseState.complete, data: {'data': []});
+    _notificationsResponse = ApiResponse(
+      state: ResponseState.complete,
+      data: {'data': []},
+    );
     notifyListeners();
   }
 }

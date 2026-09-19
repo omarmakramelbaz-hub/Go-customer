@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
@@ -336,6 +337,9 @@ class CommonMethods {
   }
 
   static Future<bool> hasConnection() async {
+    // Browser requests to unrelated connectivity probes can fail CORS even
+    // while our API is reachable. Let Dio report the actual request outcome.
+    if (kIsWeb) return true;
     bool result = await InternetConnection().hasInternetAccess;
 
     if (!result) {

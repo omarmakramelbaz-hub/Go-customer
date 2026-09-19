@@ -23,7 +23,7 @@ private struct LiveActivitiesAppAttributes: ActivityAttributes, Identifiable {
 
 @main
 @objc class AppDelegate: FlutterAppDelegate {
-    private let liveActivityAppGroupId = "group.faskhaninja.liveactivities"
+    private let liveActivityAppGroupId = "group.com.fasakhansta.godrive.customer.liveactivities"
   
   override func application(
         _ application: UIApplication,

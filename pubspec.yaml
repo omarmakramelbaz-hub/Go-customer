@@ -1,9 +1,9 @@
 name: go_drive_customer
-description: "Go Drive standalone customer application."
+description: "Go Drive customer app — courier requests and live delivery tracking."
 publish_to: 'none'
 
 #android
-version: 1.0.54+56
+version: 1.0.0+1
 
 #ios
 #version: 2.0.6+56
@@ -52,8 +52,6 @@ dependencies:
   google_maps_flutter: ^2.9.0
   location: ^8.0.1
   skeletonizer: ^2.1.2
-  googleapis: ^15.0.0
-  googleapis_auth: ^2.0.0
   firebase_core: ^4.4.0
   flutter_local_notifications: ^19.5.0
   firebase_messaging: ^16.0.4
@@ -100,7 +98,6 @@ flutter:
     - assets/map_styles/
     - assets/images/delivery_bike.png
     - assets/payment/
-    - assets/splash_video/
 
   fonts:
     - family: Roboto

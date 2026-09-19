@@ -98,14 +98,18 @@ class SocialBtn extends StatelessWidget {
 class SocialLoginRowWidget extends StatelessWidget {
   const SocialLoginRowWidget({super.key});
 
-  // OAuth 2.0 Web client for the same Firebase/Google Cloud project used by
-  // the Android app. Android uses it as serverClientId so Google returns an
-  // ID token whose audience can be verified safely by the backend.
   static const String _googleWebClientId = String.fromEnvironment(
     'GOOGLE_WEB_CLIENT_ID',
-    defaultValue:
-        '224648167390-efdtr7rjcnept7eiml1d642sdn8n9ki7.apps.googleusercontent.com',
   );
+  static const String _facebookAppId = String.fromEnvironment(
+    'FACEBOOK_APP_ID',
+  );
+  static bool get showApple =>
+      !kIsWeb &&
+      defaultTargetPlatform == TargetPlatform.iOS &&
+      const bool.fromEnvironment('ENABLE_APPLE_SIGN_IN');
+  static bool get isAvailable =>
+      _googleWebClientId.isNotEmpty || _facebookAppId.isNotEmpty || showApple;
 
   void _onAuthSuccess(
     BuildContext context,
@@ -119,25 +123,19 @@ class SocialLoginRowWidget extends StatelessWidget {
         replace: true,
       );
     } else {
-      NamedNavigatorImpl.push(
-        BottomNavigationBarScreen.routeName,
-        clean: true,
-      );
+      NamedNavigatorImpl.push(BottomNavigationBarScreen.routeName, clean: true);
     }
   }
 
   void _initPusher(BuildContext context, int id, String token) {
     context.read<PusherController>().initPusher(
-          channelName: 'private-user.$id',
-          userId: id,
-          token: token,
-        );
+      channelName: 'private-user.$id',
+      userId: id,
+      token: token,
+    );
   }
 
-  String _responseMessage(
-    dynamic data, {
-    required String fallback,
-  }) {
+  String _responseMessage(dynamic data, {required String fallback}) {
     if (data is Map) {
       final message = data['message'];
       if (message != null && message.toString().trim().isNotEmpty) {
@@ -271,9 +269,7 @@ class SocialLoginRowWidget extends StatelessWidget {
       );
 
       if (mobile.isEmpty) {
-        final socialAuthData = <String, dynamic>{
-          'provider': provider,
-        };
+        final socialAuthData = <String, dynamic>{'provider': provider};
         if (accessToken.trim().isNotEmpty) {
           socialAuthData['access_token'] = accessToken.trim();
         }
@@ -392,8 +388,8 @@ class SocialLoginRowWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final showAppleLogin =
-        !kIsWeb && defaultTargetPlatform == TargetPlatform.iOS;
+    final showAppleLogin = showApple;
+    if (!isAvailable) return const SizedBox.shrink();
 
     return Container(
       width: double.infinity,
@@ -411,33 +407,31 @@ class SocialLoginRowWidget extends StatelessWidget {
               label: 'Apple',
               onTap: () {
                 context.read<AuthController>().signInWithApple(
-                      onSuccess: (register, mobileVerifiedAt) =>
-                          _onAuthSuccess(
-                        context,
-                        register,
-                        mobileVerifiedAt,
-                      ),
-                      onFirstTime: () => NamedNavigatorImpl.push(
-                        CreateNewAccountScreen.routeName,
-                      ),
-                      onHaveIdANDToken: (id, token) =>
-                          _initPusher(context, id, token),
-                    );
+                  onSuccess: (register, mobileVerifiedAt) =>
+                      _onAuthSuccess(context, register, mobileVerifiedAt),
+                  onFirstTime: () =>
+                      NamedNavigatorImpl.push(CreateNewAccountScreen.routeName),
+                  onHaveIdANDToken: (id, token) =>
+                      _initPusher(context, id, token),
+                );
               },
             ),
             const SizedBox(width: 8),
           ],
-          SocialBtn(
-            image: AppImages.googleIcon,
-            label: 'Google',
-            onTap: () => _signInWithGoogle(context),
-          ),
-          const SizedBox(width: 8),
-          SocialBtn(
-            image: AppImages.facebookIcon,
-            label: 'Facebook',
-            onTap: () => _signInWithFacebook(context),
-          ),
+          if (_googleWebClientId.isNotEmpty)
+            SocialBtn(
+              image: AppImages.googleIcon,
+              label: 'Google',
+              onTap: () => _signInWithGoogle(context),
+            ),
+          if (_googleWebClientId.isNotEmpty && _facebookAppId.isNotEmpty)
+            const SizedBox(width: 8),
+          if (_facebookAppId.isNotEmpty)
+            SocialBtn(
+              image: AppImages.facebookIcon,
+              label: 'Facebook',
+              onTap: () => _signInWithFacebook(context),
+            ),
         ],
       ),
     );

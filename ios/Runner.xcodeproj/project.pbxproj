@@ -637,7 +637,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 2.0.2;
-				PRODUCT_BUNDLE_IDENTIFIER = com.faskhaninja.clients;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fasakhansta.godrive.customer;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -659,7 +659,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.smartvision.faskhaninja.RunnerTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fasakhansta.godrive.customer.RunnerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -677,7 +677,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.smartvision.faskhaninja.RunnerTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fasakhansta.godrive.customer.RunnerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Runner.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Runner";
@@ -693,7 +693,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.smartvision.faskhaninja.RunnerTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fasakhansta.godrive.customer.RunnerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Runner.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Runner";
@@ -730,7 +730,7 @@
 				MARKETING_VERSION = 1.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.faskhaninja.clients.extension-example";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.fasakhansta.godrive.customer.extension-example";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -777,7 +777,7 @@
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MARKETING_VERSION = 1.0;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.faskhaninja.clients.extension-example";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.fasakhansta.godrive.customer.extension-example";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -822,7 +822,7 @@
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MARKETING_VERSION = 1.0;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.faskhaninja.clients.extension-example";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.fasakhansta.godrive.customer.extension-example";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -972,7 +972,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 2.0.2;
-				PRODUCT_BUNDLE_IDENTIFIER = com.faskhaninja.clients;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fasakhansta.godrive.customer;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -1003,7 +1003,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 2.0.2;
-				PRODUCT_BUNDLE_IDENTIFIER = com.faskhaninja.clients;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fasakhansta.godrive.customer;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;

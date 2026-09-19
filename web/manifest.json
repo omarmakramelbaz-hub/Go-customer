@@ -1,0 +1,13 @@
+{
+  "name": "Go Drive",
+  "short_name": "Go Drive",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#F7F8FA",
+  "theme_color": "#E85504",
+  "description": "اطلب مندوب وتابع توصيلك خطوة بخطوة",
+  "lang": "ar",
+  "dir": "rtl",
+  "icons": [{"src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any"}]
+}

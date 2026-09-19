@@ -2,307 +2,143 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:provider/provider.dart';
-import 'package:video_player/video_player.dart';
 
 import '../../../../helpers/hive/hive_methods.dart';
+import '../../../../helpers/networking/api_helper.dart';
 import '../../../../helpers/pusher_service/pusher_controller.dart';
 import '../../../../helpers/routes/app_routers_import.dart';
+import '../../../../helpers/theme/app_colors.dart';
+import '../../../../helpers/translation/all_translation.dart';
+import '../../../custom_widgets/go_drive_brand.dart';
 import '../../auth/controller/auth_controller.dart';
-import '../../auth/screen/login_screen.dart';
-import '../../bottom_navigation/bottom_navigation_bar_screen.dart';
-import '../../bottom_navigation/controller/advertising_controller.dart';
-import 'on_boarding_screen.dart';
-import 'opening_video_controller_stub.dart'
-    if (dart.library.html) 'opening_video_controller_web.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
-
-  static const String routeName = 'SplashScreen';
-
+  static const routeName = 'SplashScreen';
   @override
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  static const List<String> _videoChunks = [
-    'assets/splash_video/part_00.b64',
-    'assets/splash_video/part_01.b64',
-    'assets/splash_video/part_02.b64',
-    'assets/splash_video/part_03.b64',
-    'assets/splash_video/part_04.b64',
-    'assets/splash_video/part_05.b64',
-    'assets/splash_video/part_06.b64',
-    'assets/splash_video/part_07.b64',
-  ];
-
-  // Match the very first frame of the opening video as closely as possible.
-  static const Color _openingBackground = Color(0xFF3788B6);
-  static const Duration _maxOpeningDuration = Duration(seconds: 5);
-
-  final LocalAuthentication _localAuth = LocalAuthentication();
-  VideoPlayerController? _videoController;
-  String? _pendingRouteName;
-  bool _videoReady = false;
-  bool _videoFinished = false;
-  bool _videoFailed = false;
-  bool _isBiometricCheckComplete = false;
-  bool _isNavigationPending = false;
-  bool _isBiometricDialogOpen = false;
-  bool _firstFrameReleased = false;
+  bool _failed = false;
+  bool _loading = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _restoreSession());
+  }
 
-    // Keep the native launch surface visible while the MP4 texture is being
-    // prepared. This prevents Flutter from briefly painting a plain color
-    // screen between the OS launch screen and the actual opening video.
-    if (!kIsWeb) {
-      WidgetsBinding.instance.deferFirstFrame();
+  Future<void> _restoreSession() async {
+    if (_loading || !mounted) return;
+    setState(() {
+      _failed = false;
+      _loading = true;
+    });
+    HiveMethods.updateFirstTime();
+    if (HiveMethods.getToken() == null) {
+      _open(LoginScreen.routeName);
+      return;
     }
-
-    _prepareOpeningVideo();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _initial());
-  }
-
-  void _releaseFirstFrame() {
-    if (kIsWeb || _firstFrameReleased) return;
-    _firstFrameReleased = true;
-    WidgetsBinding.instance.allowFirstFrame();
-  }
-
-  Future<void> _prepareOpeningVideo() async {
-    try {
-      final controller = await createOpeningVideoController(_videoChunks);
-      _videoController = controller;
-
-      // The HQ asset is several MB, so allow enough time on a cold web load.
-      await controller.initialize().timeout(const Duration(seconds: 20));
-      await controller.setLooping(false);
-      await controller.seekTo(Duration.zero);
-
-      // Web autoplay must stay muted. On Android/iOS we only set the player
-      // volume and never change the device media/ringer settings, so the app
-      // does not force audio outside the user's current device configuration.
-      await controller.setVolume(kIsWeb ? 0.0 : 1.0);
-      controller.addListener(_handleVideoProgress);
-
-      if (!mounted) {
-        controller.removeListener(_handleVideoProgress);
-        await controller.dispose();
-        _releaseFirstFrame();
+    final auth = context.read<AuthController>();
+    await auth.getProfile();
+    if (!mounted) return;
+    if (auth.profileResponse.state == ResponseState.unauthorized) {
+      await HiveMethods.deleteToken();
+      _open(LoginScreen.routeName);
+      return;
+    }
+    if (auth.profileResponse.state != ResponseState.complete ||
+        auth.profile == null) {
+      setState(() {
+        _failed = true;
+        _loading = false;
+      });
+      return;
+    }
+    if (!kIsWeb) {
+      final localAuth = LocalAuthentication();
+      try {
+        if (await localAuth.isDeviceSupported()) {
+          final accepted = await localAuth.authenticate(
+            localizedReason: context.languageCode == 'ar'
+                ? 'تأكيد هويتك للدخول إلى Go Drive'
+                : 'Authenticate to open Go Drive',
+            persistAcrossBackgrounding: true,
+          );
+          if (!accepted) {
+            _open(LoginScreen.routeName);
+            return;
+          }
+        }
+      } catch (_) {
+        _open(LoginScreen.routeName);
         return;
       }
-
-      setState(() => _videoReady = true);
-
-      try {
-        await controller.play();
-      } catch (playError) {
-        // Some browsers can still reject the first autoplay attempt. Retry once
-        // explicitly muted before treating the splash as failed.
-        if (!kIsWeb) rethrow;
-        await controller.setVolume(0.0);
-        await controller.play();
-      }
-
-      // Only now let Flutter replace the native launch surface. The first
-      // Flutter frame already contains the initialized playing video.
-      _releaseFirstFrame();
-
-      // Never hold the user on the branding screen for more than five seconds.
-      // If the source video ends sooner, the progress listener exits earlier.
-      Future.delayed(_maxOpeningDuration, () {
-        if (!mounted || _videoFinished) return;
-        _finishOpeningVideo();
-      });
-    } catch (error, stackTrace) {
-      debugPrint('Opening splash video error: $error');
-      debugPrintStack(stackTrace: stackTrace);
-
-      _releaseFirstFrame();
-      if (!mounted) return;
-      setState(() => _videoFailed = true);
-      _finishOpeningVideo();
     }
-  }
-
-  void _handleVideoProgress() {
-    final controller = _videoController;
-    if (controller == null || _videoFinished) return;
-
-    final value = controller.value;
-    if (!value.isInitialized || value.duration == Duration.zero) return;
-
-    final remaining = value.duration - value.position;
-    if (remaining <= const Duration(milliseconds: 150)) {
-      _finishOpeningVideo();
+    if (!mounted) return;
+    HiveMethods.updateIsVisitor(false);
+    final profile = auth.profile!;
+    if (profile.id != null) {
+      HiveMethods.updateUserId(profile.id);
+      await context.read<PusherController>().initPusher(
+        channelName: 'private-user.${profile.id}',
+        userId: profile.id!,
+        token: profile.token ?? HiveMethods.getToken()!,
+      );
     }
+    _open(
+      profile.email == null
+          ? CreateNewAccountScreen.routeName
+          : BottomNavigationBarScreen.routeName,
+    );
   }
 
-  void _finishOpeningVideo() {
-    if (_videoFinished) return;
-    _videoFinished = true;
-    _tryNavigate();
-  }
-
-  @override
-  void dispose() {
-    _releaseFirstFrame();
-    _videoController?.removeListener(_handleVideoProgress);
-    _videoController?.dispose();
-    super.dispose();
+  void _open(String route) {
+    if (mounted) NamedNavigatorImpl.push(route, clean: true);
   }
 
   @override
   Widget build(BuildContext context) {
-    final controller = _videoController;
-
+    final ar = context.languageCode == 'ar';
     return Scaffold(
-      backgroundColor: _openingBackground,
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          const ColoredBox(color: _openingBackground),
-          if (_videoReady && !_videoFailed && controller != null)
-            _buildVideo(controller),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildVideo(VideoPlayerController controller) {
-    final size = controller.value.size;
-    return ClipRect(
-      child: SizedBox.expand(
-        child: FittedBox(
-          fit: BoxFit.cover,
-          alignment: Alignment.center,
-          child: SizedBox(
-            width: size.width,
-            height: size.height,
-            child: VideoPlayer(controller),
+      backgroundColor: const Color(0xFFF7F8FA),
+      body: SafeArea(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(28),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const GoDriveBrand(size: 54),
+                const SizedBox(height: 18),
+                Text(
+                  ar
+                      ? 'مندوبك في أي وقت'
+                      : 'Your courier, whenever you need one',
+                ),
+                const SizedBox(height: 36),
+                if (_failed) ...[
+                  Text(
+                    ar
+                        ? 'تعذّر الاتصال. حاول مرة أخرى.'
+                        : 'Unable to connect. Please try again.',
+                  ),
+                  const SizedBox(height: 12),
+                  FilledButton(
+                    onPressed: _restoreSession,
+                    child: Text(ar ? 'إعادة المحاولة' : 'Try again'),
+                  ),
+                  TextButton(
+                    onPressed: () => _open(LoginScreen.routeName),
+                    child: Text(ar ? 'تسجيل الدخول' : 'Sign in'),
+                  ),
+                ] else
+                  CircularProgressIndicator(color: AppColors.mainAppColor),
+              ],
+            ),
           ),
         ),
-      ),
-    );
-  }
-
-  void _initial() {
-    if (kIsWeb) {
-      _requestNavigation(BottomNavigationBarScreen.routeName);
-      return;
-    }
-
-    if (HiveMethods.isFirstTime()) {
-      _requestNavigation(OnBoardingScreen.routeName);
-    } else if (HiveMethods.getToken() != null) {
-      _getData();
-    } else {
-      _requestNavigation(LoginScreen.routeName);
-    }
-  }
-
-  void _requestNavigation(String routeName) {
-    if (!mounted || _isNavigationPending) return;
-    _pendingRouteName = routeName;
-    _tryNavigate();
-  }
-
-  void _tryNavigate() {
-    if (!mounted || _isNavigationPending || !_videoFinished) return;
-
-    final routeName = _pendingRouteName;
-    if (routeName == null) return;
-
-    _isNavigationPending = true;
-    NamedNavigatorImpl.push(clean: true, routeName);
-  }
-
-  Future<bool> _checkBiometrics() async {
-    if (kIsWeb || kDebugMode) return true;
-
-    try {
-      final canAuthenticate = await _localAuth.canCheckBiometrics;
-      final isDeviceSupported = await _localAuth.isDeviceSupported();
-
-      if (!canAuthenticate || !isDeviceSupported) return true;
-
-      return await _localAuth.authenticate(
-        localizedReason: 'Authenticate to access your account',
-        biometricOnly: false,
-        persistAcrossBackgrounding: true,
-      );
-    } catch (e) {
-      debugPrint('Biometric error: $e');
-      return false;
-    }
-  }
-
-  void _getData() {
-    context.read<AuthController>().initialProfile();
-    context.read<AdvertisingController>()
-      ..initialAdvertising()
-      ..getAdvertising();
-
-    context.read<AuthController>().getProfile(
-      onHaveIdANDToken: (id, token) {
-        context.read<PusherController>().initPusher(
-              channelName: 'private-user.$id',
-              userId: id,
-              token: token,
-            );
-      },
-      onSuccess: () async {
-        if (!mounted || _isNavigationPending) return;
-
-        final authController = context.read<AuthController>();
-        if (authController.profile?.email == null) {
-          _requestNavigation(LoginScreen.routeName);
-          return;
-        }
-
-        final bioSuccess = await _checkBiometrics();
-        _isBiometricCheckComplete = true;
-
-        if (bioSuccess) {
-          _requestNavigation(BottomNavigationBarScreen.routeName);
-        } else {
-          _handleBiometricFailure();
-        }
-      },
-      onUnauthenticated: () {
-        if (!mounted || _isNavigationPending || _isBiometricCheckComplete) {
-          return;
-        }
-        _requestNavigation(LoginScreen.routeName);
-      },
-    );
-  }
-
-  void _handleBiometricFailure() {
-    if (!mounted || _isNavigationPending || _isBiometricDialogOpen) return;
-    _isBiometricDialogOpen = true;
-
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: const Text('Authentication Required'),
-        content: const Text(
-          'Biometric authentication failed. Please login again.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _isBiometricDialogOpen = false;
-              _requestNavigation(LoginScreen.routeName);
-            },
-            child: const Text('OK'),
-          ),
-        ],
       ),
     );
   }

@@ -29,7 +29,9 @@ import 'show_delegate_on_map_screen.dart';
 class RequestDelegateScreen extends StatefulWidget {
   static const String routeName = 'RequestDelegateScreen';
 
-  const RequestDelegateScreen({super.key});
+  const RequestDelegateScreen({super.key, this.showBackButton = true});
+
+  final bool showBackButton;
 
   @override
   State<RequestDelegateScreen> createState() => _RequestDelegateScreenState();
@@ -142,10 +144,7 @@ class _RequestDelegateScreenState extends State<RequestDelegateScreen>
         ..lineTo(canvasWidth - 7, 44)
         ..lineTo(poleX, 44)
         ..close();
-      canvas.drawPath(
-        flagPath,
-        ui.Paint()..color = AppColors.mainAppColor,
-      );
+      canvas.drawPath(flagPath, ui.Paint()..color = AppColors.mainAppColor);
 
       final textPainter = TextPainter(
         text: const TextSpan(
@@ -161,10 +160,7 @@ class _RequestDelegateScreenState extends State<RequestDelegateScreen>
       )..layout(maxWidth: canvasWidth - poleX - 16);
       textPainter.paint(
         canvas,
-        Offset(
-          poleX + 10,
-          29 - (textPainter.height / 2),
-        ),
+        Offset(poleX + 10, 29 - (textPainter.height / 2)),
       );
 
       final picture = recorder.endRecording();
@@ -177,9 +173,7 @@ class _RequestDelegateScreenState extends State<RequestDelegateScreen>
       );
       if (markerBytes == null) return;
 
-      final icon = BitmapDescriptor.fromBytes(
-        markerBytes.buffer.asUint8List(),
-      );
+      final icon = BitmapDescriptor.fromBytes(markerBytes.buffer.asUint8List());
       if (!mounted) return;
       setState(() => _pickupGoDriveIcon = icon);
     } catch (e) {
@@ -214,8 +208,10 @@ class _RequestDelegateScreenState extends State<RequestDelegateScreen>
   }
 
   Future<void> _updateLocation(double lat, double lng) async {
-    final controller =
-        Provider.of<RequestDelegateController>(context, listen: false);
+    final controller = Provider.of<RequestDelegateController>(
+      context,
+      listen: false,
+    );
 
     _orangePinIcon ??= await BitmapDescriptor.asset(
       const ImageConfiguration(),
@@ -232,7 +228,8 @@ class _RequestDelegateScreenState extends State<RequestDelegateScreen>
           Marker(
             markerId: const MarkerId('currentLocation'),
             position: LatLng(lat, lng),
-            icon: _orangePinIcon ??
+            icon:
+                _orangePinIcon ??
                 BitmapDescriptor.defaultMarkerWithHue(
                   BitmapDescriptor.hueOrange,
                 ),
@@ -253,68 +250,67 @@ class _RequestDelegateScreenState extends State<RequestDelegateScreen>
             lan: currentLng.toString(),
           )
           .then((_) async {
-        final delegatesOnMap = controller.delegatesOnMap;
+            final delegatesOnMap = controller.delegatesOnMap;
 
-        if (delegatesOnMap?.shippingOrderId != null &&
-            delegatesOnMap?.shippingOrderId != 0) {
-          controller.setOrderId(delegatesOnMap?.shippingOrderId ?? 0);
-          NamedNavigatorImpl.push(
-            ShowDelegateOnMapScreen.routeName,
-            arguments: ShowDelegateOnMapArgs(
-              orderId: delegatesOnMap?.shippingOrderId,
-              fee: int.parse(
-                delegatesOnMap?.orderData?.actualPrice.toString() ?? '0',
-              ),
-              kmPrice: (delegatesOnMap?.shippingKmPrice ?? 0).round(),
-              shippingPercentage:
-                  (delegatesOnMap?.shippingMinPricePrecentage ?? 10).round(),
-              distance: num.parse('${controller.distance ?? 0}'),
-            ),
-          );
-        } else {
-          controller.setDistance(0.0);
-        }
-
-        _recalculateFareForCurrentRoute(controller);
-
-        if (delegatesOnMap?.userData != null) {
-          try {
-            final customMarkerIcon = await BitmapDescriptor.asset(
-              const ImageConfiguration(),
-              'assets/images/motorcycleImage.png',
-              height: 50,
-            );
-            final delegateMarkers = delegatesOnMap!.userData!
-                .where((userModel) {
-                  final lat = double.tryParse(userModel.lat ?? '');
-                  final lng = double.tryParse(userModel.lng ?? '');
-                  return lat != null &&
-                      lng != null &&
-                      _isEgyptPoint(LatLng(lat, lng));
-                })
-                .map(
-                  (userModel) => Marker(
-                    icon: customMarkerIcon,
-                    markerId: MarkerId(userModel.id.toString()),
-                    position: LatLng(
-                      double.parse(userModel.lat!),
-                      double.parse(userModel.lng!),
-                    ),
+            if (delegatesOnMap?.shippingOrderId != null &&
+                delegatesOnMap?.shippingOrderId != 0) {
+              controller.setOrderId(delegatesOnMap?.shippingOrderId ?? 0);
+              NamedNavigatorImpl.push(
+                ShowDelegateOnMapScreen.routeName,
+                arguments: ShowDelegateOnMapArgs(
+                  orderId: delegatesOnMap?.shippingOrderId,
+                  fee: int.parse(
+                    delegatesOnMap?.orderData?.actualPrice.toString() ?? '0',
                   ),
+                  kmPrice: (delegatesOnMap?.shippingKmPrice ?? 0).round(),
+                  shippingPercentage:
+                      (delegatesOnMap?.shippingMinPricePrecentage ?? 10)
+                          .round(),
+                  distance: num.parse('${controller.distance ?? 0}'),
+                ),
+              );
+            } else {
+              controller.setDistance(0.0);
+            }
+
+            _recalculateFareForCurrentRoute(controller);
+
+            if (delegatesOnMap?.userData != null) {
+              try {
+                final customMarkerIcon = await BitmapDescriptor.asset(
+                  const ImageConfiguration(),
+                  'assets/images/motorcycleImage.png',
+                  height: 50,
                 );
-            markers.addAll(delegateMarkers);
-            if (mounted) setState(() {});
-          } catch (e) {
-            log('Failed to load delegate marker image: $e');
-          }
-        }
-      });
+                final delegateMarkers = delegatesOnMap!.userData!
+                    .where((userModel) {
+                      final lat = double.tryParse(userModel.lat ?? '');
+                      final lng = double.tryParse(userModel.lng ?? '');
+                      return lat != null &&
+                          lng != null &&
+                          _isEgyptPoint(LatLng(lat, lng));
+                    })
+                    .map(
+                      (userModel) => Marker(
+                        icon: customMarkerIcon,
+                        markerId: MarkerId(userModel.id.toString()),
+                        position: LatLng(
+                          double.parse(userModel.lat!),
+                          double.parse(userModel.lng!),
+                        ),
+                      ),
+                    );
+                markers.addAll(delegateMarkers);
+                if (mounted) setState(() {});
+              } catch (e) {
+                log('Failed to load delegate marker image: $e');
+              }
+            }
+          });
     });
 
     if (gmc != null) {
-      await gmc!.animateCamera(
-        CameraUpdate.newLatLng(LatLng(lat, lng)),
-      );
+      await gmc!.animateCamera(CameraUpdate.newLatLng(LatLng(lat, lng)));
     }
 
     try {
@@ -341,11 +337,10 @@ class _RequestDelegateScreenState extends State<RequestDelegateScreen>
     });
   }
 
-  double? _resolveShippingKmPrice(
-    RequestDelegateController controller,
-  ) {
-    final liveKmPrice =
-        double.tryParse('${controller.delegatesOnMap?.shippingKmPrice}');
+  double? _resolveShippingKmPrice(RequestDelegateController controller) {
+    final liveKmPrice = double.tryParse(
+      '${controller.delegatesOnMap?.shippingKmPrice}',
+    );
     if (liveKmPrice != null && liveKmPrice > 0) {
       _cachedShippingKmPrice = liveKmPrice;
       return liveKmPrice;
@@ -428,7 +423,8 @@ class _RequestDelegateScreenState extends State<RequestDelegateScreen>
       return null;
     }
 
-    final distanceKm = Geolocator.distanceBetween(
+    final distanceKm =
+        Geolocator.distanceBetween(
           pickup.latitude,
           pickup.longitude,
           delivery.latitude,
@@ -444,9 +440,7 @@ class _RequestDelegateScreenState extends State<RequestDelegateScreen>
     ).round().toString();
   }
 
-  void _recalculateFareForCurrentRoute(
-    RequestDelegateController controller,
-  ) {
+  void _recalculateFareForCurrentRoute(RequestDelegateController controller) {
     final fromLat = double.tryParse(controller.fromLat ?? '');
     final fromLng = double.tryParse(controller.fromLan ?? '');
     final toLat = double.tryParse(controller.toLat ?? '');
@@ -470,13 +464,8 @@ class _RequestDelegateScreenState extends State<RequestDelegateScreen>
 
     final pickup = LatLng(fromLat, fromLng);
     final delivery = LatLng(toLat, toLng);
-    final distanceKm = Geolocator.distanceBetween(
-          fromLat,
-          fromLng,
-          toLat,
-          toLng,
-        ) /
-        1000;
+    final distanceKm =
+        Geolocator.distanceBetween(fromLat, fromLng, toLat, toLng) / 1000;
     final updatedFare = _calculateDashboardFare(
       distanceKm: distanceKm,
       kmPrice: kmPrice,
@@ -498,9 +487,7 @@ class _RequestDelegateScreenState extends State<RequestDelegateScreen>
     controller.setActualPrice(updatedFare);
   }
 
-  void _syncFareForSelectedRoute(
-    RequestDelegateController controller,
-  ) {
+  void _syncFareForSelectedRoute(RequestDelegateController controller) {
     final pickup = _pickupPoint(controller);
     final delivery = _deliveryPoint(controller);
     final kmPrice = _resolveShippingKmPrice(controller);
@@ -527,7 +514,8 @@ class _RequestDelegateScreenState extends State<RequestDelegateScreen>
     );
     if (_fareRouteKey == key) return;
 
-    final distanceKm = Geolocator.distanceBetween(
+    final distanceKm =
+        Geolocator.distanceBetween(
           pickup.latitude,
           pickup.longitude,
           delivery.latitude,
@@ -626,11 +614,10 @@ class _RequestDelegateScreenState extends State<RequestDelegateScreen>
         Marker(
           markerId: const MarkerId('pickupLocation'),
           position: pickup,
-          icon: _pickupGoDriveIcon ??
+          icon:
+              _pickupGoDriveIcon ??
               _pickupRiderIcon ??
-              BitmapDescriptor.defaultMarkerWithHue(
-                BitmapDescriptor.hueOrange,
-              ),
+              BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
           anchor: const Offset(.31, 1),
           zIndex: 100,
           infoWindow: InfoWindow(
@@ -648,10 +635,9 @@ class _RequestDelegateScreenState extends State<RequestDelegateScreen>
         Marker(
           markerId: const MarkerId('deliveryDestination'),
           position: delivery,
-          icon: _orangePinIcon ??
-              BitmapDescriptor.defaultMarkerWithHue(
-                BitmapDescriptor.hueOrange,
-              ),
+          icon:
+              _orangePinIcon ??
+              BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
           zIndex: 90,
           infoWindow: InfoWindow(
             title: context.languageCode == 'ar'
@@ -752,7 +738,8 @@ class _RequestDelegateScreenState extends State<RequestDelegateScreen>
   Future<void> _fitSafeEndpoints(LatLng pickup, LatLng delivery) async {
     if (gmc == null) return;
 
-    final distanceKm = Geolocator.distanceBetween(
+    final distanceKm =
+        Geolocator.distanceBetween(
           pickup.latitude,
           pickup.longitude,
           delivery.latitude,
@@ -769,10 +756,7 @@ class _RequestDelegateScreenState extends State<RequestDelegateScreen>
     try {
       await gmc!.animateCamera(
         CameraUpdate.newCameraPosition(
-          CameraPosition(
-            target: center,
-            zoom: zoom,
-          ),
+          CameraPosition(target: center, zoom: zoom),
         ),
       );
     } catch (e) {
@@ -857,9 +841,7 @@ class _RequestDelegateScreenState extends State<RequestDelegateScreen>
                     });
                   } else if (currentLat != null && currentLng != null) {
                     gmc!.animateCamera(
-                      CameraUpdate.newLatLng(
-                        LatLng(currentLat!, currentLng!),
-                      ),
+                      CameraUpdate.newLatLng(LatLng(currentLat!, currentLng!)),
                     );
                   }
                 },
@@ -879,7 +861,9 @@ class _RequestDelegateScreenState extends State<RequestDelegateScreen>
                 child: Material(
                   color: Colors.transparent,
                   child: InkWell(
-                    onTap: () => NamedNavigatorImpl.pop(),
+                    onTap: widget.showBackButton
+                        ? () => NamedNavigatorImpl.pop()
+                        : null,
                     borderRadius: BorderRadius.circular(25),
                     child: Ink(
                       width: 48,
@@ -899,7 +883,9 @@ class _RequestDelegateScreenState extends State<RequestDelegateScreen>
                         ],
                       ),
                       child: Icon(
-                        context.languageCode == 'ar'
+                        !widget.showBackButton
+                            ? Icons.delivery_dining_rounded
+                            : context.languageCode == 'ar'
                             ? Icons.arrow_forward_rounded
                             : Icons.arrow_back_rounded,
                         color: AppColors.mainAppColor,
@@ -1054,7 +1040,8 @@ class _RequestDelegateScreenState extends State<RequestDelegateScreen>
   }
 
   void _onConfirmOrder(RequestDelegateController controller) {
-    final expectedPrice = _calculateExpectedFareForCurrentRoute(controller) ??
+    final expectedPrice =
+        _calculateExpectedFareForCurrentRoute(controller) ??
         controller.priceEC.text.trim();
     final serviceActivated = controller.delegatesOnMap?.goDriveBlock == 0;
 
@@ -1081,8 +1068,8 @@ class _RequestDelegateScreenState extends State<RequestDelegateScreen>
                 arguments: ShowDelegateOnMapArgs(
                   orderId: controller.orderId,
                   fee: int.parse(controller.actualPrice ?? '0'),
-                  kmPrice:
-                      (controller.delegatesOnMap?.shippingKmPrice ?? 0).round(),
+                  kmPrice: (controller.delegatesOnMap?.shippingKmPrice ?? 0)
+                      .round(),
                   shippingPercentage:
                       (controller.delegatesOnMap?.shippingMinPricePrecentage ??
                               10)
@@ -1111,10 +1098,12 @@ class _RequestDelegateScreenState extends State<RequestDelegateScreen>
                         kmPrice:
                             (controller.delegatesOnMap?.shippingKmPrice ?? 0)
                                 .round(),
-                        shippingPercentage: (controller.delegatesOnMap
-                                    ?.shippingMinPricePrecentage ??
-                                10)
-                            .round(),
+                        shippingPercentage:
+                            (controller
+                                        .delegatesOnMap
+                                        ?.shippingMinPricePrecentage ??
+                                    10)
+                                .round(),
                         distance: num.parse('${controller.distance}'),
                       ),
                     );

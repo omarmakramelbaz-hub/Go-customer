@@ -103,7 +103,7 @@ class DeliveryProvider extends ChangeNotifier {
       }
 
       await _liveActivitiesPlugin.init(
-        appGroupId: 'group.faskhaninja.liveactivities',
+        appGroupId: 'group.com.fasakhansta.godrive.customer.liveactivities',
         urlScheme: Platform.isIOS ? 'la' : null,
       );
       _subscribeToActivityUpdates();

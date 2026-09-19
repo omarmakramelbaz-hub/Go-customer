@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <base href="$FLUTTER_BASE_HREF">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="جو درايف — اطلب مندوب وتابع توصيلك خطوة بخطوة.">
+  <meta name="theme-color" content="#E85504">
+  <meta name="apple-mobile-web-app-title" content="Go Drive">
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <link rel="manifest" href="manifest.json">
+  <title>Go Drive</title>
+  <style>
+    html,body{margin:0;background:#f7f8fa;height:100%;font-family:Arial,sans-serif}
+    #loading{height:100%;display:grid;place-content:center;text-align:center;color:#171a1f;gap:16px}
+    #loading b{font-size:36px;direction:ltr}#loading b span{color:#e85504}
+    #loading p{font-size:16px;color:#666}
+  </style>
+  <!-- MAPS_SCRIPT -->
+  <script src="https://js.pusher.com/8.4.0/pusher.min.js"></script>
+</head>
+<body>
+  <div id="loading" role="status"><b><span>GO</span> Drive</b><p>جاري التحميل…</p></div>
+  <script>window.addEventListener('flutter-first-frame', () => document.getElementById('loading')?.remove());</script>
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>
