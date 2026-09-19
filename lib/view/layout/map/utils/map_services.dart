@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -13,6 +14,7 @@ import '../model/place_details_model/place_details_model.dart';
 import '../model/routes_model/routes_model.dart';
 import 'google_maps_place_service.dart';
 import 'routes_service.dart';
+import 'routes_client_bridge.dart';
 
 class MapServices {
   PlacesService placesService = PlacesService();
@@ -35,6 +37,16 @@ class MapServices {
   }
 
   Future<List<LatLng>> getRouteData({required LatLng originFrom, required LatLng desintation}) async {
+    if (kIsWeb) {
+      final webPath = await getWebRoutePath(
+        origin: originFrom,
+        destination: desintation,
+      );
+      if (webPath != null && webPath.length >= 2) {
+        return webPath;
+      }
+    }
+
     LocationInfoModel origin = LocationInfoModel(
       location: LocationModel(
         latLng: LatLngModel(latitude: originFrom.latitude, longitude: originFrom.longitude),
