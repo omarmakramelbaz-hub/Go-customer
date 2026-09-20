@@ -60,6 +60,8 @@ class Urls {
   static const String partnerApplications = '${baseUrl}partner-applications';
   static const String partnerApplicationStatus = '${baseUrl}partner-applications/status';
   static const String professions = '${baseUrl}professions';
+  static String professionPartners(String key) => '${baseUrl}professions/$key/partners';
+  static const String partnerServiceRequests = '${baseUrl}user/partner-service-requests';
   static const String updateUserLocation = '${baseUrl}user/update/';
   static const String contract = '${baseUrl}contract/';
   static const String emptyCart = '${baseUrl}user/cart/remove';
