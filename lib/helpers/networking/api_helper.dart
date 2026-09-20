@@ -67,6 +67,7 @@ class ApiHelper {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'Lang': HiveMethods.getLang(),
+        'X-App-Scope': 'go',
         if (HiveMethods.getToken() != null && hasToken) ...{
           'Authorization': 'Bearer ${HiveMethods.getToken()}',
         },
