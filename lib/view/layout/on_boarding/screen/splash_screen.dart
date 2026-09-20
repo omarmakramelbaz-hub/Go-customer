@@ -39,6 +39,13 @@ class _SplashScreenState extends State<SplashScreen> {
       _loading = true;
     });
     HiveMethods.updateFirstTime();
+    // GitHub Pages is a public UI preview. Do not let stale browser auth
+    // state/API availability trap the preview on the splash screen.
+    if (kIsWeb && Uri.base.host.endsWith('github.io')) {
+      HiveMethods.updateIsVisitor(true);
+      _open(BottomNavigationBarScreen.routeName);
+      return;
+    }
     if (HiveMethods.getToken() == null) {
       _open(LoginScreen.routeName);
       return;
