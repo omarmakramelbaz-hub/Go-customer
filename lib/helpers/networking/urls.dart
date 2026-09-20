@@ -57,6 +57,9 @@ class Urls {
   static const String chargingWallet = '${baseUrl}user/charging/wallet';
   static const String chooseAvatar = '${baseUrl}user/update-profile-avatar';
   static const String vendorSignUp = '${baseUrl}signup';
+  static const String partnerApplications = '${baseUrl}partner-applications';
+  static const String partnerApplicationStatus = '${baseUrl}partner-applications/status';
+  static const String professions = '${baseUrl}professions';
   static const String updateUserLocation = '${baseUrl}user/update/';
   static const String contract = '${baseUrl}contract/';
   static const String emptyCart = '${baseUrl}user/cart/remove';
