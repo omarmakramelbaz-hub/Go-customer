@@ -7,6 +7,7 @@ import '../../../../helpers/theme/app_colors.dart';
 import '../../../../helpers/translation/all_translation.dart';
 import '../../auth/controller/auth_controller.dart';
 import '../../request_delegate/screen/request_delegate_screen.dart';
+import '../../partner_search/screen/profession_partners_screen.dart';
 import '../widgets/service_photo_sprite.dart';
 
 class GoServicesHomeScreen extends StatefulWidget {
@@ -208,6 +209,27 @@ class _GoServicesHomeScreenState extends State<GoServicesHomeScreen> {
     ),
   ];
 
+  static const Map<String, String> _professionKeys = {
+    'فني صيانة ثلاجات وغسالات': 'appliance_technician',
+    'سباك': 'plumber',
+    'نقاش': 'painter',
+    'فني تركيب بلاط': 'tile_installer',
+    'فني تركيب رخام': 'marble_installer',
+    'حداد': 'blacksmith',
+    'كهربائي': 'electrician',
+    'فني تركيب وصيانة الدش': 'satellite_technician',
+    'نجار أثاث': 'furniture_carpenter',
+    'فني تكييف': 'ac_technician',
+    'عامل بناء': 'construction_worker',
+    'ميكانيكي سيارات': 'auto_mechanic',
+    'كهربائي سيارات': 'auto_electrician',
+    'كوافير رجالي': 'mens_barber',
+    'كوافيرة سيدات': 'womens_hairdresser',
+    'خياط': 'tailor',
+    'عامل نظافة': 'male_cleaner',
+    'عاملة نظافة': 'female_cleaner',
+  };
+
   static const _allSpecialties = [
     'مندوب توصيل',
     'فني صيانة ثلاجات وغسالات',
@@ -288,7 +310,21 @@ class _GoServicesHomeScreenState extends State<GoServicesHomeScreen> {
       _openDelivery();
       return;
     }
-    _showComingSoon(service.arTitle, service.enTitle);
+
+    final professionKey = _professionKeys[service.arTitle];
+    if (professionKey == null) {
+      _showComingSoon(service.arTitle, service.enTitle);
+      return;
+    }
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => ProfessionPartnersScreen(
+          professionKey: professionKey,
+          title: _ar ? service.arTitle : service.enTitle,
+        ),
+      ),
+    );
   }
 
   void _showComingSoon(String arTitle, String enTitle) {
@@ -470,7 +506,19 @@ class _GoServicesHomeScreenState extends State<GoServicesHomeScreen> {
                             if (delivery) {
                               _openDelivery();
                             } else {
-                              _showComingSoon(service, service);
+                              final key = _professionKeys[service];
+                              if (key != null) {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (_) => ProfessionPartnersScreen(
+                                      professionKey: key,
+                                      title: service,
+                                    ),
+                                  ),
+                                );
+                              } else {
+                                _showComingSoon(service, service);
+                              }
                             }
                           },
                         );
