@@ -66,7 +66,7 @@ class _GoServicesShellState extends State<_GoServicesShell> {
         if (!didPop) nav.updateIndex(0);
       },
       child: Scaffold(
-        backgroundColor: const Color(0xFFF6F7F9),
+        backgroundColor: const Color(0xFFF8F9FB),
         body: IndexedStack(
           index: nav.screenIndex,
           children: [
@@ -98,7 +98,7 @@ class _GoServicesShellState extends State<_GoServicesShell> {
           data: NavigationBarThemeData(
             height: 72,
             backgroundColor: Colors.white,
-            indicatorColor: const Color(0xFFFFE9DA),
+            indicatorColor: const Color(0xFFFFF1E5),
             labelTextStyle: WidgetStateProperty.resolveWith((states) {
               final selected = states.contains(WidgetState.selected);
               return TextStyle(
