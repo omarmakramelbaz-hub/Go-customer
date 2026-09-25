@@ -22,6 +22,10 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get
+      - name: Verify approved identity and active home route
+        run: python3 tool/verify_approved_identity.py
+      - name: Test approved identity and responsive home
+        run: flutter test test/go_customer_identity_test.dart
       - name: Check standalone boundaries
         run: dart run tool/check_standalone.dart
       - name: Configure browser integrations
@@ -39,6 +43,8 @@ jobs:
             --dart-define=MAPS_WEB_API_KEY="$MAPS_WEB_API_KEY" \
             --dart-define=GOOGLE_WEB_CLIENT_ID="$GOOGLE_WEB_CLIENT_ID" \
             --dart-define=FACEBOOK_APP_ID="$FACEBOOK_APP_ID"
+      - name: Stamp published identity revision
+        run: python3 tool/stamp_web_identity.py
       - name: Upload downloadable web build
         uses: actions/upload-artifact@v4
         with:
