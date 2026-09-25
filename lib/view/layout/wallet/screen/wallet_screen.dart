@@ -78,7 +78,7 @@ class _WalletScreenState extends State<WalletScreen> {
           body: PageContainer(
             bottom: false,
             child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(20, 22, 20, 130),
+              padding: const EdgeInsets.fromLTRB(20, 18, 20, 130),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -158,7 +158,7 @@ class _WalletScreenState extends State<WalletScreen> {
       padding: const EdgeInsets.symmetric(vertical: 16),
       decoration: BoxDecoration(
         color: AppColors.whiteColor,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(color: AppColors.greyColor.withValues(alpha: .10)),
         boxShadow: [BoxShadow(color: AppColors.greyColor.withValues(alpha: .08), blurRadius: 14, offset: const Offset(0, 5))],
       ),
