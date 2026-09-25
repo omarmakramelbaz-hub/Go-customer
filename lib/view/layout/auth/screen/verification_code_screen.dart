@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../helpers/extensions/extensions.dart';
 import '../../../../helpers/images/app_images.dart';
+import '../../../../helpers/identity/go_customer_identity.dart';
 import '../../../../helpers/routes/app_routers_import.dart';
 import '../../../../helpers/theme/app_colors.dart';
 import '../../../../helpers/theme/app_text_style.dart';
@@ -59,7 +60,7 @@ class _VerificationCodeScreenState extends State<VerificationCodeScreen> with Si
       child: Scaffold(
         appBar: CustomAppBar(
           centerTitle: false,
-          title: const CustomImage(path: AppImages.appLogo, type: ImageType.asset, height: 55, radius: 12),
+          title: SvgPicture.asset(GoCustomerIdentity.logoAsset, height: 44),
           appBarColor: AppColors.whiteColor,
         ),
         body: SingleChildScrollView(
