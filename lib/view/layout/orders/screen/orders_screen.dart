@@ -81,9 +81,9 @@ class _OrdersScreenState extends State<OrdersScreen> {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 25),
+                const SizedBox(height: 18),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   child: Text('orders'.tr, style: AppTextStyle.text18BS()),
                 ),
                 Expanded(
@@ -92,8 +92,8 @@ class _OrdersScreenState extends State<OrdersScreen> {
                     decoration: BoxDecoration(
                       color: AppColors.whiteColor,
                       borderRadius: const BorderRadius.only(
-                        topRight: Radius.circular(36),
-                        topLeft: Radius.circular(36),
+                        topRight: Radius.circular(24),
+                        topLeft: Radius.circular(24),
                       ),
                       boxShadow: [
                         BoxShadow(
