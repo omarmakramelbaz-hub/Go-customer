@@ -26,9 +26,9 @@ class CustomButton extends StatelessWidget {
   final List<BoxShadow>? boxShadow;
   const CustomButton({
     super.key,
-    this.radius = 23.5,
+    this.radius = 14,
     this.width,
-    this.height = 47,
+    this.height = 54,
     this.style,
     this.text,
     this.prefixIcon = const SizedBox(),
@@ -59,7 +59,7 @@ class CustomButton extends StatelessWidget {
                   LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [AppColors.gridOneButtonColor, AppColors.gridTwoButtonColor],
+                    colors: [AppColors.mainAppColor, AppColors.mainAppColor],
                   ),
               borderRadius: borderRadius ?? BorderRadius.circular(radius),
               border: Border.all(color: borderColor ?? Colors.transparent),
