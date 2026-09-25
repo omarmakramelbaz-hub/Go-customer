@@ -1,9 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../helpers/hive/hive_methods.dart';
+import '../../../../helpers/identity/go_customer_identity.dart';
 import '../../../../helpers/networking/api_helper.dart';
 import '../../../../helpers/pusher_service/pusher_controller.dart';
 import '../../../../helpers/routes/app_routers_import.dart';
@@ -112,7 +114,7 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     final ar = context.languageCode == 'ar';
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F8FA),
+      backgroundColor: const Color(0xff171A1F),
       body: SafeArea(
         child: Center(
           child: Padding(
@@ -120,31 +122,29 @@ class _SplashScreenState extends State<SplashScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const GoDriveBrand(size: 54),
-                const SizedBox(height: 18),
+                SvgPicture.asset(GoCustomerIdentity.lightLogoAsset, width: 210, height: 150),
+                const SizedBox(height: 12),
                 Text(
-                  ar
-                      ? 'مندوبك في أي وقت'
-                      : 'Your courier, whenever you need one',
+                  ar ? 'كل خدماتك عندك' : 'All your services, in one place',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w800),
                 ),
                 const SizedBox(height: 36),
                 if (_failed) ...[
-                  Text(
-                    ar
-                        ? 'تعذّر الاتصال. حاول مرة أخرى.'
-                        : 'Unable to connect. Please try again.',
-                  ),
+                  Text(ar ? 'تعذّر الاتصال. حاول مرة أخرى.' : 'Unable to connect. Please try again.',
+                    style: const TextStyle(color: Colors.white70)),
                   const SizedBox(height: 12),
                   FilledButton(
                     onPressed: _restoreSession,
+                    style: FilledButton.styleFrom(backgroundColor: const Color(0xffFD7201)),
                     child: Text(ar ? 'إعادة المحاولة' : 'Try again'),
                   ),
                   TextButton(
                     onPressed: () => _open(LoginScreen.routeName),
-                    child: Text(ar ? 'تسجيل الدخول' : 'Sign in'),
+                    child: Text(ar ? 'تسجيل الدخول' : 'Sign in', style: const TextStyle(color: Colors.white)),
                   ),
                 ] else
-                  CircularProgressIndicator(color: AppColors.mainAppColor),
+                  const CircularProgressIndicator(color: Color(0xffFD7201)),
               ],
             ),
           ),
