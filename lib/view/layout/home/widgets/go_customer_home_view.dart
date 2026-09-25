@@ -107,7 +107,7 @@ class _GoCustomerHomeViewState extends State<GoCustomerHomeView> {
                   return ListTile(
                     leading: Icon(service.icon, color: GoHomeStyle.orange),
                     title: Text(ar ? service.ar : service.en),
-                    trailing: const Icon(Icons.chevron_left, size: 18),
+                    trailing: Icon(ar ? Icons.chevron_left : Icons.chevron_right, size: 18),
                     onTap: () { Navigator.pop(sheet); widget.onService(service); },
                   );
                 },
@@ -213,13 +213,14 @@ class _GoCustomerHomeViewState extends State<GoCustomerHomeView> {
             ]),
           ),
         )),
-        const SizedBox(width: 12),
-        Column(children: [
+        const SizedBox(width: 10),
+        SizedBox(width: 78, child: Column(children: [
           const GoDriveBrand(size: 30, light: true),
           const SizedBox(height: 3),
-          Text(t('كل الخدمات عندك', 'Every service, one app'), style: const TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.w700)),
-        ]),
-        const SizedBox(width: 8),
+          Text(t('كل الخدمات عندك', 'Every service, one app'), maxLines: 1, overflow: TextOverflow.ellipsis,
+              style: const TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.w700)),
+        ])),
+        const SizedBox(width: 6),
         Stack(children: [
           IconButton(key: const ValueKey('go-home-notifications'), tooltip: t('الإشعارات', 'Notifications'), onPressed: widget.onNotifications,
               icon: const Icon(Icons.notifications_outlined, color: Colors.white)),
@@ -271,14 +272,18 @@ class _GoCustomerHomeViewState extends State<GoCustomerHomeView> {
             const SizedBox(height: 6),
             Text(t('اختار خدمتك\nوسيب الباقي علينا', 'Choose your service.\nWe take care of the rest.'), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 17, height: 1.4)),
             const SizedBox(height: 14),
-            FilledButton.icon(
+            SizedBox(width: double.infinity, child: FilledButton(
               key: const ValueKey('go-home-book'), onPressed: _allServices,
-              icon: const Icon(Icons.arrow_forward, size: 18),
-              label: Text(t('اطلب الآن', 'Book now')),
               style: FilledButton.styleFrom(backgroundColor: GoHomeStyle.orange, foregroundColor: Colors.white,
-                  minimumSize: const Size(0, 46), padding: const EdgeInsets.symmetric(horizontal: 14),
+                  minimumSize: const Size(0, 46), padding: const EdgeInsets.symmetric(horizontal: 10),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-            ),
+              child: Row(children: [
+                Expanded(child: Text(t('اطلب الآن', 'Book now'), maxLines: 1, overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800))),
+                const SizedBox(width: 6),
+                const Icon(Icons.arrow_forward, size: 16),
+              ]),
+            )),
           ],
         ))),
         Expanded(flex: 4, child: Stack(fit: StackFit.expand, children: [
