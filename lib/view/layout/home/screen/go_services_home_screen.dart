@@ -26,9 +26,9 @@ class _GoServicesHomeScreenState extends State<GoServicesHomeScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _query = '';
 
-  static const _ink = Color(0xFF0B1721);
+  static const _ink = Color(0xFF171A1F);
   static const _muted = Color(0xFF7E8790);
-  static const _bg = Color(0xFFF7F8FA);
+  static const _bg = Color(0xFFF8F9FB);
   static const _line = Color(0xFFE8ECEF);
   static const _gold = Color(0xFFE7B84A);
 
