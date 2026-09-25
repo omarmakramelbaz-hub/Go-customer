@@ -143,11 +143,18 @@ class _ShowDelegateOnMapScreenState extends State<ShowDelegateOnMapScreen>
       await requestDelegateController.getAcceptedDelegate(
         delegateOrderId: widget.args.orderId,
       );
-      if (requestDelegateController.acceptedDelegate?.delegates?.isNotEmpty ==
-          true) {
+      // Always mirror the server list. A driver's pre-selection decline only
+      // removes that driver; the customer keeps searching for another one.
+      // Do not turn an empty proposal list into an order cancellation.
+      if (mounted) {
         setState(() {
           acceptedDelegates =
               requestDelegateController.acceptedDelegate?.delegates ?? [];
+          final serverFare =
+              requestDelegateController.acceptedDelegate?.order?.actualPrice;
+          if (serverFare != null) {
+            _feeEC.text = serverFare.toString();
+          }
         });
       }
     } catch (e) {
