@@ -14,10 +14,10 @@ class AppBottomSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(top: 20),
+      margin: const EdgeInsets.only(top: 16),
       decoration: BoxDecoration(
         color: isDark == true ? AppColors.blackColor : AppColors.whiteColor,
-        borderRadius: const BorderRadius.only(topLeft: Radius.circular(36), topRight: Radius.circular(36)),
+        borderRadius: const BorderRadius.only(topLeft: Radius.circular(24), topRight: Radius.circular(24)),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
