@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../helpers/extensions/extensions.dart';
+import '../../../../helpers/identity/go_customer_identity.dart';
 import '../../../../helpers/images/app_images.dart';
 import '../../../../helpers/pusher_service/pusher_controller.dart';
 import '../../../../helpers/routes/app_routers_import.dart';
@@ -59,9 +61,10 @@ class _CreateNewAccountScreenState extends State<CreateNewAccountScreen> with Va
           return Form(
             key: _formKey,
             child: Scaffold(
+              backgroundColor: const Color(0xffF8F9FB),
               appBar: CustomAppBar(
                 centerTitle: false,
-                title: const CustomImage(path: AppImages.appLogo, type: ImageType.asset, height: 55, radius: 12),
+                title: SvgPicture.asset(GoCustomerIdentity.logoAsset, height: 44),
                 appBarColor: AppColors.whiteColor,
               ),
               body: ApiResponseWidget(
