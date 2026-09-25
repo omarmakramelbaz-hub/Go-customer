@@ -23,11 +23,11 @@ import 'terms_and_conditions_screen.dart';
 class MyAccountScreen extends StatelessWidget {
   const MyAccountScreen({super.key});
 
-  static const _orange = Color(0xFFE85504);
-  static const _navy = Color(0xFF0B1721);
-  static const _muted = Color(0xFF7C858E);
-  static const _bg = Color(0xFFF7F8FA);
-  static const _line = Color(0xFFE7EBEE);
+  static const _orange = Color(0xFFFD7201);
+  static const _navy = Color(0xFF171A1F);
+  static const _muted = Color(0xFF7D8490);
+  static const _bg = Color(0xFFF8F9FB);
+  static const _line = Color(0xFFECEEF1);
 
   @override
   Widget build(BuildContext context) {
