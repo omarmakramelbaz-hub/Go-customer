@@ -183,9 +183,9 @@ class _TrackingDelegateOrderScreenState extends State<TrackingDelegateOrderScree
             onReload: () => requestDelegateController.getDelegateOrderDetails(id: widget.args.id),
             isEmpty: orderDetails == null,
             child: Container(
-              color: AppColors.blackColor,
+              color: const Color(0xff171A1F),
               child: Scaffold(
-                backgroundColor: AppColors.blackColor,
+                backgroundColor: const Color(0xff171A1F),
                 appBar: CustomAppBar(
                   appBarColor: AppColors.blackColor,
                   title: Text(
