@@ -66,11 +66,13 @@ class _ChatScreenState extends State<ChatScreen> {
       builder: (context, chatController, _) {
         return Scaffold(
           appBar: CustomAppBar(
-            height: 90,
-            radius: 60,
+            height: 72,
+            radius: 0,
+            appBarColor: const Color(0xff171A1F),
             actions: const [],
-            title: Text('messages'.tr),
+            title: Text('messages'.tr, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
           ),
+          backgroundColor: const Color(0xffF8F9FB),
           body: Column(
             children: [
               Expanded(
