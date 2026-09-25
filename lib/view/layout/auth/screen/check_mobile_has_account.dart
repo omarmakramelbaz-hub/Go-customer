@@ -1,10 +1,12 @@
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../helpers/extension/string_extension.dart';
 import '../../../../helpers/extensions/extensions.dart';
 import '../../../../helpers/images/app_images.dart';
+import '../../../../helpers/identity/go_customer_identity.dart';
 import '../../../../helpers/routes/app_routers_import.dart';
 import '../../../../helpers/theme/app_colors.dart';
 import '../../../../helpers/theme/app_text_style.dart';
@@ -54,16 +56,11 @@ class _CheckMobileHasAccountState extends State<CheckMobileHasAccount>
     return Form(
       key: _formKey,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF7F8FA),
+        backgroundColor: Colors.white,
         appBar: CustomAppBar(
           centerTitle: false,
           height: 70,
-          title: const CustomImage(
-            path: AppImages.appLogo,
-            type: ImageType.asset,
-            height: 52,
-            radius: 12,
-          ),
+          title: SvgPicture.asset(GoCustomerIdentity.logoAsset, height: 44),
           appBarColor: Colors.white,
         ),
         body: SafeArea(
@@ -97,9 +94,9 @@ class _CheckMobileHasAccountState extends State<CheckMobileHasAccount>
         gradient: const LinearGradient(
           begin: Alignment.topRight,
           end: Alignment.bottomLeft,
-          colors: [Color(0xFFFFF8F1), Color(0xFFFFF1E4)],
+          colors: [Color(0xFFFFF8F1), Color(0xFFFFF1E5)],
         ),
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(color: const Color(0xFFFFDFC2)),
       ),
       child: Row(
@@ -160,7 +157,7 @@ class _CheckMobileHasAccountState extends State<CheckMobileHasAccount>
       padding: const EdgeInsets.fromLTRB(16, 18, 16, 18),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(color: _border),
         boxShadow: const [
           BoxShadow(
