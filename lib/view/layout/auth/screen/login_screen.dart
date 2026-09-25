@@ -1,10 +1,12 @@
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../helpers/extension/string_extension.dart';
 import '../../../../helpers/extensions/extensions.dart';
 import '../../../../helpers/hive/hive_methods.dart';
+import '../../../../helpers/identity/go_customer_identity.dart';
 import '../../../../helpers/pusher_service/pusher_controller.dart';
 import '../../../../helpers/routes/app_routers_import.dart';
 import '../../../../helpers/theme/app_colors.dart';
@@ -63,10 +65,10 @@ class _LoginScreenState extends State<LoginScreen> with ValidationMixin {
         return Form(
           key: _formKey,
           child: Scaffold(
-            backgroundColor: const Color(0xFFF7F8FA),
+            backgroundColor: Colors.white,
             appBar: CustomAppBar(
               centerTitle: false,
-              title: const GoDriveBrand(),
+              title: SvgPicture.asset(GoCustomerIdentity.logoAsset, height: 42),
               appBarColor: Colors.white,
               showLang: true,
             ),
@@ -106,9 +108,9 @@ class _LoginScreenState extends State<LoginScreen> with ValidationMixin {
         gradient: const LinearGradient(
           begin: Alignment.topRight,
           end: Alignment.bottomLeft,
-          colors: [Color(0xFFFFF8F1), Color(0xFFFFF1E4)],
+          colors: [Color(0xFFFFF8F1), Color(0xFFFFF1E5)],
         ),
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(color: const Color(0xFFFFDFC2)),
       ),
       child: Row(
@@ -169,7 +171,7 @@ class _LoginScreenState extends State<LoginScreen> with ValidationMixin {
       padding: const EdgeInsets.fromLTRB(16, 18, 16, 16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(color: _border),
         boxShadow: const [
           BoxShadow(
