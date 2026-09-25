@@ -1,10 +1,12 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../helpers/hive/hive_methods.dart';
 import '../../../../helpers/images/app_images.dart';
+import '../../../../helpers/identity/go_customer_identity.dart';
 import '../../../../helpers/routes/app_routers_import.dart';
 import '../../../../helpers/theme/app_colors.dart';
 import '../../../../helpers/theme/app_text_style.dart';
@@ -48,7 +50,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
             appBar: CustomAppBar(
               height: 130,
               appBarColor: AppColors.whiteColor,
-              title: const CustomImage(path: AppImages.appLogo, type: ImageType.asset, height: 60, radius: 12),
+              title: SvgPicture.asset(GoCustomerIdentity.logoAsset, height: 44),
               leading: Center(
                 child: TextButton(
                   onPressed: () {

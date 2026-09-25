@@ -1,10 +1,12 @@
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../helpers/extension/string_extension.dart';
 import '../../../../helpers/pusher_service/pusher_controller.dart';
 import '../../../../helpers/routes/app_routers_import.dart';
+import '../../../../helpers/identity/go_customer_identity.dart';
 import '../../../../helpers/theme/app_colors.dart';
 import '../../../../helpers/theme/app_text_style.dart';
 import '../../../../helpers/translation/all_translation.dart';
@@ -63,12 +65,12 @@ class _RegisterScreenState extends State<RegisterScreen> with ValidationMixin {
         return Form(
           key: _formKey,
           child: Scaffold(
-            backgroundColor: const Color(0xFFF7F8FA),
+            backgroundColor: Colors.white,
             appBar: CustomAppBar(
               showLang: true,
               centerTitle: false,
               height: 70,
-              title: const GoDriveBrand(),
+              title: SvgPicture.asset(GoCustomerIdentity.logoAsset, height: 44),
               appBarColor: Colors.white,
             ),
             body: SafeArea(
@@ -111,9 +113,9 @@ class _RegisterScreenState extends State<RegisterScreen> with ValidationMixin {
         gradient: const LinearGradient(
           begin: Alignment.topRight,
           end: Alignment.bottomLeft,
-          colors: [Color(0xFFFFF8F1), Color(0xFFFFF0E1)],
+          colors: [Color(0xFFFFF8F1), Color(0xFFFFF1E5)],
         ),
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(color: const Color(0xFFFFD9B8)),
       ),
       child: Row(
@@ -221,7 +223,7 @@ class _RegisterScreenState extends State<RegisterScreen> with ValidationMixin {
       padding: const EdgeInsets.fromLTRB(16, 18, 16, 16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(color: _border),
         boxShadow: const [
           BoxShadow(

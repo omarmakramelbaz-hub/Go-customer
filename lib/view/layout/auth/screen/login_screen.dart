@@ -59,45 +59,84 @@ class _LoginScreenState extends State<LoginScreen> with ValidationMixin {
 
   @override
   Widget build(BuildContext context) {
+    final ar = context.languageCode == 'ar';
     return StreamBuilder<String>(
       stream: mainAppBloc.langStream,
-      builder: (context, lang) {
-        return Form(
-          key: _formKey,
-          child: Scaffold(
-            backgroundColor: Colors.white,
-            appBar: CustomAppBar(
-              centerTitle: false,
-              title: SvgPicture.asset(GoCustomerIdentity.logoAsset, height: 42),
-              appBarColor: Colors.white,
-              showLang: true,
-            ),
-            body: SafeArea(
-              top: false,
-              child: SingleChildScrollView(
-                keyboardDismissBehavior:
-                    ScrollViewKeyboardDismissBehavior.onDrag,
-                padding: const EdgeInsets.fromLTRB(16, 18, 16, 24),
-                child: Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 520),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        _welcomeHeader(context),
-                        const SizedBox(height: 14),
-                        _loginCard(context),
-                        const SizedBox(height: 14),
-                        _guestCard(context),
-                      ],
-                    ),
+      builder: (context, lang) => Form(
+        key: _formKey,
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          body: SafeArea(
+            child: SingleChildScrollView(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              padding: const EdgeInsets.fromLTRB(24, 26, 24, 28),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 420),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Center(child: SvgPicture.asset(GoCustomerIdentity.logoAsset, width: 184, height: 141)),
+                      const SizedBox(height: 10),
+                      Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                        Container(width: 23, height: 3, color: AppColors.mainAppColor),
+                        const SizedBox(width: 8),
+                        Text(ar ? 'كل خدماتك عندك' : 'All your services, in one place',
+                          style: const TextStyle(color: _text, fontSize: 14, fontWeight: FontWeight.w700)),
+                        const SizedBox(width: 8),
+                        Container(width: 23, height: 3, color: AppColors.mainAppColor),
+                      ]),
+                      const SizedBox(height: 32),
+                      Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(color: const Color(0xffF4F5F7), borderRadius: BorderRadius.circular(12)),
+                        child: Row(children: [
+                          Expanded(child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            decoration: BoxDecoration(color: AppColors.mainAppColor, borderRadius: BorderRadius.circular(9)),
+                            child: Text(ar ? 'تسجيل الدخول' : 'Sign in', textAlign: TextAlign.center,
+                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+                          )),
+                          Expanded(child: TextButton(
+                            onPressed: () => NamedNavigatorImpl.push(RegisterScreen.routeName),
+                            child: Text(ar ? 'إنشاء حساب' : 'Create account',
+                              style: const TextStyle(color: _text, fontWeight: FontWeight.w700)),
+                          )),
+                        ]),
+                      ),
+                      const SizedBox(height: 24),
+                      CustomFormField(
+                        validator: (v) => validatePhone(v, country: _country),
+                        controller: _mobileEC, keyboardType: TextInputType.phone,
+                        country: _country, title: 'mobileNumber'.tr,
+                      ),
+                      const SizedBox(height: 18),
+                      CustomFormField(
+                        validator: validatePassword, controller: _passwordEC,
+                        title: 'password'.tr, isPassword: true,
+                      ),
+                      const SizedBox(height: 24),
+                      _primaryLoginButton(context),
+                      const SizedBox(height: 8),
+                      TextButton(
+                        onPressed: () => NamedNavigatorImpl.push(CheckMobileHasAccount.routeName),
+                        child: Text('didYouForgetPassword'.tr,
+                          style: const TextStyle(color: _text, fontWeight: FontWeight.w700)),
+                      ),
+                      const SizedBox(height: 12),
+                      const Divider(color: Color(0xffEEF0F3)),
+                      const SizedBox(height: 8),
+                      _accountCreationCard(context),
+                      const SizedBox(height: 10),
+                      _guestCard(context),
+                    ],
                   ),
                 ),
               ),
             ),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 
