@@ -3,20 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../helpers/extension/string_extension.dart';
-import '../../../../helpers/extensions/extensions.dart';
 import '../../../../helpers/hive/hive_methods.dart';
-import '../../../../helpers/identity/go_customer_identity.dart';
 import '../../../../helpers/pusher_service/pusher_controller.dart';
 import '../../../../helpers/routes/app_routers_import.dart';
-import '../../../../helpers/theme/app_colors.dart';
-import '../../../../helpers/theme/app_text_style.dart';
+import '../../../../helpers/theme/go_design_tokens.dart';
 import '../../../../helpers/translation/all_translation.dart';
 import '../../../../helpers/translation/main_app_bloc.dart';
-import '../../../custom_widgets/custom_app_bar/custom_app_bar.dart';
+import '../../../custom_widgets/buttons/custom_button.dart';
 import '../../../custom_widgets/custom_form_field/custom_form_field.dart';
-import '../../../custom_widgets/go_drive_brand.dart';
+import '../../../custom_widgets/go_master_ui.dart';
 import '../../../custom_widgets/validation/validation_mixin.dart';
 import '../../bottom_navigation/bottom_navigation_bar_screen.dart';
+import '../../on_boarding/screen/go_guest_welcome_screen.dart';
 import '../controller/auth_controller.dart';
 import 'check_mobile_has_account.dart';
 import 'create_new_account_screen.dart';
@@ -25,9 +23,7 @@ import 'social_login_row_widget.dart';
 
 class LoginScreen extends StatefulWidget {
   static const routeName = 'LoginScreen';
-
   const LoginScreen({super.key});
-
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
@@ -37,11 +33,6 @@ class _LoginScreenState extends State<LoginScreen> with ValidationMixin {
   final _mobileEC = TextEditingController();
   final _passwordEC = TextEditingController();
   Country? _country;
-
-  static const _text = Color(0xFF171A1F);
-  static const _muted = Color(0xFF858B94);
-  static const _border = Color(0xFFE7EAEE);
-  static const _softOrange = Color(0xFFFFF3E7);
 
   @override
   void initState() {
@@ -56,526 +47,91 @@ class _LoginScreenState extends State<LoginScreen> with ValidationMixin {
     super.dispose();
   }
 
+  void _openGuest(bool ar) => Navigator.of(context).push(MaterialPageRoute<void>(
+    builder: (guestContext) => GoGuestWelcomeScreen(
+      isArabic: ar,
+      onLogin: () => Navigator.of(guestContext).pop(),
+      onRegister: () => NamedNavigatorImpl.push(RegisterScreen.routeName),
+      onContinue: () {
+        HiveMethods.deleteToken();
+        HiveMethods.updateIsVisitor(true);
+        NamedNavigatorImpl.push(BottomNavigationBarScreen.routeName, clean: true);
+      },
+    ),
+  ));
+
   @override
-  Widget build(BuildContext context) {
-    final ar = context.languageCode == 'ar';
-    return StreamBuilder<String>(
-      stream: mainAppBloc.langStream,
-      builder: (context, lang) => Form(
-        key: _formKey,
-        child: Scaffold(
-          backgroundColor: Colors.white,
-          body: SafeArea(
-            child: SingleChildScrollView(
-              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-              padding: const EdgeInsets.fromLTRB(24, 26, 24, 28),
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 420),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Center(
-                        child: Image.asset(
-                          'assets/app_icon_master.png',
-                          width: 184,
-                          height: 141,
-                          fit: BoxFit.contain,
-                          filterQuality: FilterQuality.high,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                        Container(width: 23, height: 3, color: AppColors.mainAppColor),
-                        const SizedBox(width: 8),
-                        Text(ar ? 'كل خدماتك عندك' : 'All your services, in one place',
-                          style: const TextStyle(color: _text, fontSize: 14, fontWeight: FontWeight.w700)),
-                        const SizedBox(width: 8),
-                        Container(width: 23, height: 3, color: AppColors.mainAppColor),
-                      ]),
-                      const SizedBox(height: 32),
-                      Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(color: const Color(0xffF4F5F7), borderRadius: BorderRadius.circular(12)),
-                        child: Row(children: [
-                          Expanded(child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            decoration: BoxDecoration(color: AppColors.mainAppColor, borderRadius: BorderRadius.circular(9)),
-                            child: Text(ar ? 'تسجيل الدخول' : 'Sign in', textAlign: TextAlign.center,
-                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
-                          )),
-                          Expanded(child: TextButton(
-                            onPressed: () => NamedNavigatorImpl.push(RegisterScreen.routeName),
-                            child: Text(ar ? 'إنشاء حساب' : 'Create account',
-                              style: const TextStyle(color: _text, fontWeight: FontWeight.w700)),
-                          )),
-                        ]),
-                      ),
-                      const SizedBox(height: 24),
-                      CustomFormField(
-                        validator: (v) => validatePhone(v, country: _country),
-                        controller: _mobileEC, keyboardType: TextInputType.phone,
-                        country: _country, title: 'mobileNumber'.tr,
-                      ),
-                      const SizedBox(height: 18),
-                      CustomFormField(
-                        validator: validatePassword, controller: _passwordEC,
-                        title: 'password'.tr, isPassword: true,
-                      ),
-                      const SizedBox(height: 24),
-                      _primaryLoginButton(context),
-                      const SizedBox(height: 8),
-                      TextButton(
-                        onPressed: () => NamedNavigatorImpl.push(CheckMobileHasAccount.routeName),
-                        child: Text('didYouForgetPassword'.tr,
-                          style: const TextStyle(color: _text, fontWeight: FontWeight.w700)),
-                      ),
-                      const SizedBox(height: 12),
-                      const Divider(color: Color(0xffEEF0F3)),
-                      const SizedBox(height: 8),
-                      _accountCreationCard(context),
-                      const SizedBox(height: 10),
-                      _guestCard(context),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _welcomeHeader(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 15),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topRight,
-          end: Alignment.bottomLeft,
-          colors: [Color(0xFFFFF8F1), Color(0xFFFFF1E5)],
-        ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFFFDFC2)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 52,
-            height: 52,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x12000000),
-                  blurRadius: 12,
-                  offset: Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Icon(
-              Icons.lock_person_outlined,
-              color: AppColors.mainAppColor,
-              size: 27,
-            ),
-          ),
-          const SizedBox(width: 13),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'welcomeBackAgain'.tr,
-                  style: AppTextStyle.text20BS().copyWith(
-                    color: _text,
-                    fontSize: 21,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'welcomeToYouPleaseEnterYourAccountDetails'.tr,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTextStyle.text14RG().copyWith(
-                    color: _muted,
-                    height: 1.35,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _loginCard(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(16, 18, 16, 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: _border),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x10000000),
-            blurRadius: 22,
-            offset: Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            'login'.tr,
-            style: AppTextStyle.text18BS().copyWith(
-              color: _text,
-              fontSize: 18,
-              fontWeight: FontWeight.w900,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            context.languageCode == 'ar'
-                ? 'استخدم رقم موبايلك وكلمة المرور للدخول إلى حسابك'
-                : 'Use your mobile number and password to access your account',
-            style: AppTextStyle.text12RG().copyWith(
-              color: _muted,
-              height: 1.35,
-            ),
-          ),
-          const SizedBox(height: 18),
+  Widget build(BuildContext context) => StreamBuilder<String>(
+    stream: mainAppBloc.langStream,
+    builder: (context, language) {
+      final ar = context.languageCode == 'ar';
+      return Scaffold(
+        backgroundColor: GoDesign.paper,
+        body: Form(key: _formKey, child: GoAuthBody(isArabic: ar, children: [
+          GoAuthTabs(register: false, isArabic: ar, onLogin: () {},
+            onRegister: () => NamedNavigatorImpl.push(RegisterScreen.routeName)),
+          const SizedBox(height: 28),
           CustomFormField(
-            validator: (v) => validatePhone(v, country: _country),
-            controller: _mobileEC,
-            keyboardType: TextInputType.phone,
-            country: _country,
-            title: 'mobileNumber'.tr,
-          ),
+            validator: (value) => validatePhone(value, country: _country),
+            controller: _mobileEC, keyboardType: TextInputType.phone,
+            country: _country, hintText: ar ? 'رقم الموبايل' : 'Mobile number',
+            prefixIcon: const Icon(Icons.phone_outlined, size: 21)),
           const SizedBox(height: 14),
-          CustomFormField(
-            validator: validatePassword,
-            controller: _passwordEC,
-            title: 'password'.tr,
-            isPassword: true,
-          ),
+          CustomFormField(validator: validatePassword, controller: _passwordEC,
+            hintText: ar ? 'كلمة المرور' : 'Password', isPassword: true,
+            prefixIcon: const Icon(Icons.lock_outline, size: 21),
+            onFieldSubmitted: (_) => _submitLogin(context)),
+          Align(alignment: AlignmentDirectional.centerEnd,
+            child: TextButton(
+              onPressed: () => NamedNavigatorImpl.push(CheckMobileHasAccount.routeName),
+              style: TextButton.styleFrom(foregroundColor: GoDesign.ink),
+              child: Text(ar ? 'نسيت كلمة المرور؟' : 'Forgot password?'))),
           const SizedBox(height: 4),
-          Align(
-            alignment: AlignmentDirectional.centerEnd,
-            child: TextButton.icon(
-              onPressed: () =>
-                  NamedNavigatorImpl.push(CheckMobileHasAccount.routeName),
-              icon: Icon(
-                Icons.lock_reset_rounded,
-                size: 17,
-                color: AppColors.mainAppColor,
-              ),
-              label: Text(
-                'didYouForgetPassword'.tr,
-                style: AppTextStyle.text12BS().copyWith(
-                  color: AppColors.mainAppColor,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
-          _primaryLoginButton(context),
-          const SizedBox(height: 18),
+          CustomButton(text: ar ? 'تسجيل الدخول' : 'Sign in',
+            onPressed: () => _submitLogin(context)),
           if (SocialLoginRowWidget.isAvailable) ...[
-            _socialDivider(context),
-            const SizedBox(height: 12),
+            const SizedBox(height: 20),
             const SocialLoginRowWidget(),
           ],
+          const SizedBox(height: 24),
+          GoOrDivider(isArabic: ar),
+          const SizedBox(height: 18),
+          OutlinedButton.icon(
+            onPressed: () => _openGuest(ar),
+            style: OutlinedButton.styleFrom(foregroundColor: GoDesign.ink,
+              side: const BorderSide(color: GoDesign.border)),
+            icon: const Icon(Icons.visibility_outlined, size: 21),
+            label: Text(ar ? 'دخول كزائر' : 'Continue as guest')),
           const SizedBox(height: 12),
-          _accountCreationCard(context),
-        ],
-      ),
-    );
-  }
-
-  Widget _primaryLoginButton(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () => _submitLogin(context),
-        borderRadius: BorderRadius.circular(16),
-        child: Ink(
-          height: 54,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [AppColors.mainAppColor, const Color(0xFFFF8B25)],
-            ),
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.mainAppColor.withValues(alpha: .20),
-                blurRadius: 16,
-                offset: const Offset(0, 7),
-              ),
-            ],
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          Wrap(alignment: WrapAlignment.center, crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              Text(
-                'login'.tr,
-                style: AppTextStyle.text18BW().copyWith(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              const SizedBox(width: 9),
-              Container(
-                width: 28,
-                height: 28,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: .20),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.arrow_forward_rounded,
-                  color: Colors.white,
-                  size: 17,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+              Text(ar ? 'مش حسابك؟' : 'New here?', style: const TextStyle(color: GoDesign.muted)),
+              TextButton(onPressed: () => NamedNavigatorImpl.push(RegisterScreen.routeName),
+                child: Text(ar ? 'أنشئ حساب الآن' : 'Create an account')),
+            ]),
+        ])),
+      );
+    },
+  );
 
-  Widget _socialDivider(BuildContext context) {
-    return Row(
-      children: [
-        const Expanded(child: Divider(color: _border, height: 1)),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.verified_user_outlined,
-                size: 14,
-                color: AppColors.mainAppColor,
-              ),
-              const SizedBox(width: 5),
-              Text(
-                context.languageCode == 'ar'
-                    ? 'دخول سريع وآمن'
-                    : 'Quick & secure sign in',
-                style: AppTextStyle.text11RG().copyWith(
-                  color: _muted,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        ),
-        const Expanded(child: Divider(color: _border, height: 1)),
-      ],
-    );
-  }
-
-  Widget _accountCreationCard(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFFF8F2),
-        borderRadius: BorderRadius.circular(17),
-        border: Border.all(
-          color: AppColors.mainAppColor.withValues(alpha: .16),
-        ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFFFFE2C8)),
-            ),
-            child: Icon(
-              Icons.person_add_alt_1_rounded,
-              color: AppColors.mainAppColor,
-              size: 21,
-            ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'youDontHaveAnAccount'.tr,
-                  style: AppTextStyle.text12BS().copyWith(
-                    color: _text,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  context.languageCode == 'ar'
-                      ? 'أنشئ حسابك في خطوات بسيطة وابدأ الطلب فورًا'
-                      : 'Create your account in a few simple steps',
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTextStyle.text10RG().copyWith(
-                    color: _muted,
-                    height: 1.3,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 8),
-          OutlinedButton(
-            onPressed: () => NamedNavigatorImpl.push(RegisterScreen.routeName),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.mainAppColor,
-              backgroundColor: Colors.white,
-              side: BorderSide(
-                color: AppColors.mainAppColor.withValues(alpha: .35),
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            ),
-            child: Text(
-              'createAnAccount'.tr,
-              style: AppTextStyle.text11BS().copyWith(
-                color: AppColors.mainAppColor,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _guestCard(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: _border),
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 38,
-                height: 38,
-                decoration: BoxDecoration(
-                  color: _softOrange,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(
-                  Icons.visibility_outlined,
-                  color: AppColors.mainAppColor,
-                  size: 21,
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'loginAsGuest'.tr,
-                      style: AppTextStyle.text14BS().copyWith(
-                        color: _text,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      context.languageCode == 'ar'
-                          ? 'تصفح التطبيق أولاً ويمكنك تسجيل الدخول في أي وقت'
-                          : 'Browse first and sign in whenever you are ready',
-                      style: AppTextStyle.text10RG().copyWith(
-                        color: _muted,
-                        height: 1.3,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 8),
-              OutlinedButton(
-                onPressed: () {
-                  HiveMethods.deleteToken();
-                  HiveMethods.updateIsVisitor(true);
-                  NamedNavigatorImpl.push(
-                    BottomNavigationBarScreen.routeName,
-                    clean: true,
-                  );
-                },
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.mainAppColor,
-                  side: BorderSide(
-                    color: AppColors.mainAppColor.withValues(alpha: .35),
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(13),
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 10,
-                  ),
-                ),
-                child: Icon(
-                  Icons.arrow_forward_rounded,
-                  size: 20,
-                  color: AppColors.mainAppColor,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
+  // Keep the existing session, first-time account and realtime callbacks intact.
   void _submitLogin(BuildContext context) {
     FocusManager.instance.primaryFocus?.unfocus();
     if (!_formKey.currentState!.validate()) return;
-
     context.read<AuthController>().login(
       onHaveIdANDToken: (id, token) {
         context.read<PusherController>().initPusher(
-          channelName: 'private-user.$id',
-          userId: id,
-          token: token,
-        );
+          channelName: 'private-user.$id', userId: id, token: token);
       },
-      onFirstTime: () {
-        NamedNavigatorImpl.push(CreateNewAccountScreen.routeName);
-      },
+      onFirstTime: () => NamedNavigatorImpl.push(CreateNewAccountScreen.routeName),
       mobile: _mobileEC.text.removeZero(),
       password: _passwordEC.text,
       onSuccess: (register, mobileVerifiedAt) {
         HiveMethods.updateIsVisitor(false);
         if (register == 0 && mobileVerifiedAt != null) {
-          NamedNavigatorImpl.push(
-            BottomNavigationBarScreen.routeName,
-            replace: true,
-          );
+          NamedNavigatorImpl.push(BottomNavigationBarScreen.routeName, replace: true);
         } else {
-          NamedNavigatorImpl.push(
-            BottomNavigationBarScreen.routeName,
-            clean: true,
-          );
+          NamedNavigatorImpl.push(BottomNavigationBarScreen.routeName, clean: true);
         }
       },
     );
