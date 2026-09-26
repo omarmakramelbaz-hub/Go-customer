@@ -1,16 +1,16 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../helpers/hive/hive_methods.dart';
-import '../../../../helpers/identity/go_customer_identity.dart';
 import '../../../../helpers/networking/api_helper.dart';
 import '../../../../helpers/pusher_service/pusher_controller.dart';
 import '../../../../helpers/routes/app_routers_import.dart';
-import '../../../../helpers/theme/app_colors.dart';
+import '../../../../helpers/theme/go_design_tokens.dart';
 import '../../../../helpers/translation/all_translation.dart';
-import '../../../custom_widgets/go_drive_brand.dart';
+import '../../../custom_widgets/go_master_ui.dart';
 import '../../auth/controller/auth_controller.dart';
 import '../../auth/screen/login_screen.dart';
 import '../../auth/screen/create_new_account_screen.dart';
@@ -41,8 +41,6 @@ class _SplashScreenState extends State<SplashScreen> {
       _loading = true;
     });
     HiveMethods.updateFirstTime();
-    // GitHub Pages is a public UI preview. Do not let stale browser auth
-    // state/API availability trap the preview on the splash screen.
     if (kIsWeb && Uri.base.host.endsWith('github.io')) {
       HiveMethods.updateIsVisitor(true);
       _open(BottomNavigationBarScreen.routeName);
@@ -60,8 +58,7 @@ class _SplashScreenState extends State<SplashScreen> {
       _open(LoginScreen.routeName);
       return;
     }
-    if (auth.profileResponse.state != ResponseState.complete ||
-        auth.profile == null) {
+    if (auth.profileResponse.state != ResponseState.complete || auth.profile == null) {
       setState(() {
         _failed = true;
         _loading = false;
@@ -94,16 +91,12 @@ class _SplashScreenState extends State<SplashScreen> {
     if (profile.id != null) {
       HiveMethods.updateUserId(profile.id);
       await context.read<PusherController>().initPusher(
-        channelName: 'private-user.${profile.id}',
-        userId: profile.id!,
+        channelName: 'private-user.${profile.id}', userId: profile.id!,
         token: profile.token ?? HiveMethods.getToken()!,
       );
     }
-    _open(
-      profile.email == null
-          ? CreateNewAccountScreen.routeName
-          : BottomNavigationBarScreen.routeName,
-    );
+    _open(profile.email == null
+        ? CreateNewAccountScreen.routeName : BottomNavigationBarScreen.routeName);
   }
 
   Future<void> _open(String route) async {
@@ -116,86 +109,29 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     final ar = context.languageCode == 'ar';
-    return Scaffold(
-      backgroundColor: const Color(0xff171A1F),
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          const DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Color(0xff171A1F), Color(0xff24272D)],
-              ),
-            ),
-          ),
-          Positioned(
-            top: -90,
-            right: -70,
-            child: Container(
-              width: 260,
-              height: 260,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: Color(0x18FD7201),
-              ),
-            ),
-          ),
-          SafeArea(
-            child: Center(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 28),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Image.asset(
-                      'assets/app_icon_master.png',
-                      width: 210,
-                      height: 168,
-                      fit: BoxFit.contain,
-                      filterQuality: FilterQuality.high,
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      ar ? 'كل خدماتك عندك' : 'All your services, in one place',
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 17,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    const SizedBox(height: 30),
-                    if (_failed) ...[
-                      Text(
-                        ar ? 'تعذّر الاتصال. حاول مرة أخرى.' : 'Unable to connect. Please try again.',
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(color: Colors.white70),
-                      ),
-                      const SizedBox(height: 12),
-                      FilledButton(
-                        onPressed: _restoreSession,
-                        style: FilledButton.styleFrom(backgroundColor: const Color(0xffFD7201)),
-                        child: Text(ar ? 'إعادة المحاولة' : 'Try again'),
-                      ),
-                    ] else
-                      const SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2.5,
-                          color: Color(0xffFD7201),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.light,
+      child: Scaffold(
+        backgroundColor: GoDesign.deepInk,
+        body: GoSplashBackdrop(child: SizedBox.expand(child: SafeArea(
+          child: Center(child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 28),
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              GoBrandHeader(light: true, size: 86, isArabic: ar),
+              const SizedBox(height: 30),
+              if (_failed) ...[
+                Text(ar ? 'تعذّر الاتصال. حاول مرة أخرى.' : 'Unable to connect. Please try again.',
+                  textAlign: TextAlign.center, style: const TextStyle(color: Colors.white70)),
+                const SizedBox(height: 12),
+                FilledButton(onPressed: _restoreSession,
+                  child: Text(ar ? 'إعادة المحاولة' : 'Try again')),
+              ] else
+                const SizedBox(width: 22, height: 22,
+                  child: CircularProgressIndicator(strokeWidth: 2, color: GoDesign.orange)),
+            ]),
+          )),
+        ))),
       ),
     );
   }
-
 }
