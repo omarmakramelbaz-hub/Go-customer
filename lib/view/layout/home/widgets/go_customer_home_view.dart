@@ -158,10 +158,12 @@ class _GoCustomerHomeViewState extends State<GoCustomerHomeView> {
           )),
       )),
       const SizedBox(width: 12),
-      Column(mainAxisSize: MainAxisSize.min, children: [
+      SizedBox(width: 74, child: Column(mainAxisSize: MainAxisSize.min, children: [
         const GoDriveBrand(size: 25, light: true),
-        Text(t('كل الخدمات عندك', 'Every service'), style: const TextStyle(color: Colors.white, fontSize: 8)),
-      ]),
+        Text(t('كل الخدمات عندك', 'Every service'), textAlign: TextAlign.center,
+          maxLines: 1, overflow: TextOverflow.ellipsis,
+          style: const TextStyle(color: Colors.white, fontSize: 8)),
+      ])),
       const SizedBox(width: 4),
       IconButton(key: const ValueKey('go-home-notifications'), tooltip: t('الإشعارات', 'Notifications'),
         onPressed: widget.onNotifications, constraints: const BoxConstraints(minHeight: 48, minWidth: 40),
