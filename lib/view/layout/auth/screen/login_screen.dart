@@ -1,6 +1,5 @@
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../helpers/extension/string_extension.dart';
@@ -76,7 +75,15 @@ class _LoginScreenState extends State<LoginScreen> with ValidationMixin {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Center(child: SvgPicture.asset(GoCustomerIdentity.logoAsset, width: 184, height: 141)),
+                      Center(
+                        child: Image.asset(
+                          'assets/app_icon_master.png',
+                          width: 184,
+                          height: 141,
+                          fit: BoxFit.contain,
+                          filterQuality: FilterQuality.high,
+                        ),
+                      ),
                       const SizedBox(height: 10),
                       Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                         Container(width: 23, height: 3, color: AppColors.mainAppColor),
