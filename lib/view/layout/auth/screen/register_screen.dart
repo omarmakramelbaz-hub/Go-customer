@@ -1,6 +1,5 @@
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../helpers/extension/string_extension.dart';
@@ -70,7 +69,7 @@ class _RegisterScreenState extends State<RegisterScreen> with ValidationMixin {
               showLang: true,
               centerTitle: false,
               height: 70,
-              title: SvgPicture.asset(GoCustomerIdentity.logoAsset, height: 44),
+              title: Image.asset('assets/app_icon_master.png', height: 52, width: 76, fit: BoxFit.contain, filterQuality: FilterQuality.high),
               appBarColor: Colors.white,
             ),
             body: SafeArea(
