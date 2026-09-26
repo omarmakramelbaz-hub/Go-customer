@@ -105,7 +105,7 @@ class _LoginScreenState extends State<LoginScreen> with ValidationMixin {
           const SizedBox(height: 12),
           Wrap(alignment: WrapAlignment.center, crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              Text(ar ? 'مش حسابك؟' : 'New here?', style: const TextStyle(color: GoDesign.muted)),
+              Text(ar ? 'معندكش حساب؟' : 'New here?', style: const TextStyle(color: GoDesign.muted)),
               TextButton(onPressed: () => NamedNavigatorImpl.push(RegisterScreen.routeName),
                 child: Text(ar ? 'أنشئ حساب الآن' : 'Create an account')),
             ]),
