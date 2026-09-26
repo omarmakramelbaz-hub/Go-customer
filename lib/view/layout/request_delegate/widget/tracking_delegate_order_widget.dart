@@ -1,48 +1,62 @@
 import 'package:flutter/material.dart';
 
+import '../../../../helpers/theme/go_design_tokens.dart';
+import '../../../../helpers/utils/date_methods.dart';
+
 class TrackingDelegateOrderWidget extends StatelessWidget {
   final String status;
   final String? orderDate;
-
   const TrackingDelegateOrderWidget({super.key, required this.status, this.orderDate});
 
   @override
   Widget build(BuildContext context) {
     final ar = Localizations.localeOf(context).languageCode == 'ar';
-    final cancelled = status == 'cancelled';
-    final completed = status == 'completed';
-    final shipped = status == 'shipped' || completed;
-    final accepted = const ['accepted', 'shipped', 'completed'].contains(status);
-    final steps = <({String ar, String en, IconData icon, bool done})>[
-      (ar: 'تم الاتفاق مع المندوب', en: 'Driver confirmed', icon: Icons.handshake_outlined, done: accepted),
-      (ar: 'المندوب في الطريق إليك', en: 'Driver is on the way', icon: Icons.delivery_dining_rounded, done: accepted),
-      (ar: 'تم استلام الطلب', en: 'Order picked up', icon: Icons.inventory_2_outlined, done: shipped),
-      (ar: 'تم التوصيل', en: 'Delivered', icon: Icons.check_circle_outline_rounded, done: completed),
-    ];
-    if (cancelled) {
-      return _stateCard(ar ? 'تم إلغاء الطلب' : 'Order cancelled', Icons.cancel_outlined, const Color(0xffB84436));
+    if (status == 'cancelled') {
+      return _stateCard(ar ? 'تم إلغاء الطلب' : 'Order cancelled', Icons.cancel_outlined, GoDesign.danger);
     }
-    return Column(
-      children: List.generate(steps.length, (i) {
-        final s = steps[i];
-        return Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Column(children: [
-              Container(width: 38, height: 38, decoration: BoxDecoration(shape: BoxShape.circle, color: s.done ? const Color(0xffFFF0E3) : const Color(0xffF0F1F3)), child: Icon(s.icon, size: 20, color: s.done ? const Color(0xffFD7201) : const Color(0xffA4A9B0))),
-              if (i < steps.length - 1) Container(width: 2, height: 34, color: s.done ? const Color(0xffFD7201) : const Color(0xffE2E4E8)),
-            ]),
-            const SizedBox(width: 12),
-            Expanded(child: Padding(padding: const EdgeInsets.only(top: 9), child: Text(ar ? s.ar : s.en, style: TextStyle(fontSize: 14, fontWeight: s.done ? FontWeight.w800 : FontWeight.w500, color: s.done ? const Color(0xff171A1F) : const Color(0xff8A9099))))),
-          ],
-        );
-      }),
-    );
+    const states = {'pending': 1, 'accepted': 2, 'shipped': 3, 'completed': 4};
+    final stage = states[status];
+    if (stage == null) {
+      return _stateCard(status.isEmpty ? (ar ? 'بانتظار تحديث الحالة' : 'Awaiting status update') : status,
+        Icons.info_outline, GoDesign.muted);
+    }
+    final labels = ar
+      ? ['تم تسجيل الطلب', 'البحث عن مندوب', 'تم الاتفاق — المندوب في الطريق', 'تم استلام الطلب من المرسل', 'تم التوصيل']
+      : ['Request received', 'Finding a driver', 'Driver confirmed and on the way', 'Order picked up', 'Delivered'];
+    return Column(children: List.generate(labels.length, (i) {
+      final done = i <= stage;
+      final current = i == stage && status != 'completed';
+      final color = done ? GoDesign.success : const Color(0xFFCCD3D9);
+      return IntrinsicHeight(child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        SizedBox(width: 28, child: Column(children: [
+          Container(width: 24, height: 24,
+            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+            child: Icon(done ? Icons.check : Icons.circle, size: done ? 15 : 7, color: Colors.white)),
+          if (i < labels.length - 1) Expanded(child: Container(width: 2,
+            color: i < stage ? GoDesign.success : GoDesign.border)),
+        ])),
+        const SizedBox(width: 14),
+        Expanded(child: Padding(padding: EdgeInsets.only(top: 2, bottom: i == labels.length - 1 ? 0 : 30),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(labels[i], style: TextStyle(color: done ? GoDesign.ink : GoDesign.muted,
+              fontSize: 15, fontWeight: done ? FontWeight.w700 : FontWeight.w500, height: 1.4)),
+            if (i == 0 && orderDate != null && orderDate!.isNotEmpty) ...[
+              const SizedBox(height: 6),
+              Text(DateMethods.formatToDate(orderDate!), style: const TextStyle(color: GoDesign.muted, fontSize: 12)),
+            ],
+            if (current) ...[
+              const SizedBox(height: 6),
+              Text(ar ? 'الحالة الحالية' : 'Current status',
+                style: const TextStyle(color: GoDesign.orange, fontSize: 12)),
+            ],
+          ]))),
+      ]));
+    }));
   }
 
   Widget _stateCard(String text, IconData icon, Color color) => Container(
-    padding: const EdgeInsets.all(14),
-    decoration: BoxDecoration(color: color.withValues(alpha: .08), borderRadius: BorderRadius.circular(14)),
-    child: Row(children: [Icon(icon, color: color), const SizedBox(width: 10), Expanded(child: Text(text, style: TextStyle(color: color, fontWeight: FontWeight.w800)))]),
-  );
+    padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: color.withValues(alpha: .08),
+      borderRadius: BorderRadius.circular(GoDesign.radius)),
+    child: Row(children: [Icon(icon, color: color), const SizedBox(width: 10),
+      Expanded(child: Text(text, style: TextStyle(color: color, fontWeight: FontWeight.w700)))]));
 }

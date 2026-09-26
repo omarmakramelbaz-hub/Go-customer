@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 
+import '../../../../helpers/theme/go_design_tokens.dart';
 import '../../../custom_widgets/go_drive_brand.dart';
 import 'service_photo_sprite.dart';
 
 abstract final class GoHomeStyle {
-  static const ink = Color(0xff171A1F);
-  static const orange = Color(0xffFD7201);
-  static const muted = Color(0xff7D8490);
-  static const border = Color(0xffECEEF1);
+  static const ink = GoDesign.deepInk;
+  static const orange = GoDesign.orange;
+  static const muted = GoDesign.muted;
+  static const border = GoDesign.border;
 }
 
 class GoService {
@@ -19,10 +20,10 @@ class GoService {
   final IconData icon;
 }
 
-// Preserve the existing API profession keys and all 19 service entry points.
+// API profession keys are stable. Display changes must never rename them.
 const goServices = <GoService>[
   GoService('delivery_courier', 'طلب مندوب توصيل', 'Delivery courier', 0, Icons.delivery_dining),
-  GoService('appliance_technician', 'فني صيانة ثلاجات وغسالات', 'Fridge & washer technician', 1, Icons.home_repair_service),
+  GoService('appliance_technician', 'فني صيانة ثلاجات وغسالات', 'Appliance repair', 1, Icons.home_repair_service),
   GoService('plumber', 'سباك', 'Plumber', 2, Icons.plumbing),
   GoService('painter', 'نقاش', 'Painter', 3, Icons.format_paint),
   GoService('tile_installer', 'فني تركيب بلاط', 'Tile installer', 4, Icons.grid_view),
@@ -31,31 +32,21 @@ const goServices = <GoService>[
   GoService('electrician', 'كهربائي', 'Electrician', 7, Icons.electrical_services),
   GoService('satellite_technician', 'فني تركيب وصيانة الدش', 'Satellite technician', 8, Icons.satellite_alt),
   GoService('furniture_carpenter', 'نجار أثاث', 'Furniture carpenter', 9, Icons.carpenter),
-  GoService('ac_technician', 'فني تكييف', 'AC technician', 10, Icons.ac_unit),
+  GoService('ac_technician', 'فني تكييف', 'Air conditioning technician', 10, Icons.ac_unit),
   GoService('construction_worker', 'عامل بناء', 'Construction worker', 11, Icons.engineering),
-  GoService('auto_mechanic', 'ميكانيكي سيارات', 'Auto mechanic', 12, Icons.car_repair),
+  GoService('auto_mechanic', 'ميكانيكي سيارات', 'Car mechanic', 12, Icons.car_repair),
   GoService('auto_electrician', 'كهربائي سيارات', 'Auto electrician', 12, Icons.electric_car),
-  GoService('mens_barber', 'كوافير رجالي', 'Men barber', 13, Icons.content_cut),
-  GoService('womens_hairdresser', 'كوافيرة سيدات', 'Women hairdresser', 13, Icons.face_retouching_natural),
+  GoService('mens_barber', 'كوافير رجالي', 'Men’s barber', 13, Icons.content_cut),
+  GoService('womens_hairdresser', 'كوافيرة سيدات', 'Women’s hairdresser', 13, Icons.face_retouching_natural),
   GoService('tailor', 'خياط', 'Tailor', 14, Icons.checkroom),
   GoService('male_cleaner', 'عامل نظافة', 'Male cleaner', 15, Icons.cleaning_services),
   GoService('female_cleaner', 'عاملة نظافة', 'Female cleaner', 15, Icons.cleaning_services),
 ];
 
-/// Testable presentation, isolated from sessions, payments and network calls.
 class GoCustomerHomeView extends StatefulWidget {
-  const GoCustomerHomeView({
-    super.key,
-    required this.isArabic,
-    required this.firstName,
-    required this.locationTitle,
-    required this.locationSubtitle,
-    required this.notificationCount,
-    required this.onAddress,
-    required this.onNotifications,
-    required this.onService,
-    this.drawer,
-  });
+  const GoCustomerHomeView({super.key, required this.isArabic, required this.firstName,
+    required this.locationTitle, required this.locationSubtitle, required this.notificationCount,
+    required this.onAddress, required this.onNotifications, required this.onService, this.drawer});
   final bool isArabic;
   final String firstName;
   final String locationTitle;
@@ -65,7 +56,6 @@ class GoCustomerHomeView extends StatefulWidget {
   final VoidCallback onNotifications;
   final ValueChanged<GoService> onService;
   final Widget? drawer;
-
   @override
   State<GoCustomerHomeView> createState() => _GoCustomerHomeViewState();
 }
@@ -74,244 +64,174 @@ class _GoCustomerHomeViewState extends State<GoCustomerHomeView> {
   final _query = TextEditingController();
   String _search = '';
   bool get ar => widget.isArabic;
-  String t(String arabic, String english) => ar ? arabic : english;
-  List<GoService> get matches => goServices.where((s) =>
-      '${s.ar} ${s.en}'.toLowerCase().contains(_search.trim().toLowerCase())).toList();
-
+  String t(String a, String e) => ar ? a : e;
   @override
-  void dispose() {
-    _query.dispose();
-    super.dispose();
-  }
+  void dispose() { _query.dispose(); super.dispose(); }
 
-  void _allServices() {
-    showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-      builder: (sheet) => Directionality(
-        textDirection: ar ? TextDirection.rtl : TextDirection.ltr,
-        child: SafeArea(
-          child: SizedBox(
-            height: MediaQuery.sizeOf(sheet).height * .72,
-            child: Column(children: [
-              Padding(padding: const EdgeInsets.all(16), child: Row(children: [
-                Expanded(child: Text(t('كل الخدمات', 'All services'), style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800))),
-                IconButton(onPressed: () => Navigator.pop(sheet), tooltip: t('إغلاق', 'Close'), icon: const Icon(Icons.close)),
-              ])),
-              Expanded(child: ListView.builder(
-                itemCount: goServices.length,
-                itemBuilder: (_, index) {
-                  final service = goServices[index];
-                  return ListTile(
-                    leading: Icon(service.icon, color: GoHomeStyle.orange),
-                    title: Text(ar ? service.ar : service.en),
-                    trailing: Icon(ar ? Icons.chevron_left : Icons.chevron_right, size: 18),
-                    onTap: () { Navigator.pop(sheet); widget.onService(service); },
-                  );
-                },
-              )),
-            ]),
-          ),
-        ),
-      ),
-    );
-  }
+  void _allServices() => showModalBottomSheet<void>(context: context, isScrollControlled: true,
+    backgroundColor: GoDesign.paper,
+    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+    builder: (sheet) => Directionality(textDirection: ar ? TextDirection.rtl : TextDirection.ltr,
+      child: SafeArea(child: SizedBox(height: MediaQuery.sizeOf(sheet).height * .75,
+        child: Column(children: [
+          Padding(padding: const EdgeInsets.fromLTRB(20, 16, 12, 8), child: Row(children: [
+            Expanded(child: Text(t('كل الخدمات', 'All services'),
+              style: const TextStyle(color: GoDesign.ink, fontSize: 21, fontWeight: FontWeight.w800))),
+            IconButton(tooltip: t('إغلاق', 'Close'), onPressed: () => Navigator.pop(sheet), icon: const Icon(Icons.close)),
+          ])),
+          Expanded(child: ListView.separated(itemCount: goServices.length,
+            separatorBuilder: (_, __) => const Divider(height: 1, color: GoDesign.border),
+            itemBuilder: (_, index) {
+              final service = goServices[index];
+              return ListTile(contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                leading: ClipRRect(borderRadius: BorderRadius.circular(8),
+                  child: SizedBox(width: 58, height: 44, child: GoServicePhoto(index: service.imageIndex))),
+                title: Text(ar ? service.ar : service.en, style: const TextStyle(color: GoDesign.ink, fontWeight: FontWeight.w600)),
+                trailing: const Icon(Icons.location_on, color: GoDesign.orange, size: 19),
+                onTap: () { Navigator.pop(sheet); widget.onService(service); });
+            })),
+        ]),
+      )),
+    ));
 
   @override
   Widget build(BuildContext context) {
-    final services = matches;
-    return Directionality(
-      textDirection: ar ? TextDirection.rtl : TextDirection.ltr,
-      child: Scaffold(
-        key: const ValueKey('go-approved-home-v2'),
-        backgroundColor: GoHomeStyle.ink,
-        drawer: widget.drawer,
-        body: SafeArea(
-          bottom: false,
-          child: CustomScrollView(slivers: [
-            SliverToBoxAdapter(child: _header()),
-            SliverToBoxAdapter(child: _searchField()),
-            SliverToBoxAdapter(child: _hero()),
-            SliverToBoxAdapter(child: Container(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-              decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-              child: Row(children: [
-                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(t('خدماتنا', 'Our services'), style: const TextStyle(color: GoHomeStyle.ink, fontWeight: FontWeight.w900, fontSize: 21)),
-                  Text(t('كل ما تحتاجه في مكان واحد', 'Everything in one place'), style: const TextStyle(color: GoHomeStyle.muted, fontSize: 12)),
-                ])),
-                TextButton(onPressed: _allServices, child: Text(t('عرض الكل', 'View all'), style: const TextStyle(color: GoHomeStyle.orange, fontWeight: FontWeight.w800))),
-              ]),
-            )),
-            SliverToBoxAdapter(child: ColoredBox(
-              color: Colors.white,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: services.isEmpty
-                    ? Padding(padding: const EdgeInsets.all(32), child: Text(t('لا توجد خدمة بهذا الاسم', 'No matching service'), textAlign: TextAlign.center))
-                    : LayoutBuilder(builder: (_, constraints) {
-                        final columns = constraints.maxWidth >= 900 ? 6 : constraints.maxWidth >= 600 ? 4 : 3;
-                        final textScale = MediaQuery.textScalerOf(context).scale(1);
-                        final cardWidth = (constraints.maxWidth - 10 * (columns - 1)) / columns;
-                        final height = cardWidth * 2 / 3 + 64 * textScale;
-                        return GridView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: services.length,
-                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: columns, crossAxisSpacing: 10, mainAxisSpacing: 12, mainAxisExtent: height,
-                          ),
-                          itemBuilder: (_, index) => _serviceCard(services[index]),
-                        );
-                      }),
-              ),
-            )),
-            SliverToBoxAdapter(child: ColoredBox(color: Colors.white, child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
-              child: Column(children: [
-                // Existing service shortcuts retained, without invented discounts.
-                Wrap(spacing: 8, runSpacing: 8, children: [
-                  ActionChip(avatar: const Icon(Icons.ac_unit, size: 18), label: Text(t('صيانة التكييف', 'AC maintenance')), onPressed: () => widget.onService(goServices[10])),
-                  ActionChip(avatar: const Icon(Icons.cleaning_services, size: 18), label: Text(t('خدمات النظافة', 'Cleaning services')), onPressed: () => widget.onService(goServices[17])),
-                ]),
-                const SizedBox(height: 16),
-                const GoDriveBrand(size: 30),
-                const SizedBox(height: 8),
-                Text(t('كل الخدمات عندك', 'Every service, one app'), style: const TextStyle(color: GoHomeStyle.muted, fontWeight: FontWeight.w600)),
-              ]),
-            ))),
-          ]),
-        ),
+    final search = _search.trim().toLowerCase();
+    final services = goServices.where((service) => search.isEmpty ||
+      service.ar.toLowerCase().contains(search) || service.en.toLowerCase().contains(search)).toList();
+    return Directionality(textDirection: ar ? TextDirection.rtl : TextDirection.ltr,
+      child: Scaffold(key: const ValueKey('go-approved-home-v2'),
+        backgroundColor: GoDesign.deepInk, drawer: widget.drawer,
+        body: SafeArea(bottom: false, child: CustomScrollView(slivers: [
+          SliverToBoxAdapter(child: _header()),
+          SliverToBoxAdapter(child: _searchField()),
+          if (search.isEmpty) SliverToBoxAdapter(child: _hero()),
+          SliverToBoxAdapter(child: Container(color: GoDesign.paper,
+            padding: const EdgeInsets.fromLTRB(16, 8, 8, 4), child: Row(children: [
+              Expanded(child: Text(t('خدماتنا', 'Our services'),
+                style: const TextStyle(color: GoDesign.ink, fontSize: 21, fontWeight: FontWeight.w800))),
+              TextButton(onPressed: _allServices, child: Text(t('عرض الكل', 'View all'))),
+            ]))),
+          if (services.isEmpty)
+            SliverFillRemaining(hasScrollBody: false, child: ColoredBox(color: GoDesign.paper,
+              child: Center(child: Padding(padding: const EdgeInsets.all(28),
+                child: Text(t('لا توجد خدمة مطابقة للبحث', 'No matching services'),
+                  style: const TextStyle(color: GoDesign.muted, fontSize: 16))))))
+          else
+            SliverToBoxAdapter(child: ColoredBox(color: GoDesign.paper, child: LayoutBuilder(builder: (context, constraints) {
+              final columns = constraints.maxWidth >= 900 ? 6 : constraints.maxWidth >= 600 ? 4 : 3;
+              final cardWidth = (constraints.maxWidth - 32 - (columns - 1) * 10) / columns;
+              final scale = MediaQuery.textScalerOf(context).scale(12) / 12;
+              return GridView.builder(shrinkWrap: true, physics: const NeverScrollableScrollPhysics(),
+                padding: const EdgeInsets.fromLTRB(16, 4, 16, 22),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: columns,
+                  crossAxisSpacing: 10, mainAxisSpacing: 10, mainAxisExtent: cardWidth / 1.5 + 58 * scale),
+                itemCount: services.length, itemBuilder: (_, index) => _serviceCard(services[index]));
+            }))),
+          if (services.isNotEmpty) SliverFillRemaining(hasScrollBody: false, child: Container(color: GoDesign.paper,
+            alignment: Alignment.topCenter, padding: const EdgeInsets.fromLTRB(20, 12, 20, 26),
+            child: Text(t('كل الخدمات عندك', 'Every service, one app'),
+              style: const TextStyle(color: GoDesign.muted, fontSize: 13)))),
+        ])),
       ),
     );
   }
 
-  Widget _header() => Padding(
-    padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
-    child: Column(children: [
-      Row(children: [
-        if (widget.drawer != null) Builder(builder: (scaffoldContext) => IconButton(
-          tooltip: t('القائمة', 'Menu'), onPressed: () => Scaffold.of(scaffoldContext).openDrawer(),
-          icon: const Icon(Icons.menu_rounded, color: Colors.white),
-        )),
-        Expanded(child: InkWell(
-          key: const ValueKey('go-home-address'),
-          onTap: widget.onAddress,
-          borderRadius: BorderRadius.circular(14),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14)),
+  Widget _header() => Builder(builder: (context) => Padding(
+    padding: const EdgeInsets.fromLTRB(12, 12, 8, 12),
+    child: Row(children: [
+      Expanded(child: Material(color: GoDesign.paper, borderRadius: BorderRadius.circular(12),
+        child: InkWell(key: const ValueKey('go-home-address'), onTap: widget.onAddress,
+          borderRadius: BorderRadius.circular(12), child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
             child: Row(children: [
-              const Icon(Icons.location_on, color: GoHomeStyle.orange, size: 21),
+              const Icon(Icons.location_on, color: GoDesign.orange, size: 22),
               const SizedBox(width: 5),
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(widget.locationTitle, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12, color: GoHomeStyle.ink, fontWeight: FontWeight.w800)),
-                Text(widget.locationSubtitle, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 10, color: GoHomeStyle.muted)),
+                Text(widget.locationTitle, maxLines: 1, overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(color: GoDesign.ink, fontSize: 12, fontWeight: FontWeight.w700)),
+                const SizedBox(height: 3),
+                Text(widget.locationSubtitle, maxLines: 1, overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(color: GoDesign.muted, fontSize: 10)),
               ])),
             ]),
-          ),
-        )),
-        const SizedBox(width: 10),
-        SizedBox(width: 78, child: Column(children: [
-          const GoDriveBrand(size: 30, light: true),
-          const SizedBox(height: 3),
-          Text(t('كل الخدمات عندك', 'Every service, one app'), maxLines: 1, overflow: TextOverflow.ellipsis,
-              style: const TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.w700)),
-        ])),
-        const SizedBox(width: 6),
-        Stack(children: [
-          IconButton(key: const ValueKey('go-home-notifications'), tooltip: t('الإشعارات', 'Notifications'), onPressed: widget.onNotifications,
-              icon: const Icon(Icons.notifications_outlined, color: Colors.white)),
-          if (widget.notificationCount > 0) const Positioned(top: 8, right: 9, child: CircleAvatar(radius: 4, backgroundColor: GoHomeStyle.orange)),
-        ]),
-      ]),
-      const SizedBox(height: 14),
-      Align(alignment: AlignmentDirectional.centerStart, child: Text(
-        widget.firstName.isEmpty ? t('أهلاً بك في GO', 'Welcome to GO') : t('مرحباً ${widget.firstName}', 'Hi ${widget.firstName}'),
-        style: const TextStyle(color: Colors.white, fontSize: 19, fontWeight: FontWeight.w800),
+          )),
       )),
-    ]),
-  );
-
-  Widget _searchField() => Padding(
-    padding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
-    child: TextField(
-      key: const ValueKey('go-home-search'),
-      controller: _query,
-      onChanged: (value) => setState(() => _search = value),
-      style: const TextStyle(color: GoHomeStyle.ink, fontSize: 13),
-      decoration: InputDecoration(
-        hintText: t('ابحث عن الخدمة التي تحتاجها…', 'Search for a service…'),
-        hintStyle: const TextStyle(color: GoHomeStyle.muted),
-        filled: true, fillColor: Colors.white,
-        prefixIcon: const Icon(Icons.search, color: GoHomeStyle.ink),
-        suffixIcon: IconButton(
-          tooltip: _search.isEmpty ? t('كل الخدمات', 'All services') : t('مسح البحث', 'Clear search'),
-          onPressed: _search.isEmpty ? _allServices : () { _query.clear(); setState(() => _search = ''); },
-          icon: Icon(_search.isEmpty ? Icons.tune : Icons.close, color: GoHomeStyle.orange),
-        ),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-      ),
-    ),
-  );
-
-  Widget _hero() => Padding(
-    padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
-    child: Container(
-      clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(color: const Color(0xff0D1B24), borderRadius: BorderRadius.circular(22), border: Border.all(color: Colors.white12)),
-      child: IntrinsicHeight(child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        Expanded(flex: 6, child: Padding(padding: const EdgeInsets.all(16), child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(t('محتاج خدمة؟', 'Need a service?'), style: const TextStyle(color: GoHomeStyle.orange, fontWeight: FontWeight.w900, fontSize: 24)),
-            const SizedBox(height: 6),
-            Text(t('اختار خدمتك\nوسيب الباقي علينا', 'Choose your service.\nWe take care of the rest.'), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 17, height: 1.4)),
-            const SizedBox(height: 14),
-            SizedBox(width: double.infinity, child: FilledButton(
-              key: const ValueKey('go-home-book'), onPressed: _allServices,
-              style: FilledButton.styleFrom(backgroundColor: GoHomeStyle.orange, foregroundColor: Colors.white,
-                  minimumSize: const Size(0, 46), padding: const EdgeInsets.symmetric(horizontal: 10),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-              child: Row(children: [
-                Expanded(child: Text(t('اطلب الآن', 'Book now'), maxLines: 1, overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800))),
-                const SizedBox(width: 6),
-                const Icon(Icons.arrow_forward, size: 16),
-              ]),
-            )),
-          ],
-        ))),
-        Expanded(flex: 4, child: Stack(fit: StackFit.expand, children: [
-          const GoServicePhoto(index: 0),
-          const DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.transparent, Color(0xdd0D1B24)]))),
-          const Positioned(bottom: 12, left: 12, right: 12, child: Center(child: GoDriveBrand(size: 32, light: true))),
-        ])),
+      const SizedBox(width: 12),
+      SizedBox(width: 74, child: Column(mainAxisSize: MainAxisSize.min, children: [
+        const GoDriveBrand(size: 25, light: true),
+        Text(t('كل الخدمات عندك', 'Every service'), textAlign: TextAlign.center,
+          maxLines: 1, overflow: TextOverflow.ellipsis,
+          style: const TextStyle(color: Colors.white, fontSize: 8)),
       ])),
-    ),
+      const SizedBox(width: 4),
+      IconButton(key: const ValueKey('go-home-notifications'), tooltip: t('الإشعارات', 'Notifications'),
+        onPressed: widget.onNotifications, constraints: const BoxConstraints(minHeight: 48, minWidth: 40),
+        icon: Badge(isLabelVisible: widget.notificationCount > 0,
+          backgroundColor: GoDesign.orange, label: Text('${widget.notificationCount}'),
+          child: const Icon(Icons.notifications_outlined, color: Colors.white, size: 23))),
+      if (widget.drawer != null) IconButton(tooltip: t('القائمة', 'Menu'),
+        onPressed: () => Scaffold.of(context).openDrawer(),
+        constraints: const BoxConstraints(minHeight: 48, minWidth: 40),
+        icon: const Icon(Icons.menu, color: Colors.white, size: 22)),
+    ]),
+  ));
+
+  Widget _searchField() => Padding(padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+    child: TextField(key: const ValueKey('go-home-search'), controller: _query,
+      onChanged: (value) => setState(() => _search = value),
+      style: const TextStyle(color: GoDesign.ink, fontSize: 14),
+      decoration: InputDecoration(hintText: t('ابحث عن الخدمة التي تحتاجها…', 'Search for a service…'),
+        hintStyle: const TextStyle(color: GoDesign.muted, fontSize: 13),
+        filled: true, fillColor: GoDesign.paper, prefixIcon: const Icon(Icons.search, color: GoDesign.ink),
+        suffixIcon: IconButton(tooltip: _search.isEmpty ? t('كل الخدمات', 'All services') : t('مسح البحث', 'Clear search'),
+          onPressed: _search.isEmpty ? _allServices : () { _query.clear(); setState(() => _search = ''); },
+          icon: Icon(_search.isEmpty ? Icons.tune : Icons.close, color: GoDesign.orange)),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14))),
   );
 
-  Widget _serviceCard(GoService service) => Material(
-    key: ValueKey('go-service-${service.key}'),
-    color: Colors.white,
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14), side: BorderSide(color: service.key == 'delivery_courier' ? GoHomeStyle.orange : GoHomeStyle.border)),
-    clipBehavior: Clip.antiAlias,
-    child: InkWell(onTap: () => widget.onService(service), child: Padding(
-      padding: const EdgeInsets.all(6),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        ClipRRect(borderRadius: BorderRadius.circular(10), child: AspectRatio(aspectRatio: 1.5, child: Stack(fit: StackFit.expand, children: [
-          GoServicePhoto(index: service.imageIndex),
-          Positioned(top: 4, right: 4, child: Container(padding: const EdgeInsets.all(4), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(7)), child: Icon(service.icon, size: 13, color: GoHomeStyle.orange))),
-        ]))),
-        Expanded(child: Center(child: Text(ar ? service.ar : service.en,
-            textAlign: TextAlign.center, maxLines: 3, overflow: TextOverflow.ellipsis,
-            style: const TextStyle(color: GoHomeStyle.ink, fontSize: 11.5, height: 1.25, fontWeight: FontWeight.w800)))),
+  Widget _hero() => Padding(padding: const EdgeInsets.fromLTRB(12, 0, 12, 14),
+    child: ClipRRect(borderRadius: BorderRadius.circular(16), child: IntrinsicHeight(
+      child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        Expanded(flex: 6, child: Padding(padding: const EdgeInsets.fromLTRB(10, 12, 10, 14),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(t('محتاج فني؟', 'Need a pro?'), style: const TextStyle(color: GoDesign.orange, fontSize: 25, fontWeight: FontWeight.w900)),
+            const SizedBox(height: 8),
+            Text(t('اختار خدمتك\nوسيب الباقي علينا', 'Choose your service.\nWe take care of the rest.'),
+              style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700, height: 1.4)),
+            const SizedBox(height: 18),
+            FilledButton.icon(key: const ValueKey('go-home-book'), onPressed: _allServices,
+              style: FilledButton.styleFrom(backgroundColor: GoDesign.orange, foregroundColor: Colors.white,
+                minimumSize: const Size(0, 48), padding: const EdgeInsets.symmetric(horizontal: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+              icon: const Icon(Icons.arrow_forward, size: 17),
+              label: Text(t('اطلب الآن', 'Book now'), style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800))),
+          ]))),
+        Expanded(flex: 4, child: Stack(fit: StackFit.expand, children: [
+          const GoServicePhoto(index: 2),
+          const DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter,
+            end: Alignment.bottomCenter, colors: [Colors.transparent, GoDesign.deepInk]))),
+        ])),
       ]),
     )),
+  );
+
+  Widget _serviceCard(GoService service) => Material(key: ValueKey('go-service-${service.key}'),
+    color: GoDesign.paper, borderRadius: BorderRadius.circular(12), clipBehavior: Clip.antiAlias,
+    child: InkWell(onTap: () => widget.onService(service), child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      ClipRRect(borderRadius: BorderRadius.circular(12), child: AspectRatio(aspectRatio: 1.5,
+        child: Stack(fit: StackFit.expand, children: [
+          GoServicePhoto(index: service.imageIndex),
+          PositionedDirectional(top: 5, end: 5, child: Container(width: 24, height: 24,
+            decoration: const BoxDecoration(color: GoDesign.paper, shape: BoxShape.circle),
+            child: Icon(service.icon, size: 14, color: GoDesign.orange))),
+        ]))),
+      Expanded(child: Padding(padding: const EdgeInsets.fromLTRB(2, 6, 2, 2), child: Text(ar ? service.ar : service.en,
+        textAlign: TextAlign.center, maxLines: 3, overflow: TextOverflow.ellipsis,
+        style: const TextStyle(color: GoDesign.ink, fontSize: 12, fontWeight: FontWeight.w700, height: 1.25)))),
+    ])),
   );
 }
 
@@ -319,11 +239,10 @@ class GoServicePhoto extends StatelessWidget {
   const GoServicePhoto({super.key, required this.index});
   final int index;
   @override
-  Widget build(BuildContext context) => ClipRect(child: FittedBox(
-    fit: BoxFit.cover,
+  Widget build(BuildContext context) => ClipRect(child: FittedBox(fit: BoxFit.cover,
     child: SizedBox(width: 180, height: 120, child: Stack(children: [
       Positioned(left: -(index % 4) * 180.0, top: -(index ~/ 4) * 120.0, width: 720, height: 480,
-          child: Image.memory(goServiceSpriteBytes, fit: BoxFit.fill, gaplessPlayback: true, filterQuality: FilterQuality.high)),
+        child: Image.memory(goServiceSpriteBytes, fit: BoxFit.fill, gaplessPlayback: true, filterQuality: FilterQuality.high)),
     ])),
   ));
 }

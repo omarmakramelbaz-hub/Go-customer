@@ -4,23 +4,41 @@
   <base href="$FLUTTER_BASE_HREF">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="جو درايف — اطلب مندوب وتابع توصيلك خطوة بخطوة.">
-  <meta name="theme-color" content="#E85504">
-  <meta name="apple-mobile-web-app-title" content="Go Drive">
-  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <meta name="description" content="GO — كل الخدمات عندك. اطلب مندوب أو مقدم خدمة وتابع طلبك.">
+  <meta name="theme-color" content="#091820">
+  <meta name="apple-mobile-web-app-title" content="GO">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=master-20260926">
   <link rel="manifest" href="manifest.json">
-  <title>Go Drive</title>
+  <title>Go Customer</title>
   <style>
-    html,body{margin:0;background:#f7f8fa;height:100%;font-family:Arial,sans-serif}
-    #loading{height:100%;display:grid;place-content:center;text-align:center;color:#171a1f;gap:16px}
-    #loading b{font-size:36px;direction:ltr}#loading b span{color:#e85504}
-    #loading p{font-size:16px;color:#666}
+    html,body{margin:0;background:#091820;min-height:100%;font-family:Tajawal,Arial,sans-serif}
+    #loading{position:fixed;inset:0;overflow:hidden;display:grid;place-content:center;
+      text-align:center;color:#fff;background:linear-gradient(145deg,#091820,#171a1f);gap:12px}
+    #loading::before{content:"";position:absolute;inset:-20%;pointer-events:none;
+      background:linear-gradient(150deg,transparent 25%,rgba(0,0,0,.15) 25%,rgba(0,0,0,.15) 36%,transparent 36%)}
+    #loading .brand,#loading p{position:relative;z-index:1;margin:0}
+    #loading .brand{display:grid;justify-items:center;gap:10px}
+    #loading img{width:min(52vw,220px);height:auto;display:block}
+    #loading strong{font-size:18px;font-weight:800}
+    #loading p{font-size:13px;color:#c5cbd0;margin-top:12px}
+    #loading .sweep{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+    noscript{position:fixed;inset:auto 20px 28px;text-align:center;color:#fff;font-size:14px;z-index:2}
   </style>
   <!-- MAPS_SCRIPT -->
   <script src="https://js.pusher.com/8.4.0/pusher.min.js"></script>
 </head>
 <body>
-  <div id="loading" role="status"><b><span>GO</span> Drive</b><p>جاري التحميل…</p></div>
+  <div id="loading" role="status" aria-live="polite">
+    <svg class="sweep" viewBox="0 0 390 844" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M-10 708 C110 530 342 626 400 490" fill="none" stroke="#fd7201" stroke-width="5"/>
+    </svg>
+    <div class="brand">
+      <img src="favicon.svg?v=master-20260926" alt="GO" width="192" height="122">
+      <strong>كل الخدمات عندك</strong>
+    </div>
+    <p>جاري التحميل…</p>
+  </div>
+  <noscript>يرجى تفعيل JavaScript لفتح التطبيق.</noscript>
   <script>window.addEventListener('flutter-first-frame', () => document.getElementById('loading')?.remove());</script>
   <script src="flutter_bootstrap.js" async></script>
 </body>

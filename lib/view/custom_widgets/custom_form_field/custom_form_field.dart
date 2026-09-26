@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import '../../../helpers/extensions/extensions.dart';
 import '../../../helpers/theme/app_colors.dart';
 import '../../../helpers/theme/app_text_style.dart';
+import '../../../helpers/theme/go_design_tokens.dart';
 import '../../../helpers/translation/all_translation.dart';
 
 enum FormFieldBorder { underLine, outLine, none }
@@ -44,39 +45,14 @@ class CustomFormField extends StatefulWidget {
   final FocusNode? focusNode;
 
   const CustomFormField({
-    super.key,
-    this.controller,
-    this.onChanged,
-    this.validator,
-    this.keyboardType,
-    this.isPassword = false,
-    this.hintText,
-    this.maxLines = 1,
-    this.minLines = 1,
-    this.onTap,
-    this.readOnly = false,
-    this.prefixIcon,
-    this.suffixIcon,
-    this.radius = 25,
-    this.fillColor,
-    this.focusColor,
-    this.unFocusColor,
-    this.title,
-    this.textDirection,
-    this.otherSideTitle,
-    this.country,
-    this.passwordColor,
-    this.formFieldBorder = FormFieldBorder.outLine,
-    this.inputFormatters,
-    this.onCountrySelect,
-    this.onFieldSubmitted,
-    this.titleStyle,
-    this.textStyle,
-    this.hintStyle,
-    this.maxLength,
-    this.autovalidateMode,
-    this.initialValue,
-    this.focusNode,
+    super.key, this.controller, this.onChanged, this.validator, this.keyboardType,
+    this.isPassword = false, this.hintText, this.maxLines = 1, this.minLines = 1,
+    this.onTap, this.readOnly = false, this.prefixIcon, this.suffixIcon,
+    this.radius = GoDesign.radius, this.fillColor, this.focusColor, this.unFocusColor,
+    this.title, this.textDirection, this.otherSideTitle, this.country, this.passwordColor,
+    this.formFieldBorder = FormFieldBorder.outLine, this.inputFormatters,
+    this.onCountrySelect, this.onFieldSubmitted, this.titleStyle, this.textStyle,
+    this.hintStyle, this.maxLength, this.autovalidateMode, this.initialValue, this.focusNode,
   });
 
   @override
@@ -88,137 +64,92 @@ class _CustomFormFieldState extends State<CustomFormField> {
 
   @override
   Widget build(BuildContext context) {
+    final ar = context.languageCode == 'ar';
+    Widget countryCode() => Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: Text('${widget.country?.flagEmoji} +${widget.country?.phoneCode}',
+        style: widget.textStyle ?? AppTextStyle.textFormStyle,
+        textDirection: TextDirection.ltr),
+    );
     return SizedBox(
-      width: context.width,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              if (widget.title != null) ...{
-                Expanded(child: Text(widget.title!, style: widget.titleStyle ?? AppTextStyle.formTitleStyle)),
-              },
-              if (widget.otherSideTitle != null) ...{
-                Text(widget.otherSideTitle!, style: widget.titleStyle ?? AppTextStyle.formTitleStyle),
-              },
-            ],
-          ),
-          if (widget.title != null || widget.otherSideTitle != null) ...{10.sbH},
-          Directionality(
-            textDirection: widget.textDirection ?? (context.isRtl ? TextDirection.rtl : TextDirection.ltr),
-            child: TextFormField(
-              onFieldSubmitted: widget.onFieldSubmitted,
-              onTapOutside: (event) => FocusManager.instance.primaryFocus?.unfocus(),
-              controller: widget.controller,
-              onChanged: widget.onChanged,
-              validator: widget.validator,
-              onTap: widget.onTap,
-              readOnly: widget.readOnly,
-              keyboardType: widget.keyboardType,
-              obscureText: widget.isPassword ? _obscureText : false,
-              style: widget.textStyle ?? AppTextStyle.textFormStyle,
-              autovalidateMode: widget.autovalidateMode ?? AutovalidateMode.onUserInteraction,
-              maxLines: widget.maxLines,
-              minLines: widget.minLines,
-              cursorColor: widget.focusColor ?? AppColors.mainAppColor,
-              inputFormatters: widget.inputFormatters,
-              maxLength: widget.maxLength,
-              decoration: InputDecoration(
-                hintMaxLines: 2,
-                hintText: widget.hintText,
-                hintStyle: widget.hintStyle ?? AppTextStyle.hintStyle,
-                fillColor: widget.fillColor ??
-                    (widget.formFieldBorder == FormFieldBorder.underLine
-                        ? Colors.transparent
-                        : AppColors.textFormFillColor),
-                filled: true,
-                border: _border(color: widget.unFocusColor ?? AppColors.textFormBorderColor),
-                disabledBorder: _border(color: widget.unFocusColor ?? AppColors.textFormBorderColor),
-                focusedBorder: _border(color: widget.unFocusColor ?? AppColors.mainAppColor),
-                enabledBorder: _border(color: widget.unFocusColor ?? AppColors.textFormBorderColor),
-                contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                prefixIcon: widget.country != null && context.languageCode == 'en'
-                    ? Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          widget.prefixIcon ?? const SizedBox(),
-                          TextButton(
-                            onPressed: null,
-                            // onPressed:
-                            //     widget.onCountrySelect != null ? _select : null,
-                            child: Text(
-                              '${widget.country?.flagEmoji} +${widget.country?.phoneCode}',
-                              style: widget.textStyle ?? AppTextStyle.textFormStyle,
-                              textDirection: TextDirection.ltr,
-                            ),
-                          ),
-                        ],
-                      )
-                    : widget.prefixIcon,
-                suffixIcon: widget.country != null && context.languageCode == 'ar'
-                    ? Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          TextButton(
-                            onPressed: null,
-                            // onPressed:
-                            //     widget.onCountrySelect != null ? _select : null,
-                            child: Text(
-                              '${widget.country?.flagEmoji} +${widget.country?.phoneCode}',
-                              style: widget.textStyle ?? AppTextStyle.textFormStyle,
-                              textDirection: TextDirection.ltr,
-                            ),
-                          ),
-                          widget.suffixIcon ?? const SizedBox(),
-                        ],
-                      )
-                    : widget.isPassword
-                        ? InkWell(
-                            onTap: () {
-                              setState(() {
-                                _obscureText = !_obscureText;
-                              });
-                            },
-                            child: Icon(
-                              _obscureText ? Icons.visibility_off_rounded : Icons.visibility_rounded,
-                              size: 20,
-                              color: widget.passwordColor ?? AppColors.hintColor,
-                            ),
-                          )
-                        : widget.suffixIcon,
-              ),
-              initialValue: widget.initialValue,
-              focusNode: widget.focusNode ?? FocusNode(),
-            ),
-          ),
+      width: double.infinity,
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        if (widget.title != null || widget.otherSideTitle != null) ...[
+          Row(children: [
+            if (widget.title != null)
+              Expanded(child: Text(widget.title!, style: widget.titleStyle ??
+                AppTextStyle.formTitleStyle.copyWith(fontSize: 14, fontWeight: FontWeight.w600))),
+            if (widget.otherSideTitle != null)
+              Text(widget.otherSideTitle!, style: widget.titleStyle ?? AppTextStyle.formTitleStyle),
+          ]),
+          const SizedBox(height: 8),
         ],
-      ),
+        Directionality(
+          textDirection: widget.textDirection ?? (context.isRtl ? TextDirection.rtl : TextDirection.ltr),
+          child: TextFormField(
+            onFieldSubmitted: widget.onFieldSubmitted,
+            onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
+            controller: widget.controller, onChanged: widget.onChanged,
+            validator: widget.validator, onTap: widget.onTap, readOnly: widget.readOnly,
+            keyboardType: widget.keyboardType,
+            obscureText: widget.isPassword && _obscureText,
+            enableSuggestions: !widget.isPassword,
+            autocorrect: !widget.isPassword,
+            style: widget.textStyle ?? AppTextStyle.textFormStyle,
+            autovalidateMode: widget.autovalidateMode ?? AutovalidateMode.onUserInteraction,
+            maxLines: widget.isPassword ? 1 : widget.maxLines,
+            minLines: widget.isPassword ? 1 : widget.minLines,
+            cursorColor: widget.focusColor ?? GoDesign.orange,
+            inputFormatters: widget.inputFormatters, maxLength: widget.maxLength,
+            decoration: InputDecoration(
+              hintMaxLines: 2, hintText: widget.hintText,
+              hintStyle: widget.hintStyle ?? const TextStyle(color: GoDesign.muted, fontSize: 14),
+              fillColor: widget.fillColor ??
+                (widget.formFieldBorder == FormFieldBorder.underLine ? Colors.transparent : GoDesign.paper),
+              filled: true,
+              border: _border(widget.unFocusColor ?? GoDesign.border),
+              enabledBorder: _border(widget.unFocusColor ?? GoDesign.border),
+              disabledBorder: _border(widget.unFocusColor ?? GoDesign.border),
+              focusedBorder: _border(widget.focusColor ?? GoDesign.orange, width: 1.5),
+              errorBorder: _border(GoDesign.danger),
+              focusedErrorBorder: _border(GoDesign.danger, width: 1.5),
+              errorMaxLines: 3,
+              contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
+              prefixIconColor: GoDesign.muted, suffixIconColor: GoDesign.muted,
+              prefixIcon: widget.country != null && !ar
+                ? Row(mainAxisSize: MainAxisSize.min, children: [
+                    if (widget.prefixIcon != null) widget.prefixIcon!, countryCode()])
+                : widget.prefixIcon,
+              suffixIcon: widget.country != null && ar
+                ? Row(mainAxisSize: MainAxisSize.min, children: [
+                    countryCode(), if (widget.suffixIcon != null) widget.suffixIcon!])
+                : widget.isPassword
+                  ? IconButton(
+                      tooltip: _obscureText ? (ar ? 'إظهار كلمة المرور' : 'Show password')
+                        : (ar ? 'إخفاء كلمة المرور' : 'Hide password'),
+                      onPressed: () => setState(() => _obscureText = !_obscureText),
+                      icon: Icon(_obscureText ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                        size: 21, color: widget.passwordColor ?? AppColors.hintColor))
+                  : widget.suffixIcon,
+            ),
+            initialValue: widget.initialValue,
+            // Let TextFormField own its internal focus node when none is supplied.
+            focusNode: widget.focusNode,
+          ),
+        ),
+      ]),
     );
   }
 
-  InputBorder _border({required Color color}) {
+  InputBorder _border(Color color, {double width = 1}) {
     switch (widget.formFieldBorder) {
       case FormFieldBorder.outLine:
-        return OutlineInputBorder(
-          borderRadius: BorderRadius.circular(widget.radius),
-          borderSide: BorderSide(color: color),
-        );
+        return OutlineInputBorder(borderRadius: BorderRadius.circular(widget.radius),
+          borderSide: BorderSide(color: color, width: width));
       case FormFieldBorder.underLine:
-        return UnderlineInputBorder(
-          borderRadius: BorderRadius.circular(0),
-          borderSide: BorderSide(color: color),
-        );
+        return UnderlineInputBorder(borderSide: BorderSide(color: color, width: width));
       case FormFieldBorder.none:
         return InputBorder.none;
     }
   }
-
-// void _select() {
-//   CountryCodeMethods.pickCountry(
-//     onSelect: (v) {
-//       widget.onCountrySelect?.call(v);
-//     },
-//     context: context,
-//   );
-// }
 }

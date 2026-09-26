@@ -49,7 +49,7 @@ class _MyAppState extends State<MyApp> {
       stream: mainAppBloc.langStream,
       initialData: GlobalTranslations.currentLanguage,
       builder: (context, language) => MaterialApp(
-        title: 'Go Drive',
+        title: 'Go Customer',
         locale: Locale(language.data ?? 'ar'),
         supportedLocales: GlobalTranslations.supportedLocales(),
         localizationsDelegates: context.localizationsDelegates,
