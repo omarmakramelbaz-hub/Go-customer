@@ -1,12 +1,9 @@
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:grouped_list/grouped_list.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../helpers/extensions/extensions.dart';
-import '../../../../helpers/theme/app_colors.dart';
+import '../../../../helpers/theme/go_design_tokens.dart';
 import '../../../../helpers/translation/all_translation.dart';
 import '../../../../helpers/utils/date_methods.dart';
 import '../../../custom_widgets/custom_app_bar/custom_app_bar.dart';
@@ -27,25 +24,15 @@ class ChatScreenArgs {
   final String vendorDeviceToken;
   final bool isVendor;
   final String accountType;
-  ChatScreenArgs({
-    required this.receiverDeviceToken,
-    required this.senderDeviceToken,
-    required this.senderName,
-    required this.receiverName,
-    required this.orderId,
-    required this.vendorDeviceToken,
-    required this.isVendor,
-    required this.accountType,
-    int? delegateId,
-  });
+  ChatScreenArgs({required this.receiverDeviceToken, required this.senderDeviceToken,
+    required this.senderName, required this.receiverName, required this.orderId,
+    required this.vendorDeviceToken, required this.isVendor, required this.accountType, int? delegateId});
 }
 
 class ChatScreen extends StatefulWidget {
   final ChatScreenArgs args;
   static const routeName = 'ChatScreen';
-
   const ChatScreen({super.key, required this.args});
-
   @override
   State<ChatScreen> createState() => _ChatScreenState();
 }
@@ -54,101 +41,74 @@ class _ChatScreenState extends State<ChatScreen> {
   final _messageEC = TextEditingController();
   @override
   void initState() {
-    Future.microtask(() {
-      context.read<ChatController>().initial(widget.args.orderId);
-    });
     super.initState();
+    Future.microtask(() { if (mounted) context.read<ChatController>().initial(widget.args.orderId); });
+  }
+  @override
+  void dispose() { _messageEC.dispose(); super.dispose(); }
+
+  void _send(ChatController controller) {
+    final text = _messageEC.text;
+    if (text.trim().isEmpty) return;
+    final id = context.read<AuthController>().profile?.id;
+    if (id == null) return;
+    controller.send(text, id, widget.args.receiverDeviceToken, widget.args.senderDeviceToken,
+      widget.args.senderName, widget.args.receiverName, widget.args.vendorDeviceToken,
+      widget.args.isVendor, widget.args.accountType);
+    _messageEC.clear();
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Consumer<ChatController>(
-      builder: (context, chatController, _) {
-        return Scaffold(
-          appBar: CustomAppBar(
-            height: 72,
-            radius: 0,
-            appBarColor: const Color(0xff171A1F),
-            actions: const [],
-            title: Text('messages'.tr, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
-          ),
-          backgroundColor: const Color(0xffF8F9FB),
-          body: Column(
-            children: [
-              Expanded(
-                child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                  stream: chatController.chatStream,
-                  builder: (context, snapshot) {
-                    log(snapshot.connectionState.name);
-                    switch (snapshot.connectionState) {
-                      case ConnectionState.none:
-                        return const Center(child: CustomLoading());
-                      case ConnectionState.waiting:
-                        return const Center(child: CustomLoading());
-                      case ConnectionState.active:
-                        if (snapshot.hasData) {
-                          List<ChatMessageModel> messages =
-                              snapshot.data!.docs.map((e) => ChatMessageModel.fromJson(e.data())).toList();
-
-                          return GroupedListView<ChatMessageModel, DateTime>(
-                            elements: messages,
-                            groupBy: (element) => DateTime(
-                              element.messageTime!.year,
-                              element.messageTime!.month,
-                              element.messageTime!.day,
-                            ),
-                            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                            itemComparator: (item1, item2) => item1.messageTime!.compareTo(item2.messageTime!),
-                            groupItemBuilder: (context, element, groupStart, groupEnd) {
-                              return MessageWidget(message: element);
-                            },
-                            groupSeparatorBuilder: (date) =>
-                                Center(child: Text(DateMethods.formatToDate(date.toIso8601String()))),
-                            separator: 15.sbH,
-                            reverse: true,
-                            order: GroupedListOrder.DESC,
-                          );
-                        } else {
-                          return const NoDataWidget();
-                        }
-                      case ConnectionState.done:
-                        return const CustomLoading();
-                    }
-                  },
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: Row(
-                  children: [
-                    Expanded(child: CustomFormField(controller: _messageEC)),
-                    IconButton(
-                      onPressed: () {
-                        final txt = _messageEC.text;
-                        if (_messageEC.text != '') {
-                          chatController.send(
-                            txt,
-                            context.read<AuthController>().profile!.id!,
-                            widget.args.receiverDeviceToken,
-                            widget.args.senderDeviceToken,
-                            widget.args.senderName,
-                            widget.args.receiverName,
-                            widget.args.vendorDeviceToken,
-                            widget.args.isVendor,
-                            widget.args.accountType,
-                          );
-                        }
-                        _messageEC.clear();
-                      },
-                      icon: Icon(Icons.send_rounded, color: AppColors.mainAppColor),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        );
-      },
+  Widget build(BuildContext context) => Consumer<ChatController>(builder: (context, controller, _) {
+    final ar = context.languageCode == 'ar';
+    return Scaffold(backgroundColor: GoDesign.paper,
+      appBar: CustomAppBar(height: 64, centerTitle: false,
+        title: Row(children: [
+          const CircleAvatar(radius: 17, backgroundColor: Color(0xFF26363D),
+            child: Icon(Icons.person_outline, color: Colors.white, size: 22)),
+          const SizedBox(width: 10),
+          Expanded(child: Text(widget.args.receiverName.trim().isEmpty ? 'messages'.tr : widget.args.receiverName,
+            maxLines: 1, overflow: TextOverflow.ellipsis,
+            style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w700))),
+        ])),
+      body: SafeArea(top: false, child: Column(children: [
+        Expanded(child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+          stream: controller.chatStream,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.none || snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CustomLoading());
+            }
+            if (!snapshot.hasData) return const NoDataWidget();
+            final messages = snapshot.data!.docs.map((doc) => ChatMessageModel.fromJson(doc.data())).toList();
+            return GroupedListView<ChatMessageModel, DateTime>(
+              elements: messages,
+              groupBy: (message) => DateTime(message.messageTime!.year, message.messageTime!.month, message.messageTime!.day),
+              itemComparator: (a, b) => a.messageTime!.compareTo(b.messageTime!),
+              padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 18),
+              groupItemBuilder: (context, message, groupStart, groupEnd) => MessageWidget(message: message),
+              groupSeparatorBuilder: (date) => Padding(padding: const EdgeInsets.symmetric(vertical: 10),
+                child: Center(child: Text(DateMethods.formatToDate(date.toIso8601String()),
+                  style: const TextStyle(color: GoDesign.muted, fontSize: 11)))),
+              separator: const SizedBox(height: 4), reverse: true, order: GroupedListOrder.DESC,
+            );
+          },
+        )),
+        Container(padding: const EdgeInsets.fromLTRB(16, 10, 16, 14),
+          decoration: const BoxDecoration(color: GoDesign.paper,
+            border: Border(top: BorderSide(color: GoDesign.border))),
+          child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+            Expanded(child: CustomFormField(controller: _messageEC,
+              hintText: ar ? 'اكتب رسالتك…' : 'Write a message…',
+              fillColor: GoDesign.canvas, maxLines: 4, minLines: 1,
+              keyboardType: TextInputType.multiline)),
+            const SizedBox(width: 10),
+            IconButton.filled(
+              tooltip: ar ? 'إرسال' : 'Send',
+              style: IconButton.styleFrom(backgroundColor: GoDesign.orange,
+                foregroundColor: Colors.white, minimumSize: const Size(48, 48)),
+              onPressed: () => _send(controller), icon: const Icon(Icons.send_rounded, size: 22)),
+          ])),
+      ])),
     );
-  }
+  });
 }
