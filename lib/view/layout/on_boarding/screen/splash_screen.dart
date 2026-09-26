@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:provider/provider.dart';
 
@@ -27,6 +26,7 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   bool _failed = false;
   bool _loading = false;
+  final DateTime _openingStartedAt = DateTime.now();
 
   @override
   void initState() {
@@ -106,7 +106,10 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 
-  void _open(String route) {
+  Future<void> _open(String route) async {
+    final elapsed = DateTime.now().difference(_openingStartedAt).inMilliseconds;
+    final remainingMs = 3000 - elapsed;
+    if (remainingMs > 0) await Future.delayed(Duration(milliseconds: remainingMs));
     if (mounted) NamedNavigatorImpl.push(route, clean: true);
   }
 
@@ -115,41 +118,84 @@ class _SplashScreenState extends State<SplashScreen> {
     final ar = context.languageCode == 'ar';
     return Scaffold(
       backgroundColor: const Color(0xff171A1F),
-      body: SafeArea(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(28),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SvgPicture.asset(GoCustomerIdentity.lightLogoAsset, width: 210, height: 150),
-                const SizedBox(height: 12),
-                Text(
-                  ar ? 'كل خدماتك عندك' : 'All your services, in one place',
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w800),
-                ),
-                const SizedBox(height: 36),
-                if (_failed) ...[
-                  Text(ar ? 'تعذّر الاتصال. حاول مرة أخرى.' : 'Unable to connect. Please try again.',
-                    style: const TextStyle(color: Colors.white70)),
-                  const SizedBox(height: 12),
-                  FilledButton(
-                    onPressed: _restoreSession,
-                    style: FilledButton.styleFrom(backgroundColor: const Color(0xffFD7201)),
-                    child: Text(ar ? 'إعادة المحاولة' : 'Try again'),
-                  ),
-                  TextButton(
-                    onPressed: () => _open(LoginScreen.routeName),
-                    child: Text(ar ? 'تسجيل الدخول' : 'Sign in', style: const TextStyle(color: Colors.white)),
-                  ),
-                ] else
-                  const CircularProgressIndicator(color: Color(0xffFD7201)),
-              ],
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          const DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Color(0xff171A1F), Color(0xff24272D)],
+              ),
             ),
           ),
-        ),
+          Positioned(
+            top: -90,
+            right: -70,
+            child: Container(
+              width: 260,
+              height: 260,
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: Color(0x18FD7201),
+              ),
+            ),
+          ),
+          SafeArea(
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 28),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Image.asset(
+                      'assets/app_icon_master.png',
+                      width: 210,
+                      height: 168,
+                      fit: BoxFit.contain,
+                      filterQuality: FilterQuality.high,
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      ar ? 'كل خدماتك عندك' : 'All your services, in one place',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 17,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                    if (_failed) ...[
+                      Text(
+                        ar ? 'تعذّر الاتصال. حاول مرة أخرى.' : 'Unable to connect. Please try again.',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(color: Colors.white70),
+                      ),
+                      const SizedBox(height: 12),
+                      FilledButton(
+                        onPressed: _restoreSession,
+                        style: FilledButton.styleFrom(backgroundColor: const Color(0xffFD7201)),
+                        child: Text(ar ? 'إعادة المحاولة' : 'Try again'),
+                      ),
+                    ] else
+                      const SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.5,
+                          color: Color(0xffFD7201),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
+
 }
