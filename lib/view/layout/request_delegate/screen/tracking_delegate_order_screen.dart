@@ -4,22 +4,19 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../helpers/extensions/extensions.dart';
 import '../../../../helpers/images/app_images.dart';
 import '../../../../helpers/routes/app_routers_import.dart';
-import '../../../../helpers/theme/app_colors.dart';
-import '../../../../helpers/theme/app_text_style.dart';
+import '../../../../helpers/theme/go_design_tokens.dart';
 import '../../../../helpers/translation/all_translation.dart';
-import '../../../../helpers/utils/date_methods.dart';
 import '../../../../helpers/utils/url_launcher_methods.dart';
 import '../../../custom_widgets/api_response_widget/api_response_widget.dart';
-import '../../../custom_widgets/buttons/custom_button.dart';
 import '../../../custom_widgets/custom_app_bar/custom_app_bar.dart';
 import '../../../custom_widgets/custom_image/custom_image.dart';
 import '../../../custom_widgets/global_widgets/connect_support_widget.dart';
+import '../../../custom_widgets/go_master_ui.dart';
 import '../../chat/screen/chat_screen.dart';
-import '../../map/utils/map_services.dart';
 import '../controller/request_delegate_controller.dart';
+import '../widget/tracking_delegate_order_widget.dart';
 
 class TrackingDelegateOrderArgs {
   final int id;
@@ -37,83 +34,46 @@ class TrackingDelegateOrderScreen extends StatefulWidget {
 
 class _TrackingDelegateOrderScreenState extends State<TrackingDelegateOrderScreen> {
   late RequestDelegateController requestDelegateController;
-  late MapServices mapServices;
   LatLng? origin;
   LatLng? destination;
-  late GoogleMapController googleMapController;
-  String? _mapStyle;
-
-  Set<Polyline> polyLines = {};
-  Set<Marker> markers = {};
-  bool isMapReady = false;
   Timer? _liveTimer;
-  bool _offerDialogOpen = false; // New flag for checking if map is ready
-
-  void initMapStyle() async {
-    var mapStyle = await DefaultAssetBundle.of(context).loadString('assets/map_styles/dark_map_style.json');
-    setState(() {
-      _mapStyle = mapStyle;
-    });
-  }
+  bool _offerDialogOpen = false;
+  bool _refreshing = false;
 
   @override
   void initState() {
-    initMapStyle();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      requestDelegateController = Provider.of<RequestDelegateController>(context, listen: false);
-      Provider.of<RequestDelegateController>(context, listen: false).initialDelegateOrderDetails();
-
-      Provider.of<RequestDelegateController>(context, listen: false).getDelegateOrderDetails(id: widget.args.id).then((
-        value,
-      ) async {
-        mapServices = MapServices();
-        final orderDetails = requestDelegateController.delegateOrderDetails;
-
-        // Set origin and destination
-        origin = LatLng(double.parse(orderDetails?.fromLat ?? '0.0'), double.parse(orderDetails?.fromLng ?? '0.0'));
-        destination = LatLng(double.parse(orderDetails?.toLat ?? '0.0'), double.parse(orderDetails?.toLng ?? '0.0'));
-
-        // Ensure the coordinates are valid before proceeding
-        if (origin!.latitude != 0.0 && destination!.latitude != 0.0) {
-          // Get the polyline points
-          // var points = await mapServices.getRouteData(
-          //   originFrom: origin!,
-          //   desintation: destination!,
-          // );
-
-          // Add polyline for the route
-          setState(() {
-            // polyLines.add(
-            //   Polyline(
-            //     polylineId: const PolylineId('route'),
-            //     points: points,
-            //     color: Colors.orange,
-            //     width: 5,
-            //   ),
-            // );
-
-            // Add markers for origin and destination
-            markers.add(Marker(markerId: const MarkerId('origin'), position: origin!));
-            markers.add(Marker(markerId: const MarkerId('destination'), position: destination!));
-            setState(() {});
-          });
-        }
-        _startLiveOrderRefresh();
-        await requestDelegateController.getAcceptedDelegate(delegateOrderId: widget.args.id);
-        if (mounted) _showRevisedOfferIfNeeded();
-      });
-    });
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+      requestDelegateController = context.read<RequestDelegateController>();
+      requestDelegateController.initialDelegateOrderDetails();
+      await _refresh();
+      if (!mounted) return;
+      _liveTimer = Timer.periodic(const Duration(seconds: 5), (_) => _refresh());
+    });
   }
 
-  void _startLiveOrderRefresh() {
-    _liveTimer?.cancel();
-    _liveTimer = Timer.periodic(const Duration(seconds: 5), (_) async {
-      if (!mounted) return;
+  LatLng? _point(String? lat, String? lng) {
+    final a = double.tryParse(lat ?? '');
+    final b = double.tryParse(lng ?? '');
+    if (a == null || b == null || !a.isFinite || !b.isFinite || a < -90 || a > 90 || b < -180 || b > 180) return null;
+    return LatLng(a, b);
+  }
+
+  Future<void> _refresh() async {
+    if (!mounted || _refreshing) return;
+    _refreshing = true;
+    try {
       await requestDelegateController.getDelegateOrderDetails(id: widget.args.id);
+      if (!mounted) return;
+      final order = requestDelegateController.delegateOrderDetails;
+      setState(() {
+        origin = _point(order?.fromLat, order?.fromLng);
+        destination = _point(order?.toLat, order?.toLng);
+      });
       await requestDelegateController.getAcceptedDelegate(delegateOrderId: widget.args.id);
       if (mounted) _showRevisedOfferIfNeeded();
-    });
+    } finally { _refreshing = false; }
   }
 
   Future<void> _showRevisedOfferIfNeeded() async {
@@ -121,363 +81,140 @@ class _TrackingDelegateOrderScreenState extends State<TrackingDelegateOrderScree
     if (_offerDialogOpen || offer == null || offer.status != 'price_revision' || !mounted) return;
     _offerDialogOpen = true;
     final ar = context.languageCode == 'ar';
-    await showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(ar ? 'عرض سعر جديد من المندوب' : 'New price offer'),
-        content: Text(ar
-            ? 'المندوب اقترح سعر توصيل جديد بقيمة ${offer.price} جنيه. لن يتغير سعر الطلب إلا بعد موافقتك.'
-            : 'The driver proposed a new fare of ${offer.price} EGP. Your fare changes only if you accept.'),
-        actions: [
-          TextButton(
-            onPressed: () async {
-              final ok = await requestDelegateController.respondToRevisedOffer(orderId: widget.args.id, status: 'declined');
-              if (ok && dialogContext.mounted) Navigator.pop(dialogContext);
-            },
-            child: Text(ar ? 'رفض' : 'Decline'),
-          ),
-          FilledButton(
-            onPressed: () async {
-              final ok = await requestDelegateController.respondToRevisedOffer(orderId: widget.args.id, status: 'accepted');
-              if (ok && dialogContext.mounted) Navigator.pop(dialogContext);
-              if (ok && mounted) {
-                await requestDelegateController.getDelegateOrderDetails(id: widget.args.id);
-              }
-            },
-            child: Text(ar ? 'قبول السعر الجديد' : 'Accept new fare'),
-          ),
-        ],
-      ),
-    );
+    await showDialog<void>(context: context, barrierDismissible: false, builder: (dialogContext) => AlertDialog(
+      title: Text(ar ? 'عرض سعر جديد من المندوب' : 'New price offer'),
+      content: Text(ar ? 'المندوب اقترح سعر توصيل جديد بقيمة ${offer.price} جنيه. لن يتغير سعر الطلب إلا بعد موافقتك.'
+        : 'The driver proposed a new fare of ${offer.price} EGP. Your fare changes only if you accept.'),
+      actions: [
+        TextButton(onPressed: () async {
+          final ok = await requestDelegateController.respondToRevisedOffer(orderId: widget.args.id, status: 'declined');
+          if (ok && dialogContext.mounted) Navigator.pop(dialogContext);
+        }, child: Text(ar ? 'رفض' : 'Decline')),
+        FilledButton(onPressed: () async {
+          final ok = await requestDelegateController.respondToRevisedOffer(orderId: widget.args.id, status: 'accepted');
+          if (ok && dialogContext.mounted) Navigator.pop(dialogContext);
+          if (ok && mounted) await requestDelegateController.getDelegateOrderDetails(id: widget.args.id);
+        }, child: Text(ar ? 'قبول السعر الجديد' : 'Accept new fare')),
+      ],
+    ));
     _offerDialogOpen = false;
   }
 
   @override
-  void dispose() {
-    _liveTimer?.cancel();
-    super.dispose();
-  }
+  void dispose() { _liveTimer?.cancel(); super.dispose(); }
 
   @override
-  Widget build(BuildContext context) {
-    return PopScope(
-      onPopInvoked: (didPop) {
-        if (didPop) {
-          widget.args.onSuccess?.call();
-        }
-      },
-      child: Consumer<RequestDelegateController>(
-        builder: (context, requestDelegateController, _) {
-          // If origin or destination are null, show a loading indicator
-          if (origin == null || destination == null) {
-            return const Center(
-              child: CircularProgressIndicator(), // Or any other loading widget
-            );
-          }
-
-          final orderDetails = requestDelegateController.delegateOrderDetails;
-
-          return ApiResponseWidget(
-            apiResponse: requestDelegateController.delegateOrderDetailsApiResponse,
-            onReload: () => requestDelegateController.getDelegateOrderDetails(id: widget.args.id),
-            isEmpty: orderDetails == null,
-            child: Container(
-              color: const Color(0xff171A1F),
-              child: Scaffold(
-                backgroundColor: const Color(0xff171A1F),
-                appBar: CustomAppBar(
-                  appBarColor: AppColors.blackColor,
-                  title: Text(
-                    DateMethods.formatDateToArabic(orderDetails?.createdAt ?? ''),
-                    style: AppTextStyle.text18BS().copyWith(color: AppColors.whiteColor),
-                  ),
-                ),
-                body: Column(
-                  children: [
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: SingleChildScrollView(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              20.sbH,
-                              _buildMap(),
-                              20.sbH,
-                              Row(
-                                children: [
-                                  const CustomImage(path: AppImages.radioToIcon, type: ImageType.svg),
-                                  const SizedBox(width: 10),
-                                  Expanded(
-                                    child: Text(
-                                      orderDetails?.fromAddress ?? '',
-                                      style: AppTextStyle.text16MS().copyWith(color: AppColors.whiteColor),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              20.sbH,
-                              Row(
-                                children: [
-                                  const CustomImage(path: AppImages.radioFromIcon, type: ImageType.svg),
-                                  const SizedBox(width: 10),
-                                  Expanded(
-                                    child: Text(
-                                      orderDetails?.toAddress ?? '',
-                                      style: AppTextStyle.text16MS().copyWith(color: AppColors.whiteColor),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              10.sbH,
-                              if (orderDetails?.delegateId != null) ...[
-                                Divider(color: AppColors.darkGreyColor),
-                                10.sbH,
-                                Row(
-                                  children: [
-                                    CustomImage(
-                                      path: orderDetails?.delegateLogo == null
-                                          ? AppImages.delegateRDIcon
-                                          : orderDetails?.delegateLogo ?? '',
-                                      type: orderDetails?.delegateLogo == null ? ImageType.svg : ImageType.network,
-                                      width: 45,
-                                      height: 45,
-                                      radius: 30,
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Expanded(
-                                      child: Text(
-                                        orderDetails?.delegateName ?? '',
-                                        style: AppTextStyle.text16MS().copyWith(color: AppColors.whiteColor),
-                                      ),
-                                    ),
-                                    GestureDetector(
-                                      onTap: () {
-                                        UrlLauncherMethods.makePhoneCall(
-                                          orderDetails?.delegateMobile ?? '',
-                                        );
-                                      },
-                                      child: Card(
-                                        elevation: 10,
-                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                                        child: CircleAvatar(
-                                          radius: 20,
-                                          backgroundColor: AppColors.whiteColor,
-                                          child: CustomImage(
-                                            path: AppImages.callIcon,
-                                            type: ImageType.svg,
-                                            color: AppColors.blackColor,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    if (orderDetails?.delegateFcmId != null) ...[
-                                      GestureDetector(
-                                        onTap: () {
-                                          NamedNavigatorImpl.push(
-                                            ChatScreen.routeName,
-                                            arguments: ChatScreenArgs(
-                                              senderDeviceToken: orderDetails?.userFcmId ?? '',
-                                              accountType: 'vendor',
-                                              isVendor: false,
-                                              vendorDeviceToken: requestDelegateController
-                                                      .delegateOrderDetails?.resturantVendorDeviceToken ??
-                                                  '',
-                                              receiverDeviceToken: orderDetails?.delegateFcmId ?? '',
-                                              senderName: orderDetails?.userName ?? '',
-                                              receiverName: orderDetails?.delegateName ?? '',
-                                              orderId: "VD${orderDetails?.id ?? ""}",
-                                            ),
-                                          );
-                                        },
-                                        child: Card(
-                                          elevation: 10,
-                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                                          child: CircleAvatar(
-                                            radius: 20,
-                                            backgroundColor: AppColors.whiteColor,
-                                            child: CustomImage(
-                                              path: AppImages.chatIcon,
-                                              type: ImageType.svg,
-                                              color: AppColors.blackColor,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ],
-                                ),
-                              ],
-                              10.sbH,
-                              Divider(color: AppColors.darkGreyColor),
-                              10.sbH,
-                              Text(
-                                'orderDetails'.tr,
-                                style: AppTextStyle.text16MS().copyWith(color: AppColors.whiteColor),
-                              ),
-                              10.sbH,
-                              Text(
-                                orderDetails?.description ?? '',
-                                style: AppTextStyle.text16MS().copyWith(color: AppColors.whiteColor),
-                              ),
-                              10.sbH,
-                              Divider(color: AppColors.darkGreyColor),
-                              10.sbH,
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'deliverCost'.tr,
-                                    style: AppTextStyle.text16MS().copyWith(color: AppColors.whiteColor),
-                                  ),
-                                  Text(
-                                    'pound'.tr.replaceAll(
-                                          '{}',
-                                          '${orderDetails?.actualPrice}',
-                                        ),
-                                    style: AppTextStyle.text16MS().copyWith(color: AppColors.whiteColor),
-                                  ),
-                                ],
-                              ),
-                              10.sbH,
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 16),
-                                    child: Text(
-                                      'paymentMethod'.tr,
-                                      style: AppTextStyle.text16BS().copyWith(color: AppColors.whiteColor),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Container(
-                                    height: 24,
-                                    width: 5,
-                                    decoration: BoxDecoration(
-                                      color: AppColors.mainAppColor,
-                                      borderRadius: BorderRadius.horizontal(
-                                        left: context.languageCode == 'ar'
-                                            ? const Radius.circular(5)
-                                            : const Radius.circular(0),
-                                        right: context.languageCode == 'ar'
-                                            ? const Radius.circular(0)
-                                            : const Radius.circular(5),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  CustomImage(
-                                    height: 18,
-                                    path: orderDetails?.paymentType == 'cash'
-                                        ? AppImages.cashIcon
-                                        : orderDetails?.paymentType == 'online'
-                                            ? AppImages.visaIcon
-                                            : orderDetails?.paymentType == 'v_cash'
-                                                ? AppImages.vfCash
-                                                : orderDetails?.paymentType == 'wallet'
-                                                    ? AppImages.payWalletIcon.tr
-                                                    : '',
-                                    type: ImageType.svg,
-                                    color: AppColors.mainAppColor,
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Text(
-                                    orderDetails?.paymentType == 'cash'
-                                        ? 'cash'.tr
-                                        : orderDetails?.paymentType == 'online'
-                                            ? 'visa'.tr
-                                            : orderDetails?.paymentType == 'v_cash'
-                                                ? 'vfCash'.tr
-                                                : orderDetails?.paymentType == 'wallet'
-                                                    ? 'appWallet'.tr
-                                                    : '',
-                                    style: AppTextStyle.text16BM(),
-                                  ),
-                                ],
-                              ),
-                              if (orderDetails?.status == 'accepted')
-                                Padding(
-                                  padding: const EdgeInsets.all(20.0),
-                                  child: CustomButton(
-                                    text: 'cancelOrder'.tr,
-                                    onPressed: () {
-                                      requestDelegateController.cancelOrder(
-                                        orderId: orderDetails!.id!,
-                                        onSuccess: () {
-                                          NamedNavigatorImpl.pop();
-                                        },
-                                      );
-                                    },
-                                  ),
-                                ),
-                              30.sbH,
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    const ConnectSupportWidget(isDark: true),
-                  ],
-                ),
-              ),
-            ),
-          );
-        },
-      ),
+  Widget build(BuildContext context) => PopScope(onPopInvokedWithResult: (didPop, _) {
+    if (didPop) widget.args.onSuccess?.call();
+  }, child: Consumer<RequestDelegateController>(builder: (context, controller, _) {
+    final ar = context.languageCode == 'ar';
+    final order = controller.delegateOrderDetails;
+    return Scaffold(backgroundColor: GoDesign.paper,
+      appBar: CustomAppBar(title: Text(ar ? 'متابعة الطلب' : 'Track request')),
+      body: SafeArea(top: false, child: ApiResponseWidget(
+        apiResponse: controller.delegateOrderDetailsApiResponse,
+        onReload: () => controller.getDelegateOrderDetails(id: widget.args.id), isEmpty: order == null,
+        child: ListView(padding: const EdgeInsets.all(20), children: [
+          Text('${ar ? 'طلب رقم' : 'Request'} #${widget.args.id}',
+            style: const TextStyle(color: GoDesign.muted, fontSize: 13)),
+          const SizedBox(height: 22),
+          GoSurface(child: TrackingDelegateOrderWidget(status: order?.status ?? '', orderDate: order?.createdAt)),
+          if (order?.delegateId != null) ...[
+            const SizedBox(height: 16),
+            GoSurface(child: Row(children: [
+              CustomImage(path: order?.delegateLogo == null ? AppImages.delegateRDIcon : order?.delegateLogo ?? '',
+                type: order?.delegateLogo == null ? ImageType.svg : ImageType.network,
+                width: 46, height: 46, radius: 23),
+              const SizedBox(width: 12),
+              Expanded(child: Text(order?.delegateName ?? '',
+                style: const TextStyle(color: GoDesign.ink, fontSize: 17, fontWeight: FontWeight.w700))),
+            ])),
+          ],
+          const SizedBox(height: 18),
+          _address(ar ? 'عنوان الاستلام' : 'Pickup address', order?.fromAddress ?? ''),
+          const SizedBox(height: 12),
+          _address(ar ? 'عنوان التوصيل' : 'Delivery address', order?.toAddress ?? ''),
+          if (origin != null && destination != null) ...[
+            const SizedBox(height: 12),
+            ExpansionTile(tilePadding: const EdgeInsets.symmetric(horizontal: 4),
+              title: Text(ar ? 'عرض المواقع على الخريطة' : 'View locations on the map',
+                style: const TextStyle(fontSize: 14, color: GoDesign.ink)),
+              leading: const Icon(Icons.map_outlined, color: GoDesign.orange),
+              children: [_buildMap()]),
+          ],
+          const SizedBox(height: 20),
+          GoSurface(child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            Text('orderDetails'.tr, style: const TextStyle(color: GoDesign.ink, fontSize: 17, fontWeight: FontWeight.w700)),
+            const SizedBox(height: 10),
+            Text(order?.description ?? '', style: const TextStyle(color: GoDesign.muted, height: 1.5)),
+            const Divider(height: 26, color: GoDesign.border),
+            Wrap(alignment: WrapAlignment.spaceBetween, spacing: 16, runSpacing: 10, children: [
+              Text('deliverCost'.tr, style: const TextStyle(color: GoDesign.ink, fontWeight: FontWeight.w600)),
+              Text(order?.actualPrice == null ? '—' : 'pound'.tr.replaceAll('{}', '${order?.actualPrice}'),
+                style: const TextStyle(color: GoDesign.orange, fontSize: 17, fontWeight: FontWeight.w700)),
+            ]),
+            const SizedBox(height: 16),
+            Row(children: [
+              const Icon(Icons.account_balance_wallet_outlined, color: GoDesign.orange, size: 21),
+              const SizedBox(width: 10),
+              Expanded(child: Text(_paymentLabel(order?.paymentType), style: const TextStyle(color: GoDesign.ink, fontSize: 14))),
+            ]),
+          ])),
+          if (order?.status == 'accepted') ...[
+            const SizedBox(height: 18),
+            TextButton.icon(style: TextButton.styleFrom(foregroundColor: GoDesign.danger),
+              onPressed: () => controller.cancelOrder(orderId: order!.id!, onSuccess: () => NamedNavigatorImpl.pop()),
+              icon: const Icon(Icons.cancel_outlined), label: Text('cancelOrder'.tr)),
+          ],
+          const SizedBox(height: 20),
+          const ConnectSupportWidget(isDark: false),
+        ]),
+      )),
+      bottomNavigationBar: order?.delegateId == null ? null : SafeArea(top: false,
+        child: Padding(padding: const EdgeInsets.fromLTRB(20, 8, 20, 14), child: Row(children: [
+          if (order?.delegateMobile?.isNotEmpty == true)
+            Expanded(child: OutlinedButton.icon(onPressed: () => UrlLauncherMethods.makePhoneCall(order?.delegateMobile ?? ''),
+              icon: const Icon(Icons.call_outlined), label: Text(ar ? 'اتصال' : 'Call'))),
+          if (order?.delegateFcmId != null) ...[
+            const SizedBox(width: 12),
+            Expanded(child: OutlinedButton.icon(onPressed: () => NamedNavigatorImpl.push(ChatScreen.routeName,
+              arguments: ChatScreenArgs(senderDeviceToken: order?.userFcmId ?? '', accountType: 'vendor', isVendor: false,
+                vendorDeviceToken: order?.resturantVendorDeviceToken ?? '', receiverDeviceToken: order?.delegateFcmId ?? '',
+                senderName: order?.userName ?? '', receiverName: order?.delegateName ?? '', orderId: 'VD${order?.id ?? ''}')),
+              icon: const Icon(Icons.chat_bubble_outline), label: Text(ar ? 'مراسلة' : 'Message'))),
+          ],
+        ]))),
     );
+  }));
+
+  String _paymentLabel(String? value) {
+    switch (value) {
+      case 'cash': return 'cash'.tr;
+      case 'online': return 'visa'.tr;
+      case 'v_cash': return 'vfCash'.tr;
+      case 'wallet': return 'appWallet'.tr;
+      default: return value ?? '—';
+    }
   }
 
-  ClipRRect _buildMap() {
-    return ClipRRect(
-      borderRadius: const BorderRadius.all(Radius.circular(15)),
-      child: SizedBox(
-        height: 250,
-        width: double.infinity,
-        child: GoogleMap(
-          mapType: MapType.normal,
-          initialCameraPosition: CameraPosition(
-            target: origin!, // Use the origin as the target
-            zoom: 16,
-          ),
-          zoomControlsEnabled: false,
-          markers: markers,
-          polylines: polyLines,
-          style: _mapStyle,
-          onMapCreated: (GoogleMapController controller) {
-            googleMapController = controller;
-            // googleMapController.setMapStyle(_mapStyle);
-            markers.add(Marker(markerId: const MarkerId('origin'), position: origin!));
+  Widget _address(String title, String address) => Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+    const Icon(Icons.location_on_outlined, color: GoDesign.orange, size: 23), const SizedBox(width: 10),
+    Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text(title, style: const TextStyle(color: GoDesign.ink, fontSize: 14, fontWeight: FontWeight.w700)),
+      const SizedBox(height: 5),
+      Text(address, style: const TextStyle(color: GoDesign.muted, fontSize: 13, height: 1.5)),
+    ])),
+  ]);
 
-            markers.add(Marker(markerId: const MarkerId('destination'), position: destination!));
-
-            setState(() {
-              isMapReady = true; // Set flag when map is ready
-            });
-
-            // Update the camera to show both origin and destination
-            googleMapController.animateCamera(
-              CameraUpdate.newLatLngBounds(
-                LatLngBounds(
-                  southwest: LatLng(
-                    origin!.latitude < destination!.latitude ? origin!.latitude : destination!.latitude,
-                    origin!.longitude < destination!.longitude ? origin!.longitude : destination!.longitude,
-                  ),
-                  northeast: LatLng(
-                    origin!.latitude > destination!.latitude ? origin!.latitude : destination!.latitude,
-                    origin!.longitude > destination!.longitude ? origin!.longitude : destination!.longitude,
-                  ),
-                ),
-                100.0,
-              ),
-            );
-          },
-        ),
-      ),
-    );
-  }
+  Widget _buildMap() => ClipRRect(borderRadius: BorderRadius.circular(14), child: SizedBox(height: 230,
+    child: GoogleMap(mapType: MapType.normal, zoomControlsEnabled: false,
+      initialCameraPosition: CameraPosition(target: origin!, zoom: 16),
+      markers: {Marker(markerId: const MarkerId('origin'), position: origin!),
+        Marker(markerId: const MarkerId('destination'), position: destination!)},
+      onMapCreated: (map) => map.animateCamera(CameraUpdate.newLatLngBounds(LatLngBounds(
+        southwest: LatLng(origin!.latitude < destination!.latitude ? origin!.latitude : destination!.latitude,
+          origin!.longitude < destination!.longitude ? origin!.longitude : destination!.longitude),
+        northeast: LatLng(origin!.latitude > destination!.latitude ? origin!.latitude : destination!.latitude,
+          origin!.longitude > destination!.longitude ? origin!.longitude : destination!.longitude)), 60)),
+    )));
 }
