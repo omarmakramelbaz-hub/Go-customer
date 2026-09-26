@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_drive_customer/helpers/theme/go_design_tokens.dart';
+import 'package:go_drive_customer/helpers/translation/all_translation.dart';
 import 'package:go_drive_customer/view/custom_widgets/buttons/custom_button.dart';
 import 'package:go_drive_customer/view/custom_widgets/custom_app_bar/custom_app_bar.dart';
 import 'package:go_drive_customer/view/custom_widgets/custom_form_field/custom_form_field.dart';
@@ -14,16 +15,21 @@ import 'package:go_drive_customer/view/layout/home/widgets/go_customer_home_view
 import 'package:go_drive_customer/view/layout/on_boarding/screen/go_guest_welcome_screen.dart';
 import 'package:go_drive_customer/view/layout/request_delegate/widget/tracking_delegate_order_widget.dart';
 
-Widget app(Widget child, {bool ar = true, double scale = 1}) => MaterialApp(
-  locale: Locale(ar ? 'ar' : 'en'),
-  supportedLocales: const [Locale('ar'), Locale('en')],
-  localizationsDelegates: GlobalMaterialLocalizations.delegates,
-  builder: (context, body) => MediaQuery(
-    data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(scale)),
-    child: body!,
-  ),
-  home: child,
-);
+Widget app(Widget child, {bool ar = true, double scale = 1}) {
+  // Production initializes this before runApp. Mirror that contract for shared
+  // controls that use the existing AppLocal extension rather than Material's locale.
+  GlobalTranslations.locale = Locale(ar ? 'ar' : 'en');
+  return MaterialApp(
+    locale: GlobalTranslations.locale,
+    supportedLocales: const [Locale('ar'), Locale('en')],
+    localizationsDelegates: GlobalMaterialLocalizations.delegates,
+    builder: (context, body) => MediaQuery(
+      data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(scale)),
+      child: body!,
+    ),
+    home: child,
+  );
+}
 
 GoCustomerHomeView home({bool ar = true, ValueChanged<GoService>? onService}) => GoCustomerHomeView(
   isArabic: ar, firstName: 'Omar', locationTitle: 'المنصورة', locationSubtitle: 'عنوان الخدمة',
