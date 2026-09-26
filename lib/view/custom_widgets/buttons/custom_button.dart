@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../helpers/networking/api_helper.dart';
-import '../../../helpers/theme/app_colors.dart';
-import '../../../helpers/theme/app_text_style.dart';
-import '../custom_loading/custom_loading.dart';
+import '../../../helpers/theme/go_design_tokens.dart';
 
 class CustomButton extends StatelessWidget {
   final double radius;
@@ -26,13 +24,13 @@ class CustomButton extends StatelessWidget {
   final List<BoxShadow>? boxShadow;
   const CustomButton({
     super.key,
-    this.radius = 14,
+    this.radius = GoDesign.radius,
     this.width,
-    this.height = 54,
+    this.height = GoDesign.controlHeight,
     this.style,
     this.text,
-    this.prefixIcon = const SizedBox(),
-    this.suffixIcon = const SizedBox(),
+    this.prefixIcon,
+    this.suffixIcon,
     this.color,
     this.gradient,
     this.apiResponse,
@@ -48,62 +46,60 @@ class CustomButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return apiResponse?.state == ResponseState.loading || isLoading
-        ? const Center(child: CustomLoading())
-        : Container(
-            width: width ?? double.infinity,
-            height: height,
-            decoration: BoxDecoration(
-              color: color ?? (isMainColor ? AppColors.mainAppColor : AppColors.secondAppColor),
-              gradient: gradient ??
-                  LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [AppColors.mainAppColor, AppColors.mainAppColor],
-                  ),
-              borderRadius: borderRadius ?? BorderRadius.circular(radius),
-              border: Border.all(color: borderColor ?? Colors.transparent),
-              boxShadow: boxShadow ??
-                  (hasShadow
-                      ? [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.08),
-                            offset: const Offset(0, 0),
-                            blurRadius: 6,
-                          ),
-                        ]
-                      : null),
-            ),
-            child: Stack(
-              children: [
-                Positioned.fill(
-                  child: Center(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        if (prefixIcon != null) ...{prefixIcon!, const SizedBox(width: 10)},
-                        Flexible(
-                          child: child ??
-                              Text(text ?? '', textAlign: TextAlign.center, style: style ?? AppTextStyle.buttonStyle),
-                        ),
-                        if (suffixIcon != null) ...{const SizedBox(width: 5), suffixIcon!},
-                      ],
-                    ),
-                  ),
+    final busy = apiResponse?.state == ResponseState.loading || isLoading;
+    final enabled = onPressed != null && !busy;
+    final background = color ?? (isMainColor ? GoDesign.orange : GoDesign.ink);
+    // A supplied white/secondary color must not be painted over by an orange
+    // gradient. Several wallet and cancel actions rely on that distinction.
+    final fillGradient = gradient ??
+        (color == null && isMainColor ? GoDesign.actionGradient : null);
+    final corners = (borderRadius ?? BorderRadius.circular(radius))
+        .resolve(Directionality.of(context));
+    final foreground = style?.color ??
+        (background == GoDesign.orange || isMainColor && color == null
+            ? GoDesign.paper
+            : ThemeData.estimateBrightnessForColor(background) == Brightness.dark
+                ? GoDesign.paper : GoDesign.ink);
+    return Semantics(
+      button: true,
+      enabled: enabled,
+      child: SizedBox(
+        width: width ?? double.infinity,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: background,
+            gradient: fillGradient,
+            borderRadius: corners,
+            border: Border.all(color: borderColor ?? Colors.transparent),
+            boxShadow: boxShadow ?? (hasShadow ? GoDesign.cardShadow : null),
+          ),
+          child: Material(
+            color: Colors.transparent,
+            borderRadius: corners,
+            child: InkWell(
+              onTap: enabled ? onPressed : null,
+              borderRadius: corners,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: height),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  child: busy
+                      ? Center(child: SizedBox(width: 22, height: 22,
+                          child: CircularProgressIndicator(strokeWidth: 2.5, color: foreground)))
+                      : Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                          if (prefixIcon != null) ...[prefixIcon!, const SizedBox(width: 8)],
+                          Flexible(child: child ?? Text(text ?? '',
+                            textAlign: TextAlign.center,
+                            style: style ?? TextStyle(color: foreground,
+                              fontSize: 16, fontWeight: FontWeight.w700))),
+                          if (suffixIcon != null) ...[const SizedBox(width: 8), suffixIcon!],
+                        ]),
                 ),
-                Positioned.fill(
-                  child: Material(
-                    color: Colors.transparent,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(radius)),
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(radius),
-                      onTap: onPressed,
-                      child: SizedBox(width: width ?? double.infinity, height: height),
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
-          );
+          ),
+        ),
+      ),
+    );
   }
 }
