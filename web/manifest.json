@@ -1,13 +1,13 @@
 {
-  "name": "Go Drive",
-  "short_name": "Go Drive",
+  "name": "Go Customer",
+  "short_name": "GO",
   "start_url": ".",
   "scope": ".",
   "display": "standalone",
-  "background_color": "#F7F8FA",
-  "theme_color": "#E85504",
-  "description": "اطلب مندوب وتابع توصيلك خطوة بخطوة",
+  "background_color": "#091820",
+  "theme_color": "#091820",
+  "description": "GO — كل الخدمات عندك. اطلب مندوب أو مقدم خدمة وتابع طلبك.",
   "lang": "ar",
   "dir": "rtl",
-  "icons": [{"src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any"}]
+  "icons": [{"src": "favicon.svg?v=master-20260926", "sizes": "any", "type": "image/svg+xml", "purpose": "any"}]
 }
