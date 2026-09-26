@@ -49,8 +49,6 @@ class CustomButton extends StatelessWidget {
     final busy = apiResponse?.state == ResponseState.loading || isLoading;
     final enabled = onPressed != null && !busy;
     final background = color ?? (isMainColor ? GoDesign.orange : GoDesign.ink);
-    // A supplied white/secondary color must not be painted over by an orange
-    // gradient. Several wallet and cancel actions rely on that distinction.
     final fillGradient = gradient ??
         (color == null && isMainColor ? GoDesign.actionGradient : null);
     final corners = (borderRadius ?? BorderRadius.circular(radius))
@@ -63,6 +61,7 @@ class CustomButton extends StatelessWidget {
     return Semantics(
       button: true,
       enabled: enabled,
+      label: busy ? text : null,
       child: SizedBox(
         width: width ?? double.infinity,
         child: DecoratedBox(
@@ -83,17 +82,27 @@ class CustomButton extends StatelessWidget {
                 constraints: BoxConstraints(minHeight: height),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                  child: busy
-                      ? Center(child: SizedBox(width: 22, height: 22,
-                          child: CircularProgressIndicator(strokeWidth: 2.5, color: foreground)))
-                      : Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                          if (prefixIcon != null) ...[prefixIcon!, const SizedBox(width: 8)],
-                          Flexible(child: child ?? Text(text ?? '',
-                            textAlign: TextAlign.center,
-                            style: style ?? TextStyle(color: foreground,
-                              fontSize: 16, fontWeight: FontWeight.w700))),
-                          if (suffixIcon != null) ...[const SizedBox(width: 8), suffixIcon!],
-                        ]),
+                  // Keep the label in layout so loading cannot expand to the
+                  // screen height or collapse a wrapped, large-text label.
+                  child: Stack(alignment: Alignment.center, children: [
+                    ExcludeSemantics(excluding: busy,
+                      child: IgnorePointer(ignoring: busy,
+                        child: Opacity(opacity: busy ? 0 : 1,
+                          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                            if (prefixIcon != null) ...[prefixIcon!, const SizedBox(width: 8)],
+                            Flexible(child: child ?? Text(text ?? '',
+                              textAlign: TextAlign.center,
+                              style: style ?? TextStyle(color: foreground,
+                                fontSize: 16, fontWeight: FontWeight.w700))),
+                            if (suffixIcon != null) ...[const SizedBox(width: 8), suffixIcon!],
+                          ]),
+                        ),
+                      ),
+                    ),
+                    if (busy) Positioned.fill(child: Center(
+                      child: SizedBox(width: 22, height: 22,
+                        child: CircularProgressIndicator(strokeWidth: 2.5, color: foreground)))),
+                  ]),
                 ),
               ),
             ),
