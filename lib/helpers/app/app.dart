@@ -1,3 +1,5 @@
+import '../../go_services/wallet_notice.dart';
+import '../../view/layout/wallet/screen/wallet_screen.dart';
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -54,7 +56,7 @@ class _MyAppState extends State<MyApp> {
         supportedLocales: GlobalTranslations.supportedLocales(),
         localizationsDelegates: context.localizationsDelegates,
         debugShowCheckedModeBanner: false,
-        builder: BotToastInit(),
+        builder: (context, child) => BotToastInit()(context, Consumer<AuthController>(builder: (_, auth, __) => GoWalletShell(sessionId: auth.profile?.id, onTopUp: () async { await NamedNavigatorImpl.navigatorState.currentState?.pushNamed(WalletScreen.routeName); }, child: child ?? const SizedBox()))),
         navigatorObservers: [BotToastNavigatorObserver()],
         initialRoute: SplashScreen.routeName,
         onGenerateRoute: NamedNavigatorImpl.onGenerateRoute,

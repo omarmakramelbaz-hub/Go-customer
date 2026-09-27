@@ -174,7 +174,7 @@ class _ServiceJobScreenState extends State<ServiceJobScreen> with WidgetsBinding
       final policy = job?['cancellation'];
       if (policy is! Map || policy['fee'] == null) { setState(() => error = t('حدّث الطلب لعرض قيمة الإلغاء أولًا.', 'Refresh the job to load the cancellation fee first.')); return; }
       cancellationFee = policy['fee'].toString();
-      if (!await confirm(t('تأكيد الإلغاء وخصم خدمة التطبيق', 'Confirm cancellation and app fee'), t('عند إلغائك بعد القبول، تُخصم خدمة التطبيق بنسبة ${policy['rate']}%، بقيمة $cancellationFee ج.م من محفظتك، وتُرد العمولة للصنايعي. أي مبلغ محجوز للشغل يُرد قبل حساب الخصم. هل توافق؟', 'Cancelling after acceptance debits the ${policy['rate']}% app service fee (EGP $cancellationFee) from your wallet and refunds the professional’s commission. Any wallet hold for the job is released before this debit. Do you agree?'))) return;
+      if (!await confirm(t('تأكيد الإلغاء وخصم خدمة التطبيق', 'Confirm cancellation and app fee'), t('عند إلغائك بعد القبول، تُخصم خدمة التطبيق بنسبة ${policy['rate']}%، بقيمة $cancellationFee ج.م من محفظتك، وتُرد العمولة للصنايعي. أي مبلغ محجوز من محفظتك يُرد أولًا. إذا لم يكفِ الرصيد، سيظهر المتبقي بالسالب ويلزم الشحن لطلبات جديدة. هل توافق؟', 'Cancelling after acceptance debits the ${policy['rate']}% app service fee (EGP $cancellationFee) from your wallet and refunds the professional’s commission. Any wallet hold is released first. If your balance is insufficient, the remainder becomes debt and you must top up for new orders. Do you agree?'))) return;
     }
     if (state == 'cancelled' || state == 'disputed') { reason = await showDialog<String>(context: context, builder: (_) => _ReasonForm(ar: ar)); if (reason == null) return; }
     else {

@@ -1,9 +1,12 @@
+import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
 import '../helpers/hive/hive_methods.dart';
 import '../helpers/networking/urls.dart';
 
 /// Isolated transport: no legacy checkout settings or wallet mutations.
 /// All prices, eligibility, acceptance and payment status are server-owned.
+final goWalletChanges = ValueNotifier<int>(0);
+
 class ServiceFailure implements Exception {
   const ServiceFailure(this.message, [this.status]);
   final String message;
@@ -64,6 +67,7 @@ class ServiceApi {
       if (raw is! Map || raw['data'] is! Map || raw['status'] != 'Success') {
         throw const ServiceFailure('استجابة غير متوقعة من الخادم / Invalid server response.');
       }
+      if (body != null) goWalletChanges.value++;
       return Map<String, dynamic>.from(raw['data'] as Map);
     } on DioException {
       throw const ServiceFailure('تعذر الاتصال. راجع حالة الطلب قبل إعادة المحاولة / Connection failed. Check the job before retrying.');
@@ -77,6 +81,7 @@ class ServiceApi {
       rethrow;
     }
   }
+  Future<Map<String, dynamic>> walletStatus() => request('wallet-status');
   Future<Map<String, dynamic>> jobs({String scope = 'open', int page = 1}) => request('jobs', query: {'scope': scope, 'page': page});
   Future<Map<String, dynamic>> job(int id) => request('jobs/$id');
   Future<Map<String, dynamic>> create(FormData data) => request('jobs', body: data);
