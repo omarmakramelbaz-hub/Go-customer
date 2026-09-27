@@ -62,9 +62,7 @@ class ServiceRequestForm extends StatefulWidget {
 class _ServiceRequestFormState extends State<ServiceRequestForm> {
   final form = GlobalKey<FormState>();
   final description = TextEditingController();
-  final area = TextEditingController();
   final address = TextEditingController();
-  final phone = TextEditingController();
   final photos = <XFile>[];
   final requestKey = List.generate(32, (_) => Random.secure().nextInt(16).toRadixString(16)).join();
   LatLng? location;
@@ -74,7 +72,7 @@ class _ServiceRequestFormState extends State<ServiceRequestForm> {
   String? error;
   String t(String a, String e) => st(widget.ar, a, e);
   @override
-  void dispose() { description.dispose(); area.dispose(); address.dispose(); phone.dispose(); super.dispose(); }
+  void dispose() { description.dispose(); address.dispose(); super.dispose(); }
   Future<void> pickPhotos() async {
     try {
       final picked = await ImagePicker().pickMultiImage(maxWidth: 1800, maxHeight: 1800, imageQuality: 85);
@@ -101,7 +99,7 @@ class _ServiceRequestFormState extends State<ServiceRequestForm> {
     if (frozen == null) {
       if (!form.currentState!.validate()) return;
       if (location == null) { setState(() => error = t('حدد موقع تنفيذ الشغل على الخريطة أولًا.', 'Select the work location on the map first.')); return; }
-      frozen = {'request_key': requestKey, 'profession_key': widget.professionKey, 'description': description.text.trim(), 'area': area.text.trim(), 'address': address.text.trim(), 'phone': phone.text.trim(), 'lat': location!.latitude, 'lng': location!.longitude, if (schedule != null) 'scheduled_at': schedule!.toUtc().toIso8601String()};
+      frozen = {'request_key': requestKey, 'profession_key': widget.professionKey, 'description': description.text.trim(), 'address': address.text.trim(), 'lat': location!.latitude, 'lng': location!.longitude, if (schedule != null) 'scheduled_at': schedule!.toUtc().toIso8601String()};
     }
     setState(() { sending = true; error = null; });
     try {
@@ -127,9 +125,7 @@ class _ServiceRequestFormState extends State<ServiceRequestForm> {
         Text(widget.title, style: const TextStyle(fontSize: 23, fontWeight: FontWeight.bold)),
         TextFormField(controller: description, enabled: !locked, maxLines: 5, maxLength: 2000, decoration: InputDecoration(labelText: t('مطلوب إيه بالضبط؟', 'What exactly needs doing?'), hintText: t('المشكلة، عدد القطع، المقاسات، والشغل المطلوب...', 'Problem, quantities, dimensions and required work...')), validator: (v) => (v?.trim().length ?? 0) < 10 ? t('اكتب وصفًا لا يقل عن ١٠ أحرف.', 'Write at least 10 characters.') : null),
         OutlinedButton.icon(onPressed: locked ? null : chooseLocation, icon: const Icon(Icons.location_on_outlined), label: Text(location == null ? t('حدد موقع التنفيذ بدبوس الخريطة', 'Pin the work location') : t('موقع التنفيذ محدد — تعديل', 'Work location selected — edit'))),
-        TextFormField(controller: area, enabled: !locked, maxLength: 150, decoration: InputDecoration(labelText: t('المنطقة أو الحي', 'Area or district')), validator: (v) => (v?.trim().length ?? 0) < 2 ? t('أدخل المنطقة', 'Enter the area') : null),
         TextFormField(controller: address, enabled: !locked, maxLength: 500, decoration: InputDecoration(labelText: t('العنوان التفصيلي (يظهر بعد الاتفاق)', 'Exact address (shared after agreement)')), validator: (v) => (v?.trim().length ?? 0) < 5 ? t('أدخل عنوانًا واضحًا', 'Enter a clear address') : null),
-        TextFormField(controller: phone, enabled: !locked, keyboardType: TextInputType.phone, decoration: InputDecoration(labelText: t('رقم التواصل', 'Contact phone')), validator: (v) => !RegExp(r'^\+?[0-9]{10,15}$').hasMatch(v?.trim() ?? '') ? t('أدخل رقمًا من ١٠ إلى ١٥ رقمًا بالأرقام الإنجليزية.', 'Enter 10–15 digits; use 0–9.') : null),
         const SizedBox(height: 15),
         OutlinedButton.icon(onPressed: locked || photos.length >= 5 ? null : pickPhotos, icon: const Icon(Icons.add_photo_alternate_outlined), label: Text(t('إضافة صور (${photos.length}/٥)', 'Add photos (${photos.length}/5)'))),
         for (var i = 0; i < photos.length; i++) ListTile(leading: const Icon(Icons.image_outlined), title: Text(photos[i].name), trailing: IconButton(onPressed: locked ? null : () => setState(() => photos.removeAt(i)), icon: const Icon(Icons.close))),

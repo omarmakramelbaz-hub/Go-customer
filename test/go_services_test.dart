@@ -3,6 +3,8 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import '../lib/go_services/customer_services.dart';
 import '../lib/go_services/service_api.dart';
 import '../lib/go_services/service_widgets.dart';
 
@@ -19,6 +21,34 @@ ResponseBody reply(Map<String, dynamic> data, [int code = 200]) => ResponseBody.
 ServiceApi api(MemoryAdapter adapter, {bool partner = false}) => ServiceApi(partner: partner, dio: Dio()..httpClientAdapter = adapter, baseUrl: 'https://example.invalid/api/', token: () => 'test-token-not-real');
 Map<String, dynamic> exampleJob() => {'id': 7, 'status': 'searching', 'description': 'Repair kitchen sink', 'area': 'District', 'search_until': DateTime.now().add(const Duration(hours: 1)).toIso8601String(), 'offers': [{'id': 3, 'partner_id': 9, 'name': 'Professional', 'price': '500.00', 'scope': 'Replace the damaged connection', 'materials_included': false, 'arrival_minutes': 30, 'duration_minutes': 60, 'status': 'offered', 'expires_at': DateTime.now().add(const Duration(minutes: 30)).toIso8601String()}]};
 void main() {
+  for (final ar in [true, false]) {
+    testWidgets('request uses description, map and exact address only (Arabic=$ar)', (tester) async {
+      final adapter = MemoryAdapter((_) => reply(exampleJob()));
+      final client = api(adapter);
+      await tester.pumpWidget(MaterialApp(home: ServiceRequestForm(api: client, ar: ar, professionKey: 'plumber', title: ar ? 'سباك' : 'Plumber')));
+      await tester.pumpAndSettle();
+      expect(find.byType(TextFormField), findsNWidgets(2));
+      expect(find.text(ar ? 'رقم التواصل' : 'Contact phone'), findsNothing);
+      expect(find.text(ar ? 'المنطقة أو الحي' : 'Area or district'), findsNothing);
+      await tester.enterText(find.byType(TextFormField).at(0), 'Repair the kitchen sink pipe');
+      await tester.enterText(find.byType(TextFormField).at(1), 'Building 4, second floor, apartment 3');
+      // Supply the map's selected value without invoking native map services.
+      final dynamic state = tester.state(find.byType(ServiceRequestForm));
+      state.location = const LatLng(30, 31);
+      final submit = find.text(ar ? 'إرسال والبحث عن صنايعية' : 'Submit and find professionals');
+      await tester.scrollUntilVisible(submit, 200, scrollable: find.byType(Scrollable).first);
+      await tester.tap(submit); await tester.pumpAndSettle();
+      final request = adapter.requests.single;
+      expect(request.path, endsWith('/go-services/jobs'));
+      final fields = Map<String, String>.fromEntries((request.data as FormData).fields);
+      expect(fields['address'], 'Building 4, second floor, apartment 3');
+      expect(fields['lat'], '30.0'); expect(fields['lng'], '31.0');
+      expect(fields.containsKey('phone'), isFalse);
+      expect(fields.containsKey('area'), isFalse);
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox()); client.close();
+    });
+  }
   test('prices stay exact, Arabic digits work and invalid amounts fail closed', () {
     expect(normalizeServicePrice('١٢٣٫٤٥'), '123.45');
     expect(normalizeServicePrice('001.2'), '1.20');
