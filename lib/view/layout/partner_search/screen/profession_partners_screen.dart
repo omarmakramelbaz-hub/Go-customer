@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import '../../../../go_services/customer_services.dart';
 import '../../../../go_services/service_widgets.dart';
 import '../../../../helpers/translation/all_translation.dart';
-import 'legacy_profession_partners_screen.dart' as legacy;
 
-/// Preserve the home-card route and old-server compatibility. Once the schema
-/// exists, new work goes through quotations, not a direct-choice bypass button.
+/// New professional requests always use quotations. Existing requests remain
+/// accessible through Orders while the marketplace is unavailable.
 class ProfessionPartnersScreen extends StatelessWidget {
   const ProfessionPartnersScreen({super.key, required this.professionKey, required this.title});
   final String professionKey;
@@ -16,7 +15,7 @@ class ProfessionPartnersScreen extends StatelessWidget {
     return Scaffold(body: ServiceGate(
       partner: false,
       ar: ar,
-      fallback: (_) => legacy.ProfessionPartnersScreen(professionKey: professionKey, title: title),
+      title: title,
       builder: (api, caps) => CustomerServiceHub(
         api: api,
         capabilities: caps,

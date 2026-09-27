@@ -78,6 +78,43 @@ void main() {
     await tester.pumpAndSettle(); expect(find.text('legacy retained'), findsOneWidget); expect(find.text('new marketplace'), findsNothing);
     await tester.pumpWidget(const SizedBox()); client.close();
   });
+  testWidgets('new professional requests wait for quotations and retry readiness', (tester) async {
+    var ready = false;
+    final adapter = MemoryAdapter((_) => reply({'schema_ready': ready, 'version': 1, 'enabled': ready}));
+    final client = api(adapter);
+    await tester.pumpWidget(MaterialApp(home: ServiceGate(api: client, partner: false, ar: false, title: 'Plumber', builder: (_, __) => const Text('quotation hub'))));
+    await tester.pumpAndSettle();
+    expect(find.text('Labour quotations are currently unavailable'), findsOneWidget);
+    expect(find.text('quotation hub'), findsNothing);
+    expect(adapter.requests.every((r) => r.method == 'GET' && r.path.endsWith('/capabilities')), isTrue);
+    ready = true;
+    await tester.tap(find.text('Retry')); await tester.pumpAndSettle();
+    expect(find.text('quotation hub'), findsOneWidget);
+    await tester.pumpWidget(const SizedBox()); client.close();
+  });
+  testWidgets('rejecting one quote sends its id and retains the other quotes', (tester) async {
+    var job = exampleJob();
+    final first = serviceMaps(job['offers']).first;
+    job['offers'] = [first, {...first, 'id': 4, 'name': 'Another professional', 'price': '450.00'}];
+    final adapter = MemoryAdapter((request) {
+      if (request.path.endsWith('capabilities')) return reply({'schema_ready': true, 'version': 1, 'enabled': true, 'payment_methods': ['cash']});
+      if (request.method == 'POST') {
+        job = {...job, 'offers': [{...first, 'status': 'rejected'}, serviceMaps(job['offers'])[1]]};
+      }
+      return reply(job);
+    });
+    final client = api(adapter);
+    await tester.pumpWidget(MaterialApp(home: ServiceJobScreen(api: client, ar: false, id: 7)));
+    await tester.pumpAndSettle();
+    final reject = find.text('Reject and keep searching').first;
+    await tester.scrollUntilVisible(reject, 200); await tester.tap(reject); await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Confirm')); await tester.pumpAndSettle();
+    final mutations = adapter.requests.where((r) => r.method == 'POST').toList();
+    expect(mutations, hasLength(1));
+    expect(mutations.single.path, endsWith('/jobs/7/offers/3/reject'));
+    expect(serviceMaps(job['offers'])[1]['status'], 'offered');
+    await tester.pumpWidget(const SizedBox()); client.close();
+  });
   testWidgets('acceptance requires review and explicit confirmation', (tester) async {
     final adapter = MemoryAdapter((request) => request.path.endsWith('capabilities') ? reply({'schema_ready': true, 'version': 1, 'enabled': true, 'payment_methods': ['cash']}) : reply(exampleJob())); final client = api(adapter);
     await tester.pumpWidget(MaterialApp(home: ServiceJobScreen(api: client, ar: false, id: 7)));

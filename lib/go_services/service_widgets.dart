@@ -10,13 +10,14 @@ Widget serviceCard(Widget child) => Card(margin: const EdgeInsets.symmetric(vert
 Widget serviceText(String text) => Padding(padding: const EdgeInsets.symmetric(vertical: 5), child: Text(text, style: const TextStyle(height: 1.5)));
 String localTime(dynamic value) { final date = DateTime.tryParse('$value'); return date == null ? '—' : date.toLocal().toString().substring(0, 16); }
 
-/// Only an old-backend 404/missing schema retains the legacy UI. Read access
-/// remains available when new creation is disabled on an installed schema.
+/// Legacy fallback is explicit for existing order history only. New service
+/// requests wait for quotations instead of silently using direct assignment.
 class ServiceGate extends StatefulWidget {
-  const ServiceGate({super.key, required this.partner, required this.ar, required this.fallback, required this.builder, this.api});
+  const ServiceGate({super.key, required this.partner, required this.ar, this.fallback, this.title, required this.builder, this.api});
   final bool partner;
   final bool ar;
-  final WidgetBuilder fallback;
+  final WidgetBuilder? fallback;
+  final String? title;
   final Widget Function(ServiceApi, ServiceCapabilities) builder;
   final ServiceApi? api;
   @override
@@ -39,7 +40,22 @@ class _ServiceGateState extends State<ServiceGate> {
   Widget build(BuildContext context) {
     if (error != null) return Center(child: serviceCard(Column(mainAxisSize: MainAxisSize.min, children: [Text(error!), TextButton(onPressed: load, child: Text(st(widget.ar, 'إعادة المحاولة', 'Retry')))])));
     if (caps == null) return const Center(child: Padding(padding: EdgeInsets.all(30), child: CircularProgressIndicator()));
-    return caps!.ready ? widget.builder(api, caps!) : widget.fallback(context);
+    if (caps!.ready) return widget.builder(api, caps!);
+    if (widget.fallback != null) return widget.fallback!(context);
+    return Directionality(
+      textDirection: widget.ar ? TextDirection.rtl : TextDirection.ltr,
+      child: Scaffold(
+        appBar: AppBar(title: Text(widget.title ?? st(widget.ar, 'طلب صنايعي', 'Request a professional'))),
+        body: ListView(padding: const EdgeInsets.all(20), children: [
+          const Icon(Icons.request_quote_outlined, size: 52),
+          const SizedBox(height: 16),
+          Text(st(widget.ar, 'عروض المصنعية غير متاحة حاليًا', 'Labour quotations are currently unavailable'), style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+          serviceText(st(widget.ar, 'هتوصف الشغلانة، والصنايعية المتاحين في منطقتك يرسلوا عروضهم. إنت تختار السعر ونطاق الشغل المناسبين قبل الاتفاق.', 'Describe the job, receive quotes from available local professionals, then choose the price and scope before agreeing.')),
+          serviceText(st(widget.ar, 'لم يتم إرسال طلب أو اختيار صنايعي. تقدر تتابع طلباتك السابقة من «طلباتي».', 'No request has been sent and no professional selected. Existing requests remain available in My orders.')),
+          FilledButton(onPressed: load, child: Text(st(widget.ar, 'إعادة المحاولة', 'Retry'))),
+        ]),
+      ),
+    );
   }
 }
 
