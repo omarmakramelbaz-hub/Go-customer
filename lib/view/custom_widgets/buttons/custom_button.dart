@@ -49,8 +49,7 @@ class CustomButton extends StatelessWidget {
     final busy = apiResponse?.state == ResponseState.loading || isLoading;
     final enabled = onPressed != null && !busy;
     final background = color ?? (isMainColor ? GoDesign.orange : GoDesign.ink);
-    final fillGradient = gradient ??
-        (color == null && isMainColor ? GoDesign.actionGradient : null);
+    final fillGradient = gradient;
     final corners = (borderRadius ?? BorderRadius.circular(radius))
         .resolve(Directionality.of(context));
     final foreground = style?.color ??

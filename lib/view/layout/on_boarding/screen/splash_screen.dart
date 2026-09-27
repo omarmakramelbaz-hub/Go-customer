@@ -58,7 +58,8 @@ class _SplashScreenState extends State<SplashScreen> {
       _open(LoginScreen.routeName);
       return;
     }
-    if (auth.profileResponse.state != ResponseState.complete || auth.profile == null) {
+    if (auth.profileResponse.state != ResponseState.complete ||
+        auth.profile == null) {
       setState(() {
         _failed = true;
         _loading = false;
@@ -91,18 +92,23 @@ class _SplashScreenState extends State<SplashScreen> {
     if (profile.id != null) {
       HiveMethods.updateUserId(profile.id);
       await context.read<PusherController>().initPusher(
-        channelName: 'private-user.${profile.id}', userId: profile.id!,
+        channelName: 'private-user.${profile.id}',
+        userId: profile.id!,
         token: profile.token ?? HiveMethods.getToken()!,
       );
     }
-    _open(profile.email == null
-        ? CreateNewAccountScreen.routeName : BottomNavigationBarScreen.routeName);
+    _open(
+      profile.email == null
+          ? CreateNewAccountScreen.routeName
+          : BottomNavigationBarScreen.routeName,
+    );
   }
 
   Future<void> _open(String route) async {
     final elapsed = DateTime.now().difference(_openingStartedAt).inMilliseconds;
     final remainingMs = 3000 - elapsed;
-    if (remainingMs > 0) await Future.delayed(Duration(milliseconds: remainingMs));
+    if (remainingMs > 0)
+      await Future.delayed(Duration(milliseconds: remainingMs));
     if (mounted) NamedNavigatorImpl.push(route, clean: true);
   }
 
@@ -113,24 +119,54 @@ class _SplashScreenState extends State<SplashScreen> {
       value: SystemUiOverlayStyle.light,
       child: Scaffold(
         backgroundColor: GoDesign.deepInk,
-        body: GoSplashBackdrop(child: SizedBox.expand(child: SafeArea(
-          child: Center(child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 28),
-            child: Column(mainAxisSize: MainAxisSize.min, children: [
-              GoBrandHeader(light: true, size: 86, isArabic: ar),
-              const SizedBox(height: 30),
-              if (_failed) ...[
-                Text(ar ? 'تعذّر الاتصال. حاول مرة أخرى.' : 'Unable to connect. Please try again.',
-                  textAlign: TextAlign.center, style: const TextStyle(color: Colors.white70)),
-                const SizedBox(height: 12),
-                FilledButton(onPressed: _restoreSession,
-                  child: Text(ar ? 'إعادة المحاولة' : 'Try again')),
-              ] else
-                const SizedBox(width: 22, height: 22,
-                  child: CircularProgressIndicator(strokeWidth: 2, color: GoDesign.orange)),
-            ]),
-          )),
-        ))),
+        body: GoSplashBackdrop(
+          child: SizedBox.expand(
+            child: SafeArea(
+              child: Stack(
+                children: [
+                  Align(
+                    alignment: const Alignment(0, -.52),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 28),
+                      child: GoBrandHeader(
+                        light: true,
+                        size: 84,
+                        isArabic: ar,
+                        tagline: ar
+                            ? 'معًا نصنع الفرص'
+                            : 'Creating opportunities together',
+                      ),
+                    ),
+                  ),
+                  if (_failed)
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              ar
+                                  ? 'تعذّر الاتصال. حاول مرة أخرى.'
+                                  : 'Unable to connect. Please try again.',
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                            const SizedBox(height: 12),
+                            FilledButton(
+                              onPressed: _restoreSession,
+                              child: Text(ar ? 'إعادة المحاولة' : 'Try again'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

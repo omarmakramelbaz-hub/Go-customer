@@ -14,7 +14,7 @@ Color _headerForeground(Color background) =>
 Widget? _headerTitle(Widget? title, Color foreground) {
   if (title is Text && title.data != null) {
     return Text(title.data!, key: title.key,
-      style: (title.style ?? const TextStyle(fontSize: 18, fontWeight: FontWeight.w700))
+      style: (title.style ?? const TextStyle(fontSize: 20, fontWeight: FontWeight.w800))
         .copyWith(color: foreground),
       textAlign: title.textAlign, maxLines: title.maxLines ?? 1,
       overflow: title.overflow ?? TextOverflow.ellipsis,
@@ -51,26 +51,26 @@ class CustomAppBar extends PreferredSize {
     child: AppBar(
       elevation: elevation,
       scrolledUnderElevation: 0,
-      backgroundColor: appBarColor ?? GoDesign.deepInk,
-      foregroundColor: _headerForeground(appBarColor ?? GoDesign.deepInk),
-      iconTheme: IconThemeData(color: _headerForeground(appBarColor ?? GoDesign.deepInk)),
-      actionsIconTheme: IconThemeData(color: _headerForeground(appBarColor ?? GoDesign.deepInk)),
-      systemOverlayStyle: _headerForeground(appBarColor ?? GoDesign.deepInk) == GoDesign.paper
+      backgroundColor: appBarColor ?? GoDesign.paper,
+      foregroundColor: _headerForeground(appBarColor ?? GoDesign.paper),
+      iconTheme: IconThemeData(color: _headerForeground(appBarColor ?? GoDesign.paper)),
+      actionsIconTheme: IconThemeData(color: _headerForeground(appBarColor ?? GoDesign.paper)),
+      systemOverlayStyle: _headerForeground(appBarColor ?? GoDesign.paper) == GoDesign.paper
           ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
       toolbarHeight: height,
       automaticallyImplyLeading: automaticallyImplyLeading,
       shadowColor: shadowColor,
-      centerTitle: centerTitle ?? true,
-      title: _headerTitle(title, _headerForeground(appBarColor ?? GoDesign.deepInk)),
+      centerTitle: centerTitle ?? false,
+      title: _headerTitle(title, _headerForeground(appBarColor ?? GoDesign.paper)),
       leading: leading ?? (onPop == null ? null : BackButton(onPressed: onPop,
-        color: _headerForeground(appBarColor ?? GoDesign.deepInk))),
+        color: _headerForeground(appBarColor ?? GoDesign.paper))),
       actions: actions ?? [
         if (showLang)
           IconButton(
             onPressed: () => Utils.showAppBottomSheet(const ChangeLangBottomSheet()),
             icon: SvgPicture.asset(AppImages.langIcon, width: 24, height: 24,
               colorFilter: ColorFilter.mode(
-                _headerForeground(appBarColor ?? GoDesign.deepInk), BlendMode.srcIn)),
+                _headerForeground(appBarColor ?? GoDesign.paper), BlendMode.srcIn)),
           ),
       ],
       shape: radius > 0 || borderRadius != null

@@ -14,7 +14,7 @@ class GoDriveBrand extends StatelessWidget {
     image: true,
     child: SvgPicture.asset(
       light ? GoCustomerIdentity.lightLogoAsset : GoCustomerIdentity.logoAsset,
-      height: size * 1.35,
+      height: size * 160 / 252 * 2.5,
       width: size * 2.5,
       fit: BoxFit.contain,
     ),

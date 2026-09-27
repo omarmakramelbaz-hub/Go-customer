@@ -70,7 +70,7 @@ class _GoCustomerHomeViewState extends State<GoCustomerHomeView> {
 
   void _allServices() => showModalBottomSheet<void>(context: context, isScrollControlled: true,
     backgroundColor: GoDesign.paper,
-    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(GoDesign.sheetRadius))),
     builder: (sheet) => Directionality(textDirection: ar ? TextDirection.rtl : TextDirection.ltr,
       child: SafeArea(child: SizedBox(height: MediaQuery.sizeOf(sheet).height * .75,
         child: Column(children: [
@@ -106,8 +106,9 @@ class _GoCustomerHomeViewState extends State<GoCustomerHomeView> {
           SliverToBoxAdapter(child: _header()),
           SliverToBoxAdapter(child: _searchField()),
           if (search.isEmpty) SliverToBoxAdapter(child: _hero()),
-          SliverToBoxAdapter(child: Container(color: GoDesign.paper,
-            padding: const EdgeInsets.fromLTRB(16, 8, 8, 4), child: Row(children: [
+          SliverToBoxAdapter(child: Container(decoration: const BoxDecoration(color: GoDesign.paper,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+            padding: const EdgeInsets.fromLTRB(20, 16, 12, 8), child: Row(children: [
               Expanded(child: Text(t('خدماتنا', 'Our services'),
                 style: const TextStyle(color: GoDesign.ink, fontSize: 21, fontWeight: FontWeight.w800))),
               TextButton(onPressed: _allServices, child: Text(t('عرض الكل', 'View all'))),
