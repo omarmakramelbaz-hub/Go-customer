@@ -36,7 +36,7 @@ void main() {
       final dynamic state = tester.state(find.byType(ServiceRequestForm));
       state.location = const LatLng(30, 31);
       final submit = find.text(ar ? 'إرسال والبحث عن صنايعية' : 'Submit and find professionals');
-      await tester.scrollUntilVisible(submit, 200);
+      await tester.scrollUntilVisible(submit, 200, scrollable: find.byType(Scrollable).first);
       await tester.tap(submit); await tester.pumpAndSettle();
       final request = adapter.requests.single;
       expect(request.path, endsWith('/go-services/jobs'));
