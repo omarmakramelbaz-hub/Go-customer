@@ -11,13 +11,12 @@ import 'service_api.dart';
 import 'service_widgets.dart';
 
 class CustomerServiceHub extends StatefulWidget {
-  const CustomerServiceHub({super.key, required this.api, required this.capabilities, required this.ar, required this.title, this.professionKey, this.legacyBuilder});
+  const CustomerServiceHub({super.key, required this.api, required this.capabilities, required this.ar, required this.title, this.professionKey});
   final ServiceApi api;
   final ServiceCapabilities capabilities;
   final bool ar;
   final String title;
   final String? professionKey;
-  final WidgetBuilder? legacyBuilder;
   @override
   State<CustomerServiceHub> createState() => _CustomerServiceHubState();
 }
@@ -45,7 +44,6 @@ class _CustomerServiceHubState extends State<CustomerServiceHub> {
       Text(t('شغلاناتي وعروض الأسعار', 'My jobs and quotations'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 19)),
       Wrap(spacing: 8, children: [for (final entry in {'open': t('الجارية', 'Current'), 'history': t('السابقة', 'History')}.entries) ChoiceChip(label: Text(entry.value), selected: scope == entry.key, onSelected: (_) => setState(() => scope = entry.key))]),
       ServiceJobList(key: ValueKey(revision), api: widget.api, ar: widget.ar, scope: scope),
-      if (widget.legacyBuilder != null) TextButton(onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: widget.legacyBuilder!)), child: Text(t('عرض نظام الاختيار المباشر السابق', 'View previous direct-request flow'))),
     ]),
   ));
 }
