@@ -109,7 +109,7 @@ class _ServiceJobListState extends State<ServiceJobList> with WidgetsBindingObse
     if (initialized && jobs.isEmpty && error == null) serviceCard(Text(st(widget.ar, 'لا توجد شغلانات في هذه القائمة حاليًا.', 'No jobs in this list yet.'))),
     for (final job in jobs) serviceCard(Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       Text('#${job['id']} · ${serviceState(job['status']?.toString(), widget.ar)}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-      serviceText('${job['description'] ?? ''}'), Text('${job['area'] ?? ''}'),
+      serviceText('${job['description'] ?? ''}'),
       if (serviceMaps(job['offers']).isNotEmpty) serviceText(st(widget.ar, '${serviceMaps(job['offers']).length} عرض · اضغط لمراجعة الأسعار', '${serviceMaps(job['offers']).length} quote(s) · Review prices')),
       FilledButton(onPressed: () => open(job), child: Text(st(widget.ar, 'عرض الشغلانة والعروض', 'View job and quotes'))),
     ])),
@@ -210,7 +210,7 @@ class _ServiceJobScreenState extends State<ServiceJobScreen> with WidgetsBinding
       if (error != null) serviceCard(Column(children: [Text(error!), TextButton(onPressed: busy ? null : load, child: Text(t('تحديث الحالة', 'Check status')))])),
       if (data == null && error == null) const Center(child: CircularProgressIndicator()),
       if (data != null) ...[
-        Text(serviceState(status?.toString(), ar), style: const TextStyle(fontSize: 21, fontWeight: FontWeight.bold)), serviceText('${data['description'] ?? ''}'), serviceText('${data['area'] ?? ''}'),
+        Text(serviceState(status?.toString(), ar), style: const TextStyle(fontSize: 21, fontWeight: FontWeight.bold)), serviceText('${data['description'] ?? ''}'),
         if (data['scheduled_at'] != null) serviceText(t('الموعد المطلوب: ${localTime(data['scheduled_at'])}', 'Requested time: ${localTime(data['scheduled_at'])}')),
         if (data['photos'] is List && (data['photos'] as List).isNotEmpty) SizedBox(height: 155, child: ListView(scrollDirection: Axis.horizontal, children: [for (final photo in (data['photos'] as List).whereType<String>()) Padding(padding: const EdgeInsets.all(4), child: InkWell(onTap: () => showDialog<void>(context: context, builder: (_) => Dialog(child: InteractiveViewer(child: Image.network(photo, errorBuilder: (_, __, ___) => Text(t('حدّث الشغلانة لإعادة تحميل الصورة.', 'Refresh the job to reload the photo.')))))), child: Image.network(photo, width: 155, height: 155, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const SizedBox(width: 155, child: Icon(Icons.broken_image_outlined)))))])),
         if (data['location'] is Map) serviceCard(Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
