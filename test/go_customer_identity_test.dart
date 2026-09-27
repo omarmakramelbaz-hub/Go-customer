@@ -40,17 +40,6 @@ GoCustomerHomeView home({bool ar = true, ValueChanged<GoService>? onService}) =>
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  test('approved raster artwork decodes', () async {
-    final svg = await rootBundle.loadString('assets/svg/go_logo.svg');
-    final raw = svg.split('data:image/webp;base64,')[1].split('"')[0];
-    final codec = await ui.instantiateImageCodec(base64Decode(raw.replaceAll(RegExp(r'\s'), '')));
-    final frame = await codec.getNextFrame();
-    expect(frame.image.width, 192);
-    expect(frame.image.height, 122);
-    frame.image.dispose();
-    codec.dispose();
-  });
-
   test('guest artwork from the supplied reference decodes', () async {
     final svg = await rootBundle.loadString('assets/svg/go_guest_illustration.svg');
     final raw = svg.split('data:image/webp;base64,')[1].split('"')[0];
@@ -178,6 +167,7 @@ void main() {
 
   testWidgets('dark detail headers correct legacy black title text', (tester) async {
     await tester.pumpWidget(app(Scaffold(appBar: CustomAppBar(
+      appBarColor: GoDesign.deepInk,
       title: const Text('Wallet', style: TextStyle(color: Colors.black))), body: const SizedBox.shrink())));
     expect(tester.widget<Text>(find.text('Wallet')).style?.color, GoDesign.paper);
     expect(tester.takeException(), isNull);

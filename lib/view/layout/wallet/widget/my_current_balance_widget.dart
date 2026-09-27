@@ -21,8 +21,8 @@ class _MyCurrentBalanceWidgetState extends State<MyCurrentBalanceWidget> {
     final balance = widget.pusherWalletAmount ?? widget.wallet?.balance?.toStringAsFixed(2);
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(gradient: GoDesign.actionGradient,
+      padding: const EdgeInsets.all(22),
+      decoration: BoxDecoration(gradient: GoDesign.darkGradient,
         borderRadius: BorderRadius.circular(GoDesign.cardRadius)),
       child: Row(children: [
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -40,7 +40,7 @@ class _MyCurrentBalanceWidgetState extends State<MyCurrentBalanceWidget> {
         ])),
         const SizedBox(width: 8),
         Column(mainAxisSize: MainAxisSize.min, children: [
-          const Icon(Icons.account_balance_wallet_outlined, color: Colors.white, size: 42),
+          const Icon(Icons.account_balance_wallet_outlined, color: GoDesign.orange, size: 42),
           IconButton(
             tooltip: _visible ? (ar ? 'إخفاء الرصيد' : 'Hide balance') : (ar ? 'إظهار الرصيد' : 'Show balance'),
             onPressed: () => setState(() => _visible = !_visible),

@@ -5,38 +5,33 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="GO — كل الخدمات عندك. اطلب مندوب أو مقدم خدمة وتابع طلبك.">
-  <meta name="theme-color" content="#091820">
+  <meta name="theme-color" content="#171a1f">
   <meta name="apple-mobile-web-app-title" content="GO">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=master-20260926">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=partner-ui-20260927">
   <link rel="manifest" href="manifest.json">
   <title>Go Customer</title>
   <style>
-    html,body{margin:0;background:#091820;min-height:100%;font-family:Tajawal,Arial,sans-serif}
-    #loading{position:fixed;inset:0;overflow:hidden;display:grid;place-content:center;
-      text-align:center;color:#fff;background:linear-gradient(145deg,#091820,#171a1f);gap:12px}
-    #loading::before{content:"";position:absolute;inset:-20%;pointer-events:none;
-      background:linear-gradient(150deg,transparent 25%,rgba(0,0,0,.15) 25%,rgba(0,0,0,.15) 36%,transparent 36%)}
-    #loading .brand,#loading p{position:relative;z-index:1;margin:0}
-    #loading .brand{display:grid;justify-items:center;gap:10px}
-    #loading img{width:min(52vw,220px);height:auto;display:block}
-    #loading strong{font-size:18px;font-weight:800}
-    #loading p{font-size:13px;color:#c5cbd0;margin-top:12px}
-    #loading .sweep{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+    @font-face{font-family:Tajawal;src:url(assets/assets/font/Tajawal/Tajawal-Bold.ttf)}
+    html,body{margin:0;background:#171a1f;min-height:100%;font-family:Tajawal,Arial,sans-serif}
+    #loading{position:fixed;inset:0;overflow:hidden;text-align:center;color:#fff;
+      background:#171a1f url(assets/assets/brand/partner_splash.webp) center/cover}
+    #loading .brand{position:absolute;top:24%;left:28px;right:28px;transform:translateY(-24%);
+      display:flex;flex-direction:column;align-items:center;gap:10px}
+    #loading .logo-frame{height:161px;display:flex;align-items:center}
+    #loading img{width:210px;height:auto;display:block}
+    #loading strong{font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px}
+    #loading strong::before,#loading strong::after{content:"";width:23px;height:3px;background:#fd7201}
     noscript{position:fixed;inset:auto 20px 28px;text-align:center;color:#fff;font-size:14px;z-index:2}
   </style>
   <!-- MAPS_SCRIPT -->
   <script src="https://js.pusher.com/8.4.0/pusher.min.js"></script>
 </head>
 <body>
-  <div id="loading" role="status" aria-live="polite">
-    <svg class="sweep" viewBox="0 0 390 844" preserveAspectRatio="none" aria-hidden="true">
-      <path d="M-10 708 C110 530 342 626 400 490" fill="none" stroke="#fd7201" stroke-width="5"/>
-    </svg>
+  <div id="loading" role="status" aria-label="GO">
     <div class="brand">
-      <img src="favicon.svg?v=master-20260926" alt="GO" width="192" height="122">
-      <strong>كل الخدمات عندك</strong>
+      <div class="logo-frame"><img src="favicon.svg?v=partner-ui-20260927" alt="GO" width="252" height="160"></div>
+      <strong>معًا نصنع الفرص</strong>
     </div>
-    <p>جاري التحميل…</p>
   </div>
   <noscript>يرجى تفعيل JavaScript لفتح التطبيق.</noscript>
   <script>window.addEventListener('flutter-first-frame', () => document.getElementById('loading')?.remove());</script>
