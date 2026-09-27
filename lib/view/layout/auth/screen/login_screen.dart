@@ -14,6 +14,7 @@ import '../../../custom_widgets/go_master_ui.dart';
 import '../../../custom_widgets/validation/validation_mixin.dart';
 import '../../bottom_navigation/bottom_navigation_bar_screen.dart';
 import '../../on_boarding/screen/go_guest_welcome_screen.dart';
+import '../../partner_application/screen/partner_application_screen.dart';
 import '../controller/auth_controller.dart';
 import 'check_mobile_has_account.dart';
 import 'create_new_account_screen.dart';
@@ -132,6 +133,22 @@ class _LoginScreenState extends State<LoginScreen> with ValidationMixin {
                 ),
                 icon: const Icon(Icons.visibility_outlined, size: 21),
                 label: Text(ar ? 'دخول كزائر' : 'Continue as guest'),
+              ),
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
+                onPressed: () {
+                  FocusManager.instance.primaryFocus?.unfocus();
+                  Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => const PartnerApplicationScreen(),
+                    ),
+                  );
+                },
+                style: OutlinedButton.styleFrom(
+                  backgroundColor: GoDesign.orangeTint,
+                ),
+                icon: const Icon(Icons.handshake_outlined, size: 21),
+                label: Text(ar ? 'انضم كشريك' : 'Join as a partner'),
               ),
               const SizedBox(height: 12),
               Wrap(
