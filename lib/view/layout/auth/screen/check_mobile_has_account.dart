@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../helpers/extension/string_extension.dart';
-import '../../../../helpers/extensions/extensions.dart';
 import '../../../../helpers/routes/app_routers_import.dart';
 import '../../../../helpers/translation/all_translation.dart';
 import '../../../../helpers/utils/common_methods.dart';

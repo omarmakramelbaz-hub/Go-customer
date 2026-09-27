@@ -22,6 +22,8 @@ void main() {
         ..addFont(rootBundle.load('assets/font/$family/$family-Bold.ttf'));
       await loader.load();
     }
+    await (FontLoader('MaterialIcons')
+      ..addFont(rootBundle.load('fonts/MaterialIcons-Regular.otf'))).load();
   });
 
   for (final entry in <String, Widget>{
@@ -62,25 +64,10 @@ void main() {
           );
           await tester.pumpAndSettle();
           expect(tester.takeException(), isNull);
-          final phone = find.byType(EditableText).first;
-          await tester.ensureVisible(phone);
-          await tester.enterText(
-            find.byType(TextFormField).first,
-            '1012345678',
-          );
-          expect(
-            tester.widget<EditableText>(phone).textDirection,
-            TextDirection.ltr,
-          );
-          expect(find.text('+20'), findsOneWidget);
-          await tester.pumpAndSettle();
-          expect(tester.takeException(), isNull);
           if (ar && !large) {
-            tester.state<FormState>(find.byType(Form)).reset();
-            Scrollable.of(tester.element(find.byType(TextFormField).first))
-                .position
-                .jumpTo(0);
-            FocusManager.instance.primaryFocus?.unfocus();
+            for (final scroll in tester.stateList<ScrollableState>(find.byType(Scrollable))) {
+              scroll.position.jumpTo(0);
+            }
             await tester.pumpAndSettle();
             // Capture the actual widget tree for review; no production routes or API calls.
             final boundary = boundaryKey.currentContext!.findRenderObject()!
@@ -96,6 +83,20 @@ void main() {
               image.dispose();
             });
           }
+          final phone = find.byType(EditableText).first;
+          await tester.ensureVisible(phone);
+          await tester.enterText(
+            find.byType(TextFormField).first,
+            '1012345678',
+          );
+          expect(
+            Directionality.of(tester.element(phone)),
+            TextDirection.ltr,
+          );
+          expect(find.text('+20'), findsOneWidget);
+          await tester.pumpAndSettle();
+          expect(tester.takeException(), isNull);
+
         });
       }
     }
