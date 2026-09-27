@@ -169,6 +169,13 @@ class _ServiceJobScreenState extends State<ServiceJobScreen> with WidgetsBinding
   }
   Future<void> changeStatus(String state) async {
     String? reason;
+    String? cancellationFee;
+    if (state == 'cancelled' && job?['status'] == 'booked') {
+      final policy = job?['cancellation'];
+      if (policy is! Map || policy['fee'] == null) { setState(() => error = t('حدّث الطلب لعرض قيمة الإلغاء أولًا.', 'Refresh the job to load the cancellation fee first.')); return; }
+      cancellationFee = policy['fee'].toString();
+      if (!await confirm(t('تأكيد الإلغاء وخصم خدمة التطبيق', 'Confirm cancellation and app fee'), t('عند إلغائك بعد القبول، تُخصم خدمة التطبيق بنسبة ${policy['rate']}%، بقيمة $cancellationFee ج.م من محفظتك، وتُرد العمولة للصنايعي. أي مبلغ محجوز من محفظتك يُرد أولًا. إذا لم يكفِ الرصيد، سيظهر المتبقي بالسالب ويلزم الشحن لطلبات جديدة. هل توافق؟', 'Cancelling after acceptance debits the ${policy['rate']}% app service fee (EGP $cancellationFee) from your wallet and refunds the professional’s commission. Any wallet hold is released first. If your balance is insufficient, the remainder becomes debt and you must top up for new orders. Do you agree?'))) return;
+    }
     if (state == 'cancelled' || state == 'disputed') { reason = await showDialog<String>(context: context, builder: (_) => _ReasonForm(ar: ar)); if (reason == null) return; }
     else {
       final message = job?['payment_method'] == 'cash'
@@ -176,7 +183,7 @@ class _ServiceJobScreenState extends State<ServiceJobScreen> with WidgetsBinding
         : t('أؤكد اكتمال الشغل وأوافق على صرف المبلغ المحجوز للصنايعي.', 'I confirm completion and release of the held payment to the professional.');
       if (!await confirm(t('تأكيد الإتمام', 'Confirm completion'), message)) return;
     }
-    if (mounted) await run(() => widget.api.status(widget.id, state, reason: reason, cashPaid: state == 'completed' && job?['payment_method'] == 'cash'));
+    if (mounted) await run(() => widget.api.status(widget.id, state, reason: reason, cashPaid: state == 'completed' && job?['payment_method'] == 'cash', cancellationFee: cancellationFee));
   }
   Future<void> pay() async {
     if (busy || stale) return;
@@ -228,7 +235,9 @@ class _ServiceJobScreenState extends State<ServiceJobScreen> with WidgetsBinding
           if (status == 'booked' && data['payment_status'] == 'unpaid') ...[serviceText(t('أكمل الدفع قبل ${localTime(data['payment_due_at'])}. الرجوع من صفحة الدفع وحده ليس تأكيدًا؛ ننتظر تحقق الخادم.', 'Pay before ${localTime(data['payment_due_at'])}. Returning from checkout is not confirmation; server verification is required.')), action(t('فتح صفحة الدفع الآمنة', 'Open secure checkout'), pay)],
         ])),
         if (status == 'awaiting_confirmation') action(t('تأكيد الإتمام والدفع', 'Confirm completion and payment'), () => changeStatus('completed')),
-        if (['searching', 'booked'].contains(status)) OutlinedButton(onPressed: busy || stale ? null : () => changeStatus('cancelled'), child: Text(t('إلغاء الشغلانة', 'Cancel job'))),
+        if (status == 'booked' && data['cancellation'] is Map) serviceText(t('إذا ألغيت بعد القبول، تتحمل خدمة التطبيق: ${(data['cancellation'] as Map)['rate']}% = ${(data['cancellation'] as Map)['fee']} ج.م من محفظتك.', 'If you cancel after acceptance, you bear the app fee: ${(data['cancellation'] as Map)['rate']}% = EGP ${(data['cancellation'] as Map)['fee']} from your wallet.')),
+        if (status == 'cancelled' && data['cancellation'] is Map && (data['cancellation'] as Map)['charged_to'] != null) serviceText((data['cancellation'] as Map)['charged_to'] == 'customer' ? t('تم خصم ${(data['cancellation'] as Map)['fee']} ج.م من محفظتك لخدمة التطبيق لأنك ألغيت الطلب.', 'EGP ${(data['cancellation'] as Map)['fee']} was debited from your wallet for the app fee because you cancelled.') : t('الصنايعي ألغى الطلب وتحمل خدمة التطبيق. لا توجد عليك رسوم إلغاء.', 'The professional cancelled and bears the app fee. You owe no cancellation fee.')),
+        if (['searching', 'booked'].contains(status)) OutlinedButton(onPressed: busy || stale ? null : () => changeStatus('cancelled'), child: Text(status == 'booked' ? t('إلغاء وتحمل خدمة التطبيق', 'Cancel and bear the app fee') : t('إلغاء الشغلانة', 'Cancel job'))),
         if (['in_progress', 'awaiting_confirmation'].contains(status)) OutlinedButton(onPressed: busy || stale ? null : () => changeStatus('disputed'), child: Text(t('تسجيل اعتراض', 'Open dispute'))),
         if (status == 'disputed' || data['payment_status'] == 'refund_pending') serviceText(t('الحالة تحتاج متابعة الدعم؛ لا يتم صرف المبلغ أو رد الدفع الإلكتروني تلقائيًا من هذه الشاشة.', 'Support review is required; this screen does not automatically release disputed funds or refund gateway payments.')),
       ],
@@ -253,6 +262,7 @@ class _AcceptOfferState extends State<_AcceptOffer> {
     for (final item in widget.methods) RadioListTile<String>(value: item, groupValue: method, onChanged: (v) => setState(() => method = v), title: Text(paymentLabel(item, widget.ar))),
     if (method == 'wallet') serviceText(st(widget.ar, 'سيتم حجز كامل قيمة الشغل من محفظتك لحين تأكيد الإتمام.', 'The full price will be held from your wallet until completion.')),
     if (method != null && !['cash', 'wallet'].contains(method)) serviceText(st(widget.ar, 'بعد الاتفاق افتح صفحة الدفع وأكمل العملية قبل انتهاء المهلة.', 'After booking, open checkout and pay before the deadline.')),
+    serviceText(st(widget.ar, 'بعد الاتفاق، الطرف الذي يلغي يتحمل خدمة التطبيق${widget.offer['cancellation_fee'] == null ? '' : ': ${widget.offer['cancellation_rate']}% = ${widget.offer['cancellation_fee']} ج.م'}. إذا ألغيت أنت، تخصم من محفظتك.', 'After agreement, the cancelling party bears the app fee${widget.offer['cancellation_fee'] == null ? '' : ': ${widget.offer['cancellation_rate']}% = EGP ${widget.offer['cancellation_fee']}'}. If you cancel, it is debited from your wallet.')),
     CheckboxListTile(value: agreed, onChanged: (v) => setState(() => agreed = v == true), title: Text(st(widget.ar, 'راجعت السعر ونطاق الشغل وأوافق على العرض.', 'I reviewed and agree to the price and scope.'))),
   ])), actions: [TextButton(onPressed: () => Navigator.pop(context), child: Text(st(widget.ar, 'رجوع', 'Back'))), FilledButton(onPressed: agreed && method != null ? () => Navigator.pop(context, method) : null, child: Text(st(widget.ar, 'قبول العرض', 'Accept quote')))]);
 }
