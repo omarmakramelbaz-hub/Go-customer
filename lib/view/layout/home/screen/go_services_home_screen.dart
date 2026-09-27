@@ -59,7 +59,7 @@ class GoServicesHomeScreen extends StatelessWidget {
     return GoCustomerHomeView(
       isArabic: ar, firstName: name.isEmpty ? '' : name.split(RegExp(r'\s+')).first,
       locationTitle: city.isEmpty ? (ar ? 'موقعك الحالي' : 'Your location') : city,
-      locationSubtitle: address.isEmpty ? (ar ? 'اختر عنوان الخدمة' : 'Choose service address') : address,
+      locationSubtitle: address.isEmpty ? (ar ? 'اختر عنوان التوصيل' : 'Choose delivery address') : address,
       notificationCount: signedIn ? profile?.notificaionsCount ?? HiveMethods.getNotificationsCount() ?? 0 : 0,
       onAddress: openAddress, onNotifications: onOpenNotifications,
       onService: (service) {
