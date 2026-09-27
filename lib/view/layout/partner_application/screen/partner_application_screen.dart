@@ -1,18 +1,20 @@
-import 'package:dio/dio.dart';
+import '../../../../go_store_signup/store_signup_draft.dart';
+import '../../../../go_store_signup/store_signup_screen.dart';
+import '../../../../go_store_signup/partner_email_verification_screen.dart';
+
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../../helpers/networking/api_helper.dart';
-import '../../../../helpers/networking/urls.dart';
 import '../../../../helpers/theme/app_colors.dart';
 
 class PartnerApplicationScreen extends StatefulWidget {
   const PartnerApplicationScreen({super.key});
 
   @override
-  State<PartnerApplicationScreen> createState() => _PartnerApplicationScreenState();
+  State<PartnerApplicationScreen> createState() =>
+      _PartnerApplicationScreenState();
 }
 
 class _PartnerApplicationScreenState extends State<PartnerApplicationScreen> {
@@ -22,9 +24,11 @@ class _PartnerApplicationScreenState extends State<PartnerApplicationScreen> {
   static const _bg = Color(0xFFF7F8FA);
 
   final _formKey = GlobalKey<FormState>();
+  final _storeDraft = StoreSignupDraft();
   final _name = TextEditingController();
   final _age = TextEditingController();
   final _phone = TextEditingController();
+  final _email = TextEditingController();
   final _paymentIdentifier = TextEditingController();
 
   final _picker = ImagePicker();
@@ -40,6 +44,7 @@ class _PartnerApplicationScreenState extends State<PartnerApplicationScreen> {
 
   final List<Map<String, String>> _professions = const [
     {'key': 'delivery_courier', 'ar': 'مندوب توصيل'},
+    {'key': 'store_owner', 'ar': 'متجر — سوبر ماركت / مطعم / صيدلية'},
     {'key': 'appliance_technician', 'ar': 'فني صيانة ثلاجات وغسالات'},
     {'key': 'plumber', 'ar': 'سباك'},
     {'key': 'painter', 'ar': 'نقاش'},
@@ -65,6 +70,7 @@ class _PartnerApplicationScreenState extends State<PartnerApplicationScreen> {
     _name.dispose();
     _age.dispose();
     _phone.dispose();
+    _email.dispose();
     _paymentIdentifier.dispose();
     super.dispose();
   }
@@ -127,49 +133,88 @@ class _PartnerApplicationScreenState extends State<PartnerApplicationScreen> {
       return;
     }
 
+    if (_submitting) return;
     setState(() => _submitting = true);
     try {
-      final bytes = await _photo!.readAsBytes();
-      final body = FormData.fromMap({
-        'photo': MultipartFile.fromBytes(
-          bytes,
-          filename: _photo!.name.isEmpty ? 'partner.jpg' : _photo!.name,
-        ),
-        'full_name': _name.text.trim(),
-        'age': int.parse(_age.text.trim()),
-        'profession_key': _professionKey,
-        'lat': _lat,
-        'lng': _lng,
-        'mobile': _phone.text.trim(),
-        'payment_method': _paymentMethod,
-        'payment_identifier': _paymentIdentifier.text.trim(),
-        'work_radius_km': _radiusKm,
-        'terms_accepted': 1,
-      });
-
-      final response = await ApiHelper.instance.post(
-        Urls.partnerApplications,
-        body: body,
-        hasToken: false,
-      );
-
-      if (!mounted) return;
-      if (response.state == ResponseState.complete) {
+      final done = _professionKey == 'store_owner'
+          ? await Navigator.push<bool>(
+              context,
+              MaterialPageRoute(
+                builder: (_) => StoreSignupScreen(
+                  draft: _storeDraft,
+                  onSubmit: _sendApplication,
+                ),
+              ),
+            )
+          : await _sendApplication();
+      if (done == true && mounted) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (_) => const PartnerApplicationSuccessScreen(),
           ),
         );
-      } else {
-        final message = response.data is Map
-            ? (response.data['message']?.toString() ?? 'تعذر إرسال الطلب.')
-            : 'تعذر إرسال الطلب.';
-        _message(message);
       }
-    } catch (_) {
-      if (mounted) _message('تعذر إرسال الطلب. حاول مرة أخرى.');
+    } catch (error) {
+      if (mounted)
+        _message(
+          error is StoreSignupFailure
+              ? error.message
+              : 'تعذر إرسال الطلب. حاول مرة أخرى.',
+        );
     } finally {
       if (mounted) setState(() => _submitting = false);
+    }
+  }
+
+  Future<bool> _sendApplication() async {
+    final isStore = _professionKey == 'store_owner';
+    if (await _photo!.length() + (isStore ? _storeDraft.imageBytes : 0) >
+        6 * 1024 * 1024) {
+      throw const StoreSignupFailure(
+        'إجمالي الصور أكبر من 6 ميجا. قلّل حجم الصور أو عدد المنتجات.',
+      );
+    }
+    if (!mounted) return false;
+    final proof = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => PartnerEmailVerificationScreen(
+          mobile: _phone.text.trim(),
+          email: _email.text.trim(),
+          purpose: 'application',
+        ),
+      ),
+    );
+    if (!mounted || proof == null) return false;
+    final api = PartnerApplicationApi(scope: 'go');
+    try {
+      await api.submit(
+        {
+          'source_app': 'go',
+          'partner_type': _professionKey == 'store_owner'
+              ? 'vendor'
+              : (_professionKey == 'delivery_courier'
+                    ? 'delegate'
+                    : 'profession'),
+          'full_name': _name.text.trim(),
+          'age': int.parse(_age.text.trim()),
+          'profession_key': _professionKey,
+          'lat': _lat,
+          'lng': _lng,
+          'mobile': _phone.text.trim(),
+          'payment_method': _paymentMethod,
+          'payment_identifier': _paymentIdentifier.text.trim(),
+          'work_radius_km': _radiusKm,
+          'terms_accepted': 1,
+          'email': _email.text.trim().toLowerCase(),
+          'email_verification_token': proof,
+        },
+        _photo!,
+        store: isStore ? _storeDraft : null,
+      );
+      return true;
+    } finally {
+      api.close();
     }
   }
 
@@ -230,7 +275,9 @@ class _PartnerApplicationScreenState extends State<PartnerApplicationScreen> {
                                   _photo == null
                                       ? Icons.add_a_photo_outlined
                                       : Icons.check_circle_rounded,
-                                  color: _photo == null ? _orange : Colors.green,
+                                  color: _photo == null
+                                      ? _orange
+                                      : Colors.green,
                                 ),
                               ),
                               const SizedBox(width: 12),
@@ -254,8 +301,9 @@ class _PartnerApplicationScreenState extends State<PartnerApplicationScreen> {
                         controller: _name,
                         label: 'الاسم بالكامل',
                         icon: Icons.badge_outlined,
-                        validator: (v) =>
-                            (v == null || v.trim().length < 3) ? 'اكتب الاسم بالكامل' : null,
+                        validator: (v) => (v == null || v.trim().length < 3)
+                            ? 'اكتب الاسم بالكامل'
+                            : null,
                       ),
                       const SizedBox(height: 12),
                       _field(
@@ -273,14 +321,27 @@ class _PartnerApplicationScreenState extends State<PartnerApplicationScreen> {
                       ),
                       const SizedBox(height: 12),
                       _field(
+                        controller: _email,
+                        label: 'البريد الإلكتروني',
+                        icon: Icons.email_outlined,
+                        keyboardType: TextInputType.emailAddress,
+                        validator: (v) =>
+                            !RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$')
+                                .hasMatch((v ?? '').trim())
+                            ? 'اكتب بريدًا صحيحًا لاستقبال كود التأكيد'
+                            : null,
+                      ),
+                      const SizedBox(height: 12),
+                      _field(
                         controller: _phone,
                         label: 'رقم الهاتف',
                         icon: Icons.phone_outlined,
                         keyboardType: TextInputType.phone,
                         validator: (v) =>
-                            (v == null || v.replaceAll(RegExp(r'\D'), '').length < 10)
-                                ? 'اكتب رقم هاتف صحيح'
-                                : null,
+                            (v == null ||
+                                v.replaceAll(RegExp(r'\D'), '').length < 10)
+                            ? 'اكتب رقم هاتف صحيح'
+                            : null,
                       ),
                     ],
                   ),
@@ -294,7 +355,10 @@ class _PartnerApplicationScreenState extends State<PartnerApplicationScreen> {
                       DropdownButtonFormField<String>(
                         value: _professionKey,
                         isExpanded: true,
-                        decoration: _decoration('اختر المهنة', Icons.work_outline_rounded),
+                        decoration: _decoration(
+                          'اختر المهنة',
+                          Icons.work_outline_rounded,
+                        ),
                         items: _professions
                             .map(
                               (p) => DropdownMenuItem(
@@ -303,7 +367,8 @@ class _PartnerApplicationScreenState extends State<PartnerApplicationScreen> {
                               ),
                             )
                             .toList(),
-                        onChanged: (value) => setState(() => _professionKey = value),
+                        onChanged: (value) =>
+                            setState(() => _professionKey = value),
                       ),
                       const SizedBox(height: 14),
                       SizedBox(
@@ -314,7 +379,9 @@ class _PartnerApplicationScreenState extends State<PartnerApplicationScreen> {
                               ? const SizedBox(
                                   width: 18,
                                   height: 18,
-                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
                                 )
                               : Icon(
                                   _lat == null
@@ -356,7 +423,8 @@ class _PartnerApplicationScreenState extends State<PartnerApplicationScreen> {
                               (km) => ChoiceChip(
                                 selected: _radiusKm == km,
                                 label: Text('$km كم'),
-                                onSelected: (_) => setState(() => _radiusKm = km),
+                                onSelected: (_) =>
+                                    setState(() => _radiusKm = km),
                                 selectedColor: _orange,
                                 labelStyle: TextStyle(
                                   color: _radiusKm == km ? Colors.white : _navy,
@@ -406,8 +474,9 @@ class _PartnerApplicationScreenState extends State<PartnerApplicationScreen> {
                             : 'رقم الهاتف / عنوان Instapay',
                         icon: Icons.payments_outlined,
                         keyboardType: TextInputType.phone,
-                        validator: (v) =>
-                            (v == null || v.trim().length < 5) ? 'اكتب بيانات الاستلام' : null,
+                        validator: (v) => (v == null || v.trim().length < 5)
+                            ? 'اكتب بيانات الاستلام'
+                            : null,
                       ),
                     ],
                   ),
@@ -430,7 +499,11 @@ class _PartnerApplicationScreenState extends State<PartnerApplicationScreen> {
                           )
                         : const Icon(Icons.send_rounded),
                     label: Text(
-                      _submitting ? 'جاري إرسال الطلب...' : 'إرسال طلب الانضمام',
+                      _submitting
+                          ? 'جاري إرسال الطلب...'
+                          : (_professionKey == 'store_owner'
+                                ? 'التالي: تجهيز المتجر'
+                                : 'إرسال طلب الانضمام'),
                       style: const TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w900,
@@ -606,10 +679,7 @@ class _PartnerApplicationScreenState extends State<PartnerApplicationScreen> {
             contentPadding: EdgeInsets.zero,
             title: const Text(
               'أوافق على شروط وأحكام الانضمام كشريك',
-              style: TextStyle(
-                color: _navy,
-                fontWeight: FontWeight.w900,
-              ),
+              style: TextStyle(color: _navy, fontWeight: FontWeight.w900),
             ),
             subtitle: const Text(
               'تأكيد صحة البيانات، الالتزام بجودة الخدمة، احترام العملاء، استخدام الموقع لتحديد نطاق العمل، وسياسات المنصة والخصوصية.',
@@ -716,8 +786,7 @@ class PartnerApplicationSuccessScreen extends StatelessWidget {
 
   static const _downloadUrl = String.fromEnvironment(
     'GO_PARTNER_DOWNLOAD_URL',
-    defaultValue:
-        'https://play.google.com/store/apps/details?id=com.smartvesion.fasakhaninja_delegate',
+    defaultValue: 'https://play.google.com/store/apps/details?id=com.smartvesion.fasakhaninja_delegate',
   );
 
   Future<void> _download(BuildContext context) async {
