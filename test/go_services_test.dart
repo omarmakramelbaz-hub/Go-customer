@@ -22,6 +22,35 @@ ServiceApi api(MemoryAdapter adapter, {bool partner = false}) => ServiceApi(part
 Map<String, dynamic> exampleJob() => {'id': 7, 'status': 'searching', 'description': 'Repair kitchen sink', 'area': 'District', 'search_until': DateTime.now().add(const Duration(hours: 1)).toIso8601String(), 'offers': [{'id': 3, 'partner_id': 9, 'name': 'Professional', 'price': '500.00', 'scope': 'Replace the damaged connection', 'materials_included': false, 'arrival_minutes': 30, 'duration_minutes': 60, 'status': 'offered', 'expires_at': DateTime.now().add(const Duration(minutes: 30)).toIso8601String()}]};
 void main() {
   for (final ar in [true, false]) {
+    testWidgets('cancellation shows liability and posts only after fee consent and reason ($ar)', (tester) async {
+      final job = {...exampleJob(), 'status': 'booked', 'accepted_offer_id': 3, 'price': '100.00', 'payment_status': 'cash_due', 'payment_method': 'cash',
+        'commission': '12.50', 'commission_rate': '12.50', 'commission_status': 'charged',
+        'cancellation': {'allowed': true, 'requires_fee_confirmation': true, 'fee': '12.50', 'rate': '12.50'},
+        'offers': [{'id': 3, 'status': 'accepted', 'price': '100.00', 'scope': 'Repair pipe'}]};
+      final adapter = MemoryAdapter((r) => r.path.endsWith('capabilities') ? reply({'schema_ready': true, 'version': 1, 'enabled': true}) : reply(r.method == 'POST' ? {...job, 'status': 'cancelled'} : job));
+      final client = api(adapter);
+      await tester.pumpWidget(MaterialApp(home: ServiceJobScreen(api: client, ar: ar, id: 7)));
+      await tester.pumpAndSettle();
+      final cancel = find.text(ar ? 'إلغاء وتحمل خدمة التطبيق' : 'Cancel and bear the app fee');
+      await tester.scrollUntilVisible(cancel, 200, scrollable: find.byType(Scrollable).first);
+      await tester.tap(cancel); await tester.pumpAndSettle();
+      expect(find.descendant(of: find.byType(AlertDialog), matching: find.textContaining('12.50')), findsOneWidget);
+      expect(adapter.requests.where((r) => r.method == 'POST'), isEmpty);
+      await tester.tap(find.widgetWithText(TextButton, ar ? 'رجوع' : 'Back')); await tester.pumpAndSettle();
+      expect(adapter.requests.where((r) => r.method == 'POST'), isEmpty);
+      await tester.tap(cancel); await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(FilledButton, ar ? 'تأكيد' : 'Confirm')); await tester.pumpAndSettle();
+      expect(adapter.requests.where((r) => r.method == 'POST'), isEmpty);
+      await tester.enterText(find.descendant(of: find.byType(AlertDialog), matching: find.byType(TextField)), 'Changed plans');
+      await tester.tap(find.widgetWithText(FilledButton, ar ? 'تأكيد' : 'Confirm')); await tester.pumpAndSettle();
+      final post = adapter.requests.singleWhere((r) => r.method == 'POST');
+      expect(post.data['cancellation_fee'], '12.50'); expect(post.data['reason'], 'Changed plans'); expect(post.data['status'], 'cancelled');
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox()); client.close();
+    });
+  }
+
+  for (final ar in [true, false]) {
     testWidgets('request uses description, map and exact address only (Arabic=$ar)', (tester) async {
       final adapter = MemoryAdapter((_) => reply(exampleJob()));
       final client = api(adapter);

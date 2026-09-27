@@ -84,7 +84,7 @@ class ServiceApi {
   Future<Map<String, dynamic>> accept(int id, int offer, String method) => request('jobs/$id/offers/$offer/accept', body: {'payment_method': method});
   Future<Map<String, dynamic>> reject(int id, int offer) => request('jobs/$id/offers/$offer/reject', body: <String, dynamic>{});
   Future<Map<String, dynamic>> skip(int id) => request('jobs/$id/skip', body: <String, dynamic>{});
-  Future<Map<String, dynamic>> status(int id, String state, {String? reason, bool cashPaid = false}) => request('jobs/$id/status', body: {'status': state, if (reason != null) 'reason': reason, 'cash_paid': cashPaid});
+  Future<Map<String, dynamic>> status(int id, String state, {String? reason, bool cashPaid = false, String? cancellationFee}) => request('jobs/$id/status', body: {'status': state, if (reason != null) 'reason': reason, 'cash_paid': cashPaid, if (cancellationFee != null) 'cancellation_fee': cancellationFee});
   Future<Map<String, dynamic>> checkout(int id) => request('jobs/$id/checkout', body: <String, dynamic>{});
   void close() => _dio.close();
 }
