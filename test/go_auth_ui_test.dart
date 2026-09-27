@@ -36,7 +36,8 @@ void main() {
         ) async {
           await tester.binding.setSurfaceSize(Size(large ? 320 : 390, 844));
           addTearDown(() => tester.binding.setSurfaceSize(null));
-          await GlobalTranslations.setNewLanguage(ar ? 'ar' : 'en', false);
+          await tester.runAsync(
+              () => GlobalTranslations.setNewLanguage(ar ? 'ar' : 'en', false));
           final boundaryKey = GlobalKey();
           await tester.pumpWidget(
             MaterialApp(
@@ -82,9 +83,8 @@ void main() {
             FocusManager.instance.primaryFocus?.unfocus();
             await tester.pumpAndSettle();
             // Capture the actual widget tree for review; no production routes or API calls.
-            final boundary =
-                boundaryKey.currentContext!.findRenderObject()!
-                    as RenderRepaintBoundary;
+            final boundary = boundaryKey.currentContext!.findRenderObject()!
+                as RenderRepaintBoundary;
             await tester.runAsync(() async {
               final image = await boundary.toImage(pixelRatio: 2);
               final bytes = await image.toByteData(
