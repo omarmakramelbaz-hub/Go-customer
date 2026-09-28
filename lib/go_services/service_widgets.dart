@@ -181,6 +181,8 @@ class _ServiceJobScreenState extends State<ServiceJobScreen> with WidgetsBinding
     else {
       final message = job?['payment_method'] == 'cash'
         ? t('أؤكد اكتمال الشغل ودفع ${job?['price']} ج.م للصنايعي نقدًا.', 'I confirm completion and cash payment of EGP ${job?['price']}.')
+        : job?['payment_status'] == 'paid'
+        ? t('أؤكد اكتمال الشغل. تم بالفعل إضافة المبلغ لمحفظة الشريك.', 'I confirm completion. The payment was already credited to the partner wallet.')
         : t('أؤكد اكتمال الشغل وأوافق على صرف المبلغ المحجوز للصنايعي.', 'I confirm completion and release of the held payment to the professional.');
       if (!await confirm(t('تأكيد الإتمام', 'Confirm completion'), message)) return;
     }

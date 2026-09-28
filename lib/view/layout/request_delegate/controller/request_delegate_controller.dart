@@ -18,7 +18,7 @@ class RequestDelegateController extends ChangeNotifier {
   String _selectedPayment = '';
   String get selectedPayment => _selectedPayment;
   void setSelectedPayment(String value) {
-    if (!const ['online', 'v_cash'].contains(value)) return;
+    if (!const ['cash', 'wallet', 'v_cash', 'online'].contains(value)) return;
     _selectedPayment = value;
     notifyListeners();
   }
@@ -469,7 +469,9 @@ class RequestDelegateController extends ChangeNotifier {
         log(response.data['data']['id']);
         CommonMethods.showToast(message: response.data['message']);
       }
-      if (paymentType == 'cash') {
+      if (response.data['data']['payment_deferred'] == true) {
+        onSuccess.call();
+      } else if (paymentType == 'cash') {
         setOrderId(response.data['data']['id']);
         CommonMethods.showToast(message: response.data['message']);
         onSuccess.call();
@@ -535,6 +537,15 @@ class RequestDelegateController extends ChangeNotifier {
         notifyListeners();
       }
     }
+  }
+
+  Future<String?> checkoutOrder(int id) async {
+    final response = await ApiHelper.instance.post('${Urls.baseUrl}go-orders/$id/checkout', body: {});
+    if (response.state != ResponseState.complete) {
+      CommonMethods.showError(message: response.data['message'], apiResponse: response);
+      return null;
+    }
+    return response.data['data']['link'] as String?;
   }
 
   //=======================================  accepted  || declined delegates ============================

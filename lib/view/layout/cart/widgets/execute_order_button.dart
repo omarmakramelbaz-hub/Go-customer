@@ -105,7 +105,7 @@ class ExecuteOrderButton extends StatelessWidget {
       child: CustomButton(
         onPressed: () {
           log(selectedDateZone.toString());
-          if (!const ['online', 'v_cash'].contains(cartController.selectedPayment)) {
+          if (!const ['cash', 'wallet', 'v_cash', 'online'].contains(cartController.selectedPayment)) {
             CommonMethods.showError(message: 'choosePaymentMethod'.tr);
           } else if (cartController.isSwitchedscheduleDate == true && selectedDate == null && selectedTime == null) {
             CommonMethods.showError(message: 'chooseReDeliveryOrder'.tr);
@@ -156,6 +156,7 @@ class ExecuteOrderButton extends StatelessWidget {
                       NamedNavigatorImpl.push(
                         CustomPaymentWebViewScreen.routeName,
                         arguments: PaymentArgs(
+                          serverOrderId: orderId,
                           url: link,
                           onFailed: () {
                             CommonMethods.showError(message: 'paymentFailed'.tr);

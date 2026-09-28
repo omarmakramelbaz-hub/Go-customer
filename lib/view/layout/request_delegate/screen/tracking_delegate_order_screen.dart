@@ -1,3 +1,4 @@
+import '../../../../go_services/hosted_checkout.dart';
 import '../../../custom_widgets/popups/go_popups.dart';
 import 'dart:async';
 
@@ -40,6 +41,8 @@ class _TrackingDelegateOrderScreenState extends State<TrackingDelegateOrderScree
   Timer? _liveTimer;
   bool _offerDialogOpen = false;
   bool _refreshing = false;
+  bool _paying = false;
+  String? _paymentError;
 
   @override
   void initState() {
@@ -52,6 +55,21 @@ class _TrackingDelegateOrderScreenState extends State<TrackingDelegateOrderScree
       if (!mounted) return;
       _liveTimer = Timer.periodic(const Duration(seconds: 5), (_) => _refresh());
     });
+  }
+
+  Future<void> _pay() async {
+    if (_paying) return;
+    setState(() { _paying = true; _paymentError = null; });
+    try {
+      final link = await requestDelegateController.checkoutOrder(widget.args.id);
+      if (link != null && mounted) {
+        await openGoCheckout(context, link, ar: context.languageCode == 'ar');
+      }
+    } catch (e) {
+      if (mounted) setState(() => _paymentError = '$e');
+    } finally {
+      if (mounted) { setState(() => _paying = false); await _refresh(); }
+    }
   }
 
   LatLng? _point(String? lat, String? lng) {
@@ -161,6 +179,24 @@ class _TrackingDelegateOrderScreenState extends State<TrackingDelegateOrderScree
               Expanded(child: Text(_paymentLabel(order?.paymentType), style: const TextStyle(color: GoDesign.ink, fontSize: 14))),
             ]),
           ])),
+          if (order?.paymentDeferred == true) ...[
+            const SizedBox(height: 16),
+            GoSurface(child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+              Text(_paymentStatus(order?.paymentStatus, ar),
+                style: const TextStyle(fontWeight: FontWeight.w700, color: GoDesign.ink)),
+              if (order?.paymentRequired == true) ...[
+                const SizedBox(height: 8),
+                Text(ar ? 'أكد الدفع بالسعر المتفق عليه لبدء الطلب. يتم تحديث الحالة بعد تحقق Paymob.'
+                  : 'Pay the agreed fare to start the request. Status updates after Paymob verification.'),
+                const SizedBox(height: 12),
+                FilledButton.icon(onPressed: _paying ? null : _pay,
+                  icon: const Icon(Icons.lock_outline),
+                  label: Text(_paying ? (ar ? 'جارٍ فتح الدفع…' : 'Opening checkout…')
+                    : (ar ? 'ادفع الآن' : 'Pay now'))),
+              ],
+              if (_paymentError != null) Text(_paymentError!, style: const TextStyle(color: GoDesign.danger)),
+            ])),
+          ],
           if (order?.status == 'accepted') ...[
             const SizedBox(height: 18),
             TextButton.icon(style: TextButton.styleFrom(foregroundColor: GoDesign.danger),
@@ -187,6 +223,20 @@ class _TrackingDelegateOrderScreenState extends State<TrackingDelegateOrderScree
         ]))),
     );
   }));
+
+  String _paymentStatus(String? status, bool ar) {
+    switch (status) {
+      case 'paid': return ar ? 'تم الدفع وإضافة المبلغ لمحفظة الشريك' : 'Paid · credited to partner wallet';
+      case 'held': return ar ? 'تم حجز قيمة الطلب من محفظتك' : 'Payment held from your app wallet';
+      case 'cash_due': return ar ? 'كاش عند إتمام الطلب' : 'Cash due on completion';
+      case 'refund_pending': return ar ? 'الاسترداد قيد المراجعة' : 'Refund pending review';
+      case 'refunded': return ar ? 'تم رد المبلغ لمحفظتك' : 'Refunded to your app wallet';
+      case 'review': return ar ? 'عملية الدفع تحت المراجعة' : 'Payment under review';
+      case 'waiting_partner': return ar ? 'يتم الدفع بعد اختيار المندوب والسعر' : 'Pay after selecting a courier and fare';
+      case 'cancelled': return ar ? 'تم إلغاء الدفع' : 'Payment cancelled';
+      default: return ar ? 'بانتظار تأكيد الدفع' : 'Awaiting verified payment';
+    }
+  }
 
   String _paymentLabel(String? value) {
     switch (value) {

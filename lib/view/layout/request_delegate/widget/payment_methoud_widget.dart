@@ -22,18 +22,9 @@ class ChoosePaymentMethodWidget extends StatelessWidget {
         builder: (context, myAccountController, _) {
           return Column(
             children: [
-              if (myAccountController.setting?.paymentCardActivate == 'true') ...[
-                const SizedBox(height: 10),
-                PaymentMethodWidget(
-                  label: 'creditCard'.tr,
-                  selectedPayment: 'online',
-                  leading: const CustomImage(
-                    path: AppImages.visaIcon,
-                    type: ImageType.svg,
-                    height: 22,
-                  ),
-                ),
-              ],
+              PaymentMethodWidget(label: 'cash'.tr, selectedPayment: 'cash', leading: const Icon(Icons.payments_outlined, color: AppColors.mainAppColor)),
+              const SizedBox(height: 10),
+              PaymentMethodWidget(label: 'appWalletBalance'.tr, selectedPayment: 'wallet', leading: const Icon(Icons.account_balance_wallet_outlined, color: AppColors.mainAppColor)),
               if (myAccountController.setting?.walletCardActivate == 'true') ...[
                 const SizedBox(height: 10),
                 PaymentMethodWidget(
@@ -45,7 +36,19 @@ class ChoosePaymentMethodWidget extends StatelessWidget {
                     height: 22,
                   ),
                 ),
+              ],              if (myAccountController.setting?.paymentCardActivate == 'true') ...[
+                const SizedBox(height: 10),
+                PaymentMethodWidget(
+                  label: 'creditCard'.tr,
+                  selectedPayment: 'online',
+                  leading: const CustomImage(
+                    path: AppImages.visaIcon,
+                    type: ImageType.svg,
+                    height: 22,
+                  ),
+                ),
               ],
+
             ],
           );
         },

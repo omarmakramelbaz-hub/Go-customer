@@ -23,7 +23,7 @@ class ServiceCapabilities {
   factory ServiceCapabilities.fromMap(Map<String, dynamic> data) => ServiceCapabilities(
     ready: data['schema_ready'] == true && data['version'] == 1,
     enabled: data['enabled'] == true,
-    methods: (data['payment_methods'] as List? ?? const []).whereType<String>().where((method) => const ['mobile_wallet', 'card'].contains(method)).toList(),
+    methods: (data['payment_methods'] as List? ?? const []).whereType<String>().where((method) => const ['cash', 'wallet', 'mobile_wallet', 'card'].contains(method)).toList(),
   );
 }
 
@@ -127,7 +127,7 @@ String serviceState(String? value, bool ar) {
     'offered': ['عرض متاح', 'Available quote'], 'accepted': ['العرض المختار', 'Selected quote'],
     'rejected': ['مرفوض', 'Rejected'], 'closed': ['مغلق', 'Closed'],
     'unpaid': ['لم يتم تأكيد الدفع', 'Payment not confirmed'], 'held': ['تم تأكيد الدفع وحجز المبلغ', 'Payment verified; funds held'],
-    'cash_due': ['كاش عند إتمام العمل', 'Cash due on completion'], 'paid': ['تمت التسوية', 'Settled'],
+    'cash_due': ['كاش عند إتمام العمل', 'Cash due on completion'], 'paid': ['تم الدفع', 'Paid'],
     'refund_pending': ['استرداد قيد المعالجة', 'Refund pending'], 'refunded': ['تم رد المبلغ', 'Refunded'],
     'review': ['الدفع قيد المراجعة', 'Payment under review'],
   };

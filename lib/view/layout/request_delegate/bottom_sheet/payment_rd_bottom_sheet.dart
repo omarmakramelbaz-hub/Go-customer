@@ -27,18 +27,12 @@ class PaymentRDBottomSheet extends StatelessWidget {
             animation: requestDelegateController,
             builder: (context, _) {
               final isAr = _isArabic(context);
-              final options = <_PaymentOption>[];
-
-              if (accountController.setting?.paymentCardActivate == 'true') {
-                options.add(
-                  _PaymentOption(
-                    value: 'online',
-                    title: 'creditCard'.tr,
-                    subtitle: isAr ? 'الدفع ببطاقة بنكية' : 'Pay by bank card',
-                    icon: Icons.credit_card_rounded,
-                  ),
-                );
-              }
+              final options = <_PaymentOption>[
+                _PaymentOption(value: 'cash', title: 'cash'.tr,
+                  subtitle: isAr ? 'الدفع نقدًا عند إتمام الطلب' : 'Pay cash on completion', icon: Icons.payments_outlined),
+                _PaymentOption(value: 'wallet', title: 'appWalletBalance'.tr,
+                  subtitle: isAr ? 'الدفع من رصيد محفظة جو' : 'Pay from your GO wallet balance', icon: Icons.account_balance_wallet_outlined),
+              ];
 
               if (accountController.setting?.walletCardActivate == 'true') {
                 options.add(
@@ -50,6 +44,17 @@ class PaymentRDBottomSheet extends StatelessWidget {
                   ),
                 );
               }
+              if (accountController.setting?.paymentCardActivate == 'true') {
+                options.add(
+                  _PaymentOption(
+                    value: 'online',
+                    title: 'creditCard'.tr,
+                    subtitle: isAr ? 'الدفع ببطاقة بنكية' : 'Pay by bank card',
+                    icon: Icons.credit_card_rounded,
+                  ),
+                );
+              }
+
 
               return GoSheet(title: isAr ? 'اختر طريقة الدفع' : 'Choose payment method',
                 subtitle: isAr ? 'يمكنك تغيير طريقة الدفع قبل تأكيد الطلب' : 'You can change it before confirming the order',

@@ -21,12 +21,16 @@ class ChooseCashOrVisaOrVCashWidget extends StatelessWidget {
         builder: (context, controller, _) {
           return Column(
             children: [
-              if (controller.setting?.paymentCardActivate == 'true') ...[
-                PaymentMethodWidget(icon: AppImages.visaIcon, label: 'creditCard'.tr, selectedPayment: 'online'),
+              PaymentMethodWidget(icon: AppImages.cashIcon, label: 'cash'.tr, selectedPayment: 'cash'),
+              10.sbH,
+              PaymentMethodWidget(icon: AppImages.payWalletIcon, label: 'appWalletBalance'.tr, selectedPayment: 'wallet'),
+              10.sbH,
+              if (controller.setting?.walletCardActivate == 'true') ...[
+                PaymentMethodWidget(icon: AppImages.digitalWallet, label: 'digitalWalletAndInstaPay'.tr, selectedPayment: 'v_cash', isSvg: false),
                 10.sbH,
               ],
-              if (controller.setting?.walletCardActivate == 'true')
-                PaymentMethodWidget(icon: AppImages.digitalWallet, label: 'digitalWalletAndInstaPay'.tr, selectedPayment: 'v_cash', isSvg: false),
+              if (controller.setting?.paymentCardActivate == 'true')
+                PaymentMethodWidget(icon: AppImages.visaIcon, label: 'creditCard'.tr, selectedPayment: 'online'),
             ],
           );
         },

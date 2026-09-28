@@ -1,3 +1,4 @@
+import '../../../go_services/order_checkout_screen.dart';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -10,9 +11,10 @@ import '../custom_app_bar/custom_app_bar.dart';
 
 class PaymentArgs {
   final String url;
+  final int? serverOrderId;
   final VoidCallback onSuccess;
   final VoidCallback onFailed;
-  PaymentArgs({required this.url, required this.onSuccess, required this.onFailed});
+  PaymentArgs({this.serverOrderId, required this.url, required this.onSuccess, required this.onFailed});
 }
 
 class CustomPaymentWebViewScreen extends StatefulWidget {
@@ -31,6 +33,9 @@ class _CustomPaymentWebViewScreenState extends State<CustomPaymentWebViewScreen>
   double progress = 0;
   @override
   Widget build(BuildContext context) {
+    if (widget.args.serverOrderId != null) {
+      return GoOrderCheckoutScreen(orderId: widget.args.serverOrderId!, url: widget.args.url, onPaid: widget.args.onSuccess);
+    }
     final options = InAppWebViewGroupOptions(
       crossPlatform: InAppWebViewOptions(
         javaScriptEnabled: true,
