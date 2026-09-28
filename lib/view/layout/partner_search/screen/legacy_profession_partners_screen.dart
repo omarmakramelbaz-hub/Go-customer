@@ -1,3 +1,4 @@
+import '../../../custom_widgets/popups/go_popups.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -100,7 +101,7 @@ class _ProfessionPartnersScreenState extends State<ProfessionPartnersScreen> {
       return;
     }
     if (_lat == null || _lng == null) return;
-    showModalBottomSheet<void>(context: context, isScrollControlled: true, backgroundColor: Colors.transparent,
+    showGoModalBottomSheet<void>(context: context, isScrollControlled: true, backgroundColor: Colors.transparent,
       builder: (_) => _CreatePartnerRequestSheet(partner: partner, professionKey: widget.professionKey,
         professionTitle: widget.title, lat: _lat!, lng: _lng!));
   }
@@ -112,7 +113,7 @@ class _ProfessionPartnersScreenState extends State<ProfessionPartnersScreen> {
   Future<void> _filters() async {
     final labels = [t('الترتيب الافتراضي', 'Recommended order'), t('الأقرب إليك', 'Nearest to you'), t('الاسم', 'Name')];
     var choice = _sort;
-    final result = await showModalBottomSheet<int>(context: context,
+    final result = await showGoModalBottomSheet<int>(context: context,
       builder: (sheet) => StatefulBuilder(builder: (context, refresh) => SafeArea(child: Padding(
         padding: const EdgeInsets.all(20), child: Column(mainAxisSize: MainAxisSize.min, children: [
           Row(children: [

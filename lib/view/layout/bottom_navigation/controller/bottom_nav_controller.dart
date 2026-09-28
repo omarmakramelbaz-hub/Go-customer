@@ -1,3 +1,4 @@
+import '../../../custom_widgets/popups/go_popups.dart';
 import 'dart:convert';
 import 'dart:developer';
 
@@ -105,7 +106,7 @@ class BottomNavLogicController {
     final ads = context.read<AdvertisingController>();
     if (ads.hasSeenAdd) return;
 
-    showDialog(
+    showGoDialog(
       context: context,
       useSafeArea: true,
       builder: (context) {

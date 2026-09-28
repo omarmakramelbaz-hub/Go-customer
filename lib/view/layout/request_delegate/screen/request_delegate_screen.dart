@@ -1,3 +1,4 @@
+import '../../../custom_widgets/popups/go_popups.dart';
 import 'dart:async';
 import 'dart:developer';
 import 'dart:ui' as ui;
@@ -1028,7 +1029,7 @@ class _RequestDelegateScreenState extends State<RequestDelegateScreen>
   }
 
   Future<void> _openPaymentSheet(RequestDelegateController controller) {
-    return showModalBottomSheet<void>(
+    return showGoModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,

@@ -1,3 +1,4 @@
+import '../../../custom_widgets/popups/go_popups.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../helpers/theme/go_design_tokens.dart';
@@ -120,7 +121,7 @@ class _GoCustomerHomeViewState extends State<GoCustomerHomeView> {
     });
   }
 
-  void _allServices() => showModalBottomSheet<void>(
+  void _allServices() => showGoModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: GoDesign.paper,

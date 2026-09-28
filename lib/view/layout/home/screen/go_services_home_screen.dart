@@ -1,3 +1,4 @@
+import '../../../custom_widgets/popups/go_popups.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -108,7 +109,7 @@ class _GoServicesHomeScreenState extends State<GoServicesHomeScreen>
         }
       }
       wallet.getWallet();
-      await showModalBottomSheet<void>(
+      await showGoModalBottomSheet<void>(
         context: context,
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -169,7 +170,7 @@ class _GoServicesHomeScreenState extends State<GoServicesHomeScreen>
     }
     void openAddress() => NamedNavigatorImpl.push(signedIn ? 'AddressScreen' : 'LoginScreen');
     Future<void> signOut() async {
-      final confirmed = await showDialog<bool>(context: context, builder: (dialog) => AlertDialog(
+      final confirmed = await showGoDialog<bool>(context: context, builder: (dialog) => AlertDialog(
         title: Text(ar ? 'تسجيل الخروج؟' : 'Sign out?'),
         content: Text(ar ? 'سيتم تسجيل خروجك من حساب GO على هذا الجهاز.'
           : 'You will be signed out of your GO account on this device.'),

@@ -1,3 +1,4 @@
+import '../../../custom_widgets/popups/go_popups.dart';
 import 'dart:convert';
 import 'dart:developer';
 
@@ -55,7 +56,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
   Future<void> _clear(NotificationsController controller, bool ar) async {
     if (controller.notifications.isEmpty) return;
-    final confirmed = await showDialog<bool>(context: context, builder: (dialog) => AlertDialog(
+    final confirmed = await showGoDialog<bool>(context: context, builder: (dialog) => AlertDialog(
       title: Text(ar ? 'حذف جميع الإشعارات؟' : 'Delete all notifications?'),
       content: Text(ar ? 'سيتم حذف الإشعارات الحالية. الإشعارات الجديدة ستظهر بشكل طبيعي.'
         : 'Current notifications will be removed. New notifications will still arrive.'),

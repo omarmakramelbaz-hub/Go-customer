@@ -1,3 +1,4 @@
+import '../../../custom_widgets/popups/go_popups.dart';
 import 'dart:convert';
 import 'dart:developer';
 
@@ -170,7 +171,7 @@ class _HomeScreenState extends State<HomeScreen> {
     void showSheet() {
       if (!mounted) return;
 
-      showModalBottomSheet<void>(
+      showGoModalBottomSheet<void>(
         context: context,
         isScrollControlled: true,
         isDismissible: !delayed,

@@ -1,3 +1,4 @@
+import '../view/custom_widgets/popups/go_popups.dart';
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -161,10 +162,10 @@ class _ServiceJobScreenState extends State<ServiceJobScreen> with WidgetsBinding
     catch (e) { if (mounted) setState(() { error = '$e'; stale = true; }); }
     finally { if (mounted) setState(() => busy = false); }
   }
-  Future<bool> confirm(String title, String text) async => await showDialog<bool>(context: context, builder: (c) => AlertDialog(title: Text(title), content: Text(text), actions: [TextButton(onPressed: () => Navigator.pop(c, false), child: Text(t('رجوع', 'Back'))), FilledButton(onPressed: () => Navigator.pop(c, true), child: Text(t('تأكيد', 'Confirm')))])) ?? false;
+  Future<bool> confirm(String title, String text) async => await showGoDialog<bool>(context: context, builder: (c) => AlertDialog(title: Text(title), content: Text(text), actions: [TextButton(onPressed: () => Navigator.pop(c, false), child: Text(t('رجوع', 'Back'))), FilledButton(onPressed: () => Navigator.pop(c, true), child: Text(t('تأكيد', 'Confirm')))])) ?? false;
   Future<void> chooseOffer(Map<String, dynamic> offer) async {
     if (job == null || !serviceOfferLive(job!, offer) || busy || stale) return;
-    final method = await showDialog<String>(context: context, builder: (_) => _AcceptOffer(ar: ar, offer: offer, methods: caps?.methods ?? const []));
+    final method = await showGoDialog<String>(context: context, builder: (_) => _AcceptOffer(ar: ar, offer: offer, methods: caps?.methods ?? const []));
     if (method != null && mounted) await run(() => widget.api.accept(widget.id, serviceId(offer['id']), method));
   }
   Future<void> changeStatus(String state) async {
@@ -176,7 +177,7 @@ class _ServiceJobScreenState extends State<ServiceJobScreen> with WidgetsBinding
       cancellationFee = policy['fee'].toString();
       if (!await confirm(t('تأكيد الإلغاء وخصم خدمة التطبيق', 'Confirm cancellation and app fee'), t('عند إلغائك بعد القبول، تُخصم خدمة التطبيق بنسبة ${policy['rate']}%، بقيمة $cancellationFee ج.م من محفظتك، وتُرد العمولة للصنايعي. أي مبلغ محجوز من محفظتك يُرد أولًا. إذا لم يكفِ الرصيد، سيظهر المتبقي بالسالب ويلزم الشحن لطلبات جديدة. هل توافق؟', 'Cancelling after acceptance debits the ${policy['rate']}% app service fee (EGP $cancellationFee) from your wallet and refunds the professional’s commission. Any wallet hold is released first. If your balance is insufficient, the remainder becomes debt and you must top up for new orders. Do you agree?'))) return;
     }
-    if (state == 'cancelled' || state == 'disputed') { reason = await showDialog<String>(context: context, builder: (_) => _ReasonForm(ar: ar)); if (reason == null) return; }
+    if (state == 'cancelled' || state == 'disputed') { reason = await showGoDialog<String>(context: context, builder: (_) => _ReasonForm(ar: ar)); if (reason == null) return; }
     else {
       final message = job?['payment_method'] == 'cash'
         ? t('أؤكد اكتمال الشغل ودفع ${job?['price']} ج.م للصنايعي نقدًا.', 'I confirm completion and cash payment of EGP ${job?['price']}.')
@@ -219,7 +220,7 @@ class _ServiceJobScreenState extends State<ServiceJobScreen> with WidgetsBinding
       if (data != null) ...[
         Text(serviceState(status?.toString(), ar), style: const TextStyle(fontSize: 21, fontWeight: FontWeight.bold)), serviceText('${data['description'] ?? ''}'),
         if (data['scheduled_at'] != null) serviceText(t('الموعد المطلوب: ${localTime(data['scheduled_at'])}', 'Requested time: ${localTime(data['scheduled_at'])}')),
-        if (data['photos'] is List && (data['photos'] as List).isNotEmpty) SizedBox(height: 155, child: ListView(scrollDirection: Axis.horizontal, children: [for (final photo in (data['photos'] as List).whereType<String>()) Padding(padding: const EdgeInsets.all(4), child: InkWell(onTap: () => showDialog<void>(context: context, builder: (_) => Dialog(child: InteractiveViewer(child: Image.network(photo, errorBuilder: (_, __, ___) => Text(t('حدّث الشغلانة لإعادة تحميل الصورة.', 'Refresh the job to reload the photo.')))))), child: Image.network(photo, width: 155, height: 155, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const SizedBox(width: 155, child: Icon(Icons.broken_image_outlined)))))])),
+        if (data['photos'] is List && (data['photos'] as List).isNotEmpty) SizedBox(height: 155, child: ListView(scrollDirection: Axis.horizontal, children: [for (final photo in (data['photos'] as List).whereType<String>()) Padding(padding: const EdgeInsets.all(4), child: InkWell(onTap: () => showGoDialog<void>(context: context, builder: (_) => Dialog(child: InteractiveViewer(child: Image.network(photo, errorBuilder: (_, __, ___) => Text(t('حدّث الشغلانة لإعادة تحميل الصورة.', 'Refresh the job to reload the photo.')))))), child: Image.network(photo, width: 155, height: 155, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const SizedBox(width: 155, child: Icon(Icons.broken_image_outlined)))))])),
         if (data['location'] is Map) serviceCard(Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           serviceText('${(data['location'] as Map)['address'] ?? ''}'),
           TextButton(onPressed: () { final p = data['location'] as Map; launchUrl(Uri.https('www.google.com', '/maps', {'q': '${p['lat']},${p['lng']}'}), mode: LaunchMode.externalApplication); }, child: Text(t('موقع التنفيذ على الخريطة', 'Work location on map'))),

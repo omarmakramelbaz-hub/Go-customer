@@ -42,7 +42,7 @@ class _MenuBottomSheetWidgetState extends State<MenuBottomSheetWidget> {
       height: context.height * 0.8,
       decoration: BoxDecoration(
         color: AppColors.whiteColor,
-        borderRadius: const BorderRadius.only(topLeft: Radius.circular(36), topRight: Radius.circular(36)),
+        borderRadius: const BorderRadius.only(topLeft: Radius.circular(30), topRight: Radius.circular(30)),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 33, vertical: 20),
@@ -90,7 +90,7 @@ class _MenuBottomSheetWidgetState extends State<MenuBottomSheetWidget> {
                               width: 5,
                               decoration: BoxDecoration(
                                 borderRadius: const BorderRadius.only(
-                                  topLeft: Radius.circular(7),
+                                  topLeft: Radius.circular(30),
                                   bottomLeft: Radius.circular(7),
                                 ),
                                 color: _currentIndex == index ? AppColors.mainAppColor : Colors.transparent,
@@ -123,7 +123,7 @@ class _MenuBottomSheetWidgetState extends State<MenuBottomSheetWidget> {
                               width: 5,
                               decoration: BoxDecoration(
                                 borderRadius: const BorderRadius.only(
-                                  topLeft: Radius.circular(7),
+                                  topLeft: Radius.circular(30),
                                   bottomLeft: Radius.circular(7),
                                 ),
                                 color: _currentIndex == index ? AppColors.mainAppColor : Colors.transparent,

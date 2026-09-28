@@ -1,3 +1,4 @@
+import '../../../custom_widgets/popups/go_popups.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -112,7 +113,7 @@ class MyAccountScreen extends StatelessWidget {
                 icon: const Icon(Icons.logout_rounded),
                 label: Text(ar ? 'تسجيل الخروج' : 'Sign out'),
                 onPressed: () async {
-                  final confirmed = await showDialog<bool>(context: context, builder: (dialogContext) => AlertDialog(
+                  final confirmed = await showGoDialog<bool>(context: context, builder: (dialogContext) => AlertDialog(
                     title: Text(ar ? 'تسجيل الخروج؟' : 'Sign out?'),
                     content: Text(ar ? 'سيتم تسجيل خروجك من حساب GO على هذا الجهاز.'
                       : 'You will be signed out of your GO account on this device.'),

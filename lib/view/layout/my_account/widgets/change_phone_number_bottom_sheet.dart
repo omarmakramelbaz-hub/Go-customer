@@ -64,8 +64,8 @@ class _ChangePhoneNumberBottomSheetState extends State<ChangePhoneNumberBottomSh
             decoration: const BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(28),
-                topRight: Radius.circular(28),
+                topLeft: Radius.circular(30),
+                topRight: Radius.circular(30),
               ),
               boxShadow: [
                 BoxShadow(

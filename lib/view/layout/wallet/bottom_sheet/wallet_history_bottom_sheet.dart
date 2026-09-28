@@ -20,7 +20,7 @@ class WalletHistoryBottomSheet extends StatelessWidget {
       expand: false,
       builder: (context, scroll) => Material(
         color: GoDesign.paper,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
         clipBehavior: Clip.antiAlias,
         child: SafeArea(
           top: false,
