@@ -1,3 +1,4 @@
+import '../../../custom_widgets/popups/go_popups.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -62,52 +63,10 @@ class PaymentRDBottomSheet extends StatelessWidget {
                 );
               }
 
-              return Container(
-                padding: const EdgeInsets.fromLTRB(18, 12, 18, 22),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(30),
-                    topRight: Radius.circular(30),
-                  ),
-                ),
-                child: SafeArea(
-                  top: false,
-                  child: Directionality(
-                    textDirection: isAr ? TextDirection.rtl : TextDirection.ltr,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Center(
-                          child: Container(
-                            width: 50,
-                            height: 5,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFD7DADF),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 18),
-                        Text(
-                          isAr ? 'اختر طريقة الدفع' : 'Choose payment method',
-                          style: const TextStyle(
-                            color: Color(0xFF171A1F),
-                            fontSize: 21,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                          isAr ? 'يمكنك تغيير طريقة الدفع في أي وقت قبل تأكيد الطلب' : 'You can change it any time before confirming the order',
-                          style: const TextStyle(
-                            color: Color(0xFF888E97),
-                            fontSize: 12,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
+              return GoSheet(title: isAr ? 'اختر طريقة الدفع' : 'Choose payment method',
+                subtitle: isAr ? 'يمكنك تغيير طريقة الدفع قبل تأكيد الطلب' : 'You can change it before confirming the order',
+                icon: Icons.account_balance_wallet_outlined,
+                child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
                         ...options.map(
                           (option) => Padding(
                             padding: const EdgeInsets.only(bottom: 10),
@@ -140,11 +99,8 @@ class PaymentRDBottomSheet extends StatelessWidget {
                             ),
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
+                      
+                ]));
             },
           );
         },

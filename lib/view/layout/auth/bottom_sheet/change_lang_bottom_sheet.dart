@@ -2,8 +2,6 @@ import '../../../custom_widgets/popups/go_popups.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../helpers/extensions/extensions.dart';
-import '../../../../helpers/theme/app_colors.dart';
-import '../../../../helpers/theme/app_text_style.dart';
 import '../../../../helpers/translation/all_translation.dart';
 
 class ChangeLangBottomSheet extends StatefulWidget {
@@ -17,10 +15,6 @@ class ChangeLangBottomSheet extends StatefulWidget {
 class _ChangeLangBottomSheetState extends State<ChangeLangBottomSheet> {
   bool _isChangingLanguage = false;
 
-  static const _text = Color(0xFF17191E);
-  static const _muted = Color(0xFF7D838D);
-  static const _border = Color(0xFFE8EAED);
-  static const _surface = Color(0xFFF8F9FB);
 
   @override
   Widget build(BuildContext context) => GoSheet(title: 'changeLanguage'.tr,

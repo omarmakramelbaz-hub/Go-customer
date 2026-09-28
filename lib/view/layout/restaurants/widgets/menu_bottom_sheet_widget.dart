@@ -1,3 +1,4 @@
+import '../../../custom_widgets/popups/go_popups.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -48,24 +49,7 @@ class _MenuBottomSheetWidgetState extends State<MenuBottomSheetWidget> {
         padding: const EdgeInsets.symmetric(horizontal: 33, vertical: 20),
         child: Column(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('menu'.tr, style: AppTextStyle.text20BS()),
-                InkWell(
-                  onTap: () => Navigator.pop(context),
-                  child: Card(
-                    elevation: 10,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                    child: CircleAvatar(
-                      radius: 20,
-                      backgroundColor: AppColors.whiteColor,
-                      child: SvgPicture.asset(AppImages.closeIcon),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            GoPopupHeader(title: 'menu'.tr, icon: Icons.restaurant_menu_rounded, onClose: () => Navigator.pop(context)),
             15.sbH,
             const Divider(thickness: 1),
             15.sbH,

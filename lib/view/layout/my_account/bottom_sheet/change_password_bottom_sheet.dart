@@ -1,3 +1,4 @@
+import '../../../custom_widgets/popups/go_popups.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -42,60 +43,10 @@ class _ChangePasswordBottomSheetState extends State<ChangePasswordBottomSheet>
   @override
   Widget build(BuildContext context) {
     final isArabic = Localizations.localeOf(context).languageCode == 'ar';
-    final keyboardInset = MediaQuery.of(context).viewInsets.bottom;
 
-    return AnimatedPadding(
-      duration: const Duration(milliseconds: 180),
-      curve: Curves.easeOut,
-      padding: EdgeInsets.only(bottom: keyboardInset),
-      child: SafeArea(
-        top: false,
-        child: Material(
-          color: Colors.transparent,
-          child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.fromLTRB(18, 8, 18, 16),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(30),
-                topRight: Radius.circular(30),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Color(0x2A000000),
-                  blurRadius: 24,
-                  offset: Offset(0, -7),
-                ),
-              ],
-            ),
-            child: SingleChildScrollView(
-              physics: const ClampingScrollPhysics(),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Center(
-                      child: Container(
-                        width: 42,
-                        height: 4,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFD7D9DD),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 9),
-                    _Header(
-                      icon: Icons.lock_reset_rounded,
-                      title: 'changePassword'.tr,
-                      subtitle: isArabic
-                          ? 'أنشئ كلمة مرور قوية لحماية حسابك'
-                          : 'Create a strong password to protect your account',
-                    ),
-                    const SizedBox(height: 12),
+    return GoSheet(title: 'changePassword'.tr, subtitle: isArabic ? 'أنشئ كلمة مرور قوية لحماية حسابك' : 'Create a strong password to protect your account', icon: Icons.lock_reset_rounded, includeKeyboardInset: true,
+      child: Form(key: _formKey, child: Column(mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch, children: [
                     _SecurityHint(
                       text: isArabic
                           ? 'استخدم 6 أحرف أو أرقام على الأقل وتجنب كلمات المرور سهلة التخمين.'
@@ -192,80 +143,13 @@ class _ChangePasswordBottomSheetState extends State<ChangePasswordBottomSheet>
                       ),
                     ),
                     const SizedBox(height: 4),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
+                  
+      ])),
     );
   }
 }
 
-class _Header extends StatelessWidget {
-  const _Header({required this.icon, required this.title, required this.subtitle});
 
-  final IconData icon;
-  final String title;
-  final String subtitle;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        InkWell(
-          onTap: () => Navigator.pop(context),
-          borderRadius: BorderRadius.circular(18),
-          child: Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: const Color(0xFFFFF5EC),
-              shape: BoxShape.circle,
-              border: Border.all(color: const Color(0xFFFFDCC0)),
-            ),
-            child: Icon(Icons.close_rounded, size: 21, color: AppColors.mainAppColor),
-          ),
-        ),
-        const Spacer(),
-        Expanded(
-          flex: 5,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Text(title, style: AppTextStyle.text18BS()),
-                  const SizedBox(width: 8),
-                  Container(
-                    width: 34,
-                    height: 34,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFFF2E7),
-                      borderRadius: BorderRadius.circular(11),
-                    ),
-                    child: Icon(icon, size: 20, color: AppColors.mainAppColor),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 2),
-              Text(
-                subtitle,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.end,
-                style: AppTextStyle.text11RG().copyWith(color: const Color(0xFF8A8E95)),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
 
 class _SecurityHint extends StatelessWidget {
   const _SecurityHint({required this.text});
