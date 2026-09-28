@@ -47,7 +47,7 @@ class _PayTipsBottomSheetState extends State<PayTipsBottomSheet> with Validation
               // height: context.height * .4,
               decoration: BoxDecoration(
                 color: AppColors.whiteColor,
-                borderRadius: const BorderRadius.only(topLeft: Radius.circular(36), topRight: Radius.circular(36)),
+                borderRadius: const BorderRadius.only(topLeft: Radius.circular(30), topRight: Radius.circular(30)),
               ),
               child: Column(
                 children: [

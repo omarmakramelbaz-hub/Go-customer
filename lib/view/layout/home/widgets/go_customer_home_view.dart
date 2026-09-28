@@ -1,3 +1,4 @@
+import '../../../custom_widgets/popups/go_popups.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../helpers/theme/go_design_tokens.dart';
@@ -120,7 +121,7 @@ class _GoCustomerHomeViewState extends State<GoCustomerHomeView> {
     });
   }
 
-  void _allServices() => showModalBottomSheet<void>(
+  void _allServices() => showGoModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: GoDesign.paper,
@@ -135,18 +136,7 @@ class _GoCustomerHomeViewState extends State<GoCustomerHomeView> {
               child: Column(children: [
                 Padding(
                     padding: const EdgeInsets.fromLTRB(20, 16, 12, 8),
-                    child: Row(children: [
-                      Expanded(
-                          child: Text(t('كل الخدمات', 'All services'),
-                              style: const TextStyle(
-                                  color: GoDesign.ink,
-                                  fontSize: 21,
-                                  fontWeight: FontWeight.w800))),
-                      IconButton(
-                          tooltip: t('إغلاق', 'Close'),
-                          onPressed: () => Navigator.pop(sheet),
-                          icon: const Icon(Icons.close)),
-                    ])),
+                    child: GoPopupHeader(title: t('كل الخدمات', 'All services'), icon: Icons.grid_view_rounded, onClose: () => Navigator.pop(context))),
                 Expanded(
                     child: ListView.separated(
                         itemCount: goServices.length,

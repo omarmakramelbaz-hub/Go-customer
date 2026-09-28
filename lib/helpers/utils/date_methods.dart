@@ -1,3 +1,4 @@
+import '../../view/custom_widgets/popups/go_popups.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -50,7 +51,7 @@ class DateMethods {
       lastDate: lastDate ?? DateTime.now().add(const Duration(days: 365 * 30)),
       builder: (context, child) {
         return Theme(
-          data: ThemeData(fontFamily: context.isRtl ? 'Tajawal' : 'Roboto').copyWith(
+          data: GoPopupTheme.data(context).copyWith(
             colorScheme: ColorScheme.dark(
               primary: mainColor ?? AppColors.mainAppColor,
               onPrimary: backgroundColor,
@@ -84,7 +85,7 @@ class DateMethods {
         return MediaQuery(
           data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: false),
           child: Theme(
-            data: ThemeData(fontFamily: context.isRtl ? 'Tajawal' : 'Roboto').copyWith(
+            data: GoPopupTheme.data(context).copyWith(
               colorScheme: ColorScheme.dark(
                 primary: mainColor ?? AppColors.mainAppColor,
                 onPrimary: backgroundColor,

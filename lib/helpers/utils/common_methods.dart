@@ -1,7 +1,7 @@
+import '../../view/custom_widgets/popups/go_popups.dart';
 import 'dart:async';
 
 import 'package:bot_toast/bot_toast.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
@@ -14,97 +14,24 @@ import '../translation/all_translation.dart';
 
 class CommonMethods {
   static void showAlertDialog({String? title, required String message}) {
-    showCupertinoDialog(
-      context: NamedNavigatorImpl.navigatorState.currentContext!,
-      builder: (context) => CupertinoAlertDialog(
-        title: title != null
-            ? Text(
-                title,
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                ),
-              )
-            : null,
-        content: Text(
-          message,
-          style: const TextStyle(
-            color: Colors.black,
-            fontSize: 15,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        actions: [
-          CupertinoDialogAction(
-            child: Text(
-              'ok'.tr,
-              style: const TextStyle(
-                color: Colors.red,
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            onPressed: () => Navigator.of(context).pop(true),
-          ),
-        ],
-      ),
-    );
+    showGoDialog(context: NamedNavigatorImpl.navigatorState.currentContext!, barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: title == null ? null : Text(title),
+        content: Text(message),
+        actions: [FilledButton(onPressed: () => Navigator.of(context).pop(true), child: Text('ok'.tr))],
+      ));
   }
 
-  static void showChooseDialog(
-    BuildContext context, {
-    String? title,
-    required String message,
-    required VoidCallback onPressed,
-  }) {
-    showCupertinoDialog(
-      context: context,
-      builder: (context) => CupertinoAlertDialog(
-        title: title != null
-            ? Text(
-                title,
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                ),
-              )
-            : null,
-        content: Text(
-          message,
-          style: const TextStyle(
-            color: Colors.black,
-            fontSize: 15,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
+  static void showChooseDialog(BuildContext context, {String? title, required String message, required VoidCallback onPressed}) {
+    showGoDialog(context: context, barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: title == null ? null : Text(title),
+        content: Text(message),
         actions: [
-          CupertinoDialogAction(
-            child: Text(
-              'no'.tr,
-              style: TextStyle(
-                color: AppColors.darkTextColor,
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          CupertinoDialogAction(
-            onPressed: onPressed,
-            child: Text(
-              'yes'.tr,
-              style: TextStyle(
-                color: AppColors.darkTextColor,
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
+          TextButton(onPressed: () => Navigator.of(context).pop(), child: Text('no'.tr)),
+          FilledButton(onPressed: onPressed, child: Text('yes'.tr)),
         ],
-      ),
-    );
+      ));
   }
 
   static void showToast({

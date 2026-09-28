@@ -1,3 +1,4 @@
+import '../../../custom_widgets/popups/go_popups.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -164,31 +165,12 @@ class _ChooseVCashOrVisaWidgetState extends State<ChooseVCashOrVisaWidget> {
       );
     }
 
-    // Always keep payment methods on a two-column grid. This leaves a clear
-    // fourth position when only the three mobile-wallet options are enabled,
-    // and Visa/Mastercard fills that position automatically when activated.
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final itemWidth = (constraints.maxWidth - 8) / 2;
-        return Wrap(
-          spacing: 8,
-          runSpacing: 7,
-          children: methods
-              .map(
-                (method) => SizedBox(
-                  width: itemWidth,
-                  height: 52,
-                  child: _buildMethod(
-                    method: method,
-                    walletController: walletController,
-                    compactHorizontal: true,
-                  ),
-                ),
-              )
-              .toList(),
-        );
-      },
-    );
+    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      for (var i = 0; i < methods.length; i++) ...[
+        _buildMethod(method: methods[i], walletController: walletController),
+        if (i < methods.length - 1) const SizedBox(height: 8),
+      ],
+    ]);
   }
 
   Widget _buildMethod({
@@ -243,112 +225,9 @@ class PaymentMethodWidget extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(12),
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 160),
-        width: double.infinity,
-        padding: compactHorizontal
-            ? const EdgeInsets.symmetric(horizontal: 8, vertical: 6)
-            : const EdgeInsets.fromLTRB(4, 7, 4, 6),
-        decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFFFF7F0) : Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected
-                ? AppColors.mainAppColor
-                : const Color(0xFFE6E6E6),
-            width: isSelected ? 1.5 : 1,
-          ),
-          boxShadow: isSelected
-              ? const [
-                  BoxShadow(
-                    color: Color(0x18FD7201),
-                    blurRadius: 8,
-                    offset: Offset(0, 2),
-                  ),
-                ]
-              : null,
-        ),
-        child: compactHorizontal
-            ? Row(
-                children: [
-                  _selectionDot(),
-                  const SizedBox(width: 7),
-                  SizedBox(width: 28, child: Center(child: brand)),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      label,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppTextStyle.text10RG().copyWith(
-                        color: AppColors.darkTextColor,
-                        fontSize: 9.5,
-                        fontWeight:
-                            isSelected ? FontWeight.w700 : FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ],
-              )
-            : Stack(
-                children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                        height: 21,
-                        width: double.infinity,
-                        child: Center(child: brand),
-                      ),
-                      const SizedBox(height: 5),
-                      SizedBox(
-                        width: double.infinity,
-                        child: Text(
-                          label,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.center,
-                          style: AppTextStyle.text10RG().copyWith(
-                            color: AppColors.darkTextColor,
-                            fontSize: 9,
-                            fontWeight:
-                                isSelected ? FontWeight.w700 : FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  Positioned(top: 0, left: 0, child: _selectionDot()),
-                ],
-              ),
-      ),
-    );
-  }
-
-  Widget _selectionDot() {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 160),
-      width: 14,
-      height: 14,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: isSelected ? AppColors.mainAppColor : Colors.white,
-        border: Border.all(
-          color: isSelected
-              ? AppColors.mainAppColor
-              : const Color(0xFFBDBDBD),
-          width: 1.2,
-        ),
-      ),
-      child: isSelected
-          ? const Icon(Icons.check_rounded, size: 9, color: Colors.white)
-          : null,
-    );
-  }
+  Widget build(BuildContext context) => GoPopupChoice(
+    label: label, leading: brand, selected: isSelected, onTap: onTap,
+  );
 }
 
 class _BrandMark extends StatelessWidget {

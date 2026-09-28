@@ -1,3 +1,4 @@
+import '../../../custom_widgets/popups/go_popups.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
@@ -578,7 +579,7 @@ class CustomMapAnimatedContainer extends StatelessWidget {
     final textController =
         TextEditingController(text: controller.descriptionEC.text);
 
-    await showModalBottomSheet<void>(
+    await showGoModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -707,7 +708,7 @@ class CustomMapAnimatedContainer extends StatelessWidget {
     BuildContext context,
     RequestDelegateController controller,
   ) {
-    return showModalBottomSheet<void>(
+    return showGoModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,

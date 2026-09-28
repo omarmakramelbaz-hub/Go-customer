@@ -1,3 +1,4 @@
+import '../../../custom_widgets/popups/go_popups.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -90,74 +91,13 @@ class _SubmitYourFeeBottomSheetState extends State<SubmitYourFeeBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final viewInsets = MediaQuery.of(context).viewInsets;
     final reductionLabel = _maximumReductionPercentage.toStringAsFixed(
       _maximumReductionPercentage % 1 == 0 ? 0 : 1,
     );
 
-    return Padding(
-      padding: EdgeInsets.only(bottom: viewInsets.bottom),
-      child: Container(
-        constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height * .86,
-        ),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(30),
-            topRight: Radius.circular(30),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Color(0x22000000),
-              blurRadius: 24,
-              offset: Offset(0, -7),
-            ),
-          ],
-        ),
-        child: SafeArea(
-          top: false,
-          child: Directionality(
-            textDirection: _isArabic ? TextDirection.rtl : TextDirection.ltr,
-            child: Form(
-              key: _formKey,
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(18, 10, 18, 18),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Center(
-                      child: Container(
-                        width: 44,
-                        height: 5,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFD8DCE1),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      _isArabic ? 'عاوز تدفع كام؟' : 'How much do you want to pay?',
-                      style: const TextStyle(
-                        color: Color(0xFF171A1F),
-                        fontSize: 22,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    const SizedBox(height: 5),
-                    Text(
-                      _isArabic
-                          ? 'حدد المبلغ المناسب ليك، ويمكن تقليله بحد أقصى $reductionLabel%.'
-                          : 'Choose your fare. You can reduce it by up to $reductionLabel%.',
-                      style: const TextStyle(
-                        color: Color(0xFF8A9098),
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
+    return GoSheet(title: _isArabic ? 'عاوز تدفع كام؟' : 'How much do you want to pay?', subtitle: _isArabic ? 'حدد المبلغ المناسب ليك، ويمكن تقليله بحد أقصى $reductionLabel%.' : 'Choose your fare. You can reduce it by up to $reductionLabel%.', icon: Icons.payments_outlined, includeKeyboardInset: true,
+      child: Form(key: _formKey, child: Column(mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch, children: [
                     Container(
                       padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
@@ -339,13 +279,8 @@ class _SubmitYourFeeBottomSheetState extends State<SubmitYourFeeBottomSheet> {
                         ),
                       ),
                     ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
+
+      ])),
     );
   }
 }

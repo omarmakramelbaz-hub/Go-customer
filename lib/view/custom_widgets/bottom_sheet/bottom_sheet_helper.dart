@@ -1,3 +1,4 @@
+import '../popups/go_popups.dart';
 import 'package:flutter/material.dart';
 
 import '../../../helpers/extensions/extensions.dart';
@@ -16,13 +17,13 @@ class BottomSheetHelper {
     Color? handleColor,
     bool disableMinimumHeight = false,
   }) async {
-    return await showModalBottomSheet(
+    return await showGoModalBottomSheet(
       isDismissible: barrierDismissible,
       isScrollControlled: true,
       context: context,
       backgroundColor: AppColors.whiteColor,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20)),
+        borderRadius: BorderRadius.only(topRight: Radius.circular(30), topLeft: Radius.circular(30)),
       ),
       builder: (BuildContext context) {
         if (!isHidden) {

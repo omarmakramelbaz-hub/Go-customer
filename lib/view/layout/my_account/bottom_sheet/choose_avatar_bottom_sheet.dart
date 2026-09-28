@@ -1,3 +1,4 @@
+import '../../../custom_widgets/popups/go_popups.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -14,39 +15,8 @@ class ChooseAvatarBottomSheet extends StatelessWidget {
   const ChooseAvatarBottomSheet({super.key, this.onSuccess});
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
-      decoration: BoxDecoration(
-        color: AppColors.whiteColor,
-        borderRadius: const BorderRadius.only(topLeft: Radius.circular(36), topRight: Radius.circular(36)),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          20.sbH,
-          Row(
-            children: [
-              Text('chooseYourAvatar'.tr, style: AppTextStyle.text16RS()),
-              const Spacer(),
-              GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: Card(
-                  elevation: 10,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                  child: CircleAvatar(
-                    radius: 20,
-                    backgroundColor: AppColors.whiteColor,
-                    child: SvgPicture.asset(AppImages.cancelIcon),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          10.sbH,
-          const Divider(thickness: 1),
-          20.sbH,
-          Row(
+  Widget build(BuildContext context) => GoSheet(title: 'chooseYourAvatar'.tr, icon: Icons.face_outlined,
+    child: Row(
             children: [
               Expanded(
                 child: InkWell(
@@ -77,10 +47,5 @@ class ChooseAvatarBottomSheet extends StatelessWidget {
                 ),
               ),
             ],
-          ),
-          20.sbH,
-        ],
-      ),
-    );
-  }
+          ));
 }

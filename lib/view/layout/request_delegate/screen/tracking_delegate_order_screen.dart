@@ -1,3 +1,4 @@
+import '../../../custom_widgets/popups/go_popups.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -81,7 +82,7 @@ class _TrackingDelegateOrderScreenState extends State<TrackingDelegateOrderScree
     if (_offerDialogOpen || offer == null || offer.status != 'price_revision' || !mounted) return;
     _offerDialogOpen = true;
     final ar = context.languageCode == 'ar';
-    await showDialog<void>(context: context, barrierDismissible: false, builder: (dialogContext) => AlertDialog(
+    await showGoDialog<void>(context: context, barrierDismissible: false, builder: (dialogContext) => AlertDialog(
       title: Text(ar ? 'عرض سعر جديد من المندوب' : 'New price offer'),
       content: Text(ar ? 'المندوب اقترح سعر توصيل جديد بقيمة ${offer.price} جنيه. لن يتغير سعر الطلب إلا بعد موافقتك.'
         : 'The driver proposed a new fare of ${offer.price} EGP. Your fare changes only if you accept.'),

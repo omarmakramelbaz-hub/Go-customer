@@ -1,3 +1,4 @@
+import '../popups/go_popups.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -12,63 +13,12 @@ class ChooseGalleryOrCameraBottomSheet extends StatelessWidget {
   const ChooseGalleryOrCameraBottomSheet({super.key, this.onCamera, this.onGallery});
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.popupColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          15.sbH,
-          SizedBox(width: 40, child: Divider(color: AppColors.hintColor)),
-          15.sbH,
-          Flexible(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                children: [
-                  TextButton(
-                    onPressed: onCamera,
-                    child: Row(
-                      children: [
-                        SvgPicture.asset(
-                          AppImages.cameraIcon,
-                          colorFilter: ColorFilter.mode(AppColors.mainAppColor, BlendMode.srcIn),
-                        ),
-                        const SizedBox(width: 5),
-                        Text(
-                          'camera'.tr,
-                          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400, color: AppColors.lightTextColor),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Divider(color: AppColors.hintColor),
-                  TextButton(
-                    onPressed: onGallery,
-                    child: Row(
-                      children: [
-                        SvgPicture.asset(
-                          AppImages.galleryIcon,
-                          colorFilter: ColorFilter.mode(AppColors.mainAppColor, BlendMode.srcIn),
-                        ),
-                        const SizedBox(width: 5),
-                        Text(
-                          'gallery'.tr,
-                          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400, color: AppColors.lightTextColor),
-                        ),
-                      ],
-                    ),
-                  ),
-                  15.sbH,
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  Widget build(BuildContext context) => GoSheet(
+    title: 'popupChoosePhoto'.tr, icon: Icons.add_photo_alternate_outlined,
+    child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      OutlinedButton.icon(onPressed: onCamera, icon: const Icon(Icons.photo_camera_outlined), label: Text('camera'.tr)),
+      const SizedBox(height: 12),
+      OutlinedButton.icon(onPressed: onGallery, icon: const Icon(Icons.photo_library_outlined), label: Text('gallery'.tr)),
+    ]),
+  );
 }

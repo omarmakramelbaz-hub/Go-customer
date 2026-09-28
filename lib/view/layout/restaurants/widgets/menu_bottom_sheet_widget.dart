@@ -1,3 +1,4 @@
+import '../../../custom_widgets/popups/go_popups.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -42,30 +43,13 @@ class _MenuBottomSheetWidgetState extends State<MenuBottomSheetWidget> {
       height: context.height * 0.8,
       decoration: BoxDecoration(
         color: AppColors.whiteColor,
-        borderRadius: const BorderRadius.only(topLeft: Radius.circular(36), topRight: Radius.circular(36)),
+        borderRadius: const BorderRadius.only(topLeft: Radius.circular(30), topRight: Radius.circular(30)),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 33, vertical: 20),
         child: Column(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('menu'.tr, style: AppTextStyle.text20BS()),
-                InkWell(
-                  onTap: () => Navigator.pop(context),
-                  child: Card(
-                    elevation: 10,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                    child: CircleAvatar(
-                      radius: 20,
-                      backgroundColor: AppColors.whiteColor,
-                      child: SvgPicture.asset(AppImages.closeIcon),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            GoPopupHeader(title: 'menu'.tr, icon: Icons.restaurant_menu_rounded, onClose: () => Navigator.pop(context)),
             15.sbH,
             const Divider(thickness: 1),
             15.sbH,
@@ -90,7 +74,7 @@ class _MenuBottomSheetWidgetState extends State<MenuBottomSheetWidget> {
                               width: 5,
                               decoration: BoxDecoration(
                                 borderRadius: const BorderRadius.only(
-                                  topLeft: Radius.circular(7),
+                                  topLeft: Radius.circular(30),
                                   bottomLeft: Radius.circular(7),
                                 ),
                                 color: _currentIndex == index ? AppColors.mainAppColor : Colors.transparent,
@@ -123,7 +107,7 @@ class _MenuBottomSheetWidgetState extends State<MenuBottomSheetWidget> {
                               width: 5,
                               decoration: BoxDecoration(
                                 borderRadius: const BorderRadius.only(
-                                  topLeft: Radius.circular(7),
+                                  topLeft: Radius.circular(30),
                                   bottomLeft: Radius.circular(7),
                                 ),
                                 color: _currentIndex == index ? AppColors.mainAppColor : Colors.transparent,

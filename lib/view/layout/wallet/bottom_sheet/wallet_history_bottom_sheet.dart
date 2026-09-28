@@ -1,3 +1,4 @@
+import '../../../custom_widgets/popups/go_popups.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -20,7 +21,7 @@ class WalletHistoryBottomSheet extends StatelessWidget {
       expand: false,
       builder: (context, scroll) => Material(
         color: GoDesign.paper,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
         clipBehavior: Clip.antiAlias,
         child: SafeArea(
           top: false,
@@ -28,25 +29,7 @@ class WalletHistoryBottomSheet extends StatelessWidget {
             children: [
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 12, 12, 8),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        ar ? 'العمليات' : 'Transactions',
-                        style: const TextStyle(
-                          color: GoDesign.ink,
-                          fontSize: 21,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                    ),
-                    IconButton(
-                      tooltip: ar ? 'إغلاق' : 'Close',
-                      onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.close),
-                    ),
-                  ],
-                ),
+                child: GoPopupHeader(title: ar ? 'العمليات' : 'Transactions', icon: Icons.receipt_long_outlined, onClose: () => Navigator.pop(context)),
               ),
               Expanded(
                 child: Consumer<WalletController>(

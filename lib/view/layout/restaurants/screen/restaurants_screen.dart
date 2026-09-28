@@ -1,3 +1,4 @@
+import '../../../custom_widgets/popups/go_popups.dart';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:math' as math;
@@ -139,7 +140,7 @@ class _RestaurantsScreenState extends State<RestaurantsScreen> {
       return;
     }
 
-    showModalBottomSheet<void>(
+    showGoModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
@@ -531,7 +532,7 @@ class _RestaurantsScreenState extends State<RestaurantsScreen> {
   }
 
   void _showFilterSheet() {
-    showModalBottomSheet<void>(
+    showGoModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (sheetContext) => Directionality(

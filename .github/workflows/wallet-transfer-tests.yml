@@ -15,6 +15,13 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get
-      - run: flutter analyze --no-fatal-infos --no-fatal-warnings lib/view/layout/wallet lib/view/layout/home/screen/go_services_home_screen.dart lib/view/layout/home/widgets/go_home_wallet_card.dart lib/view/layout/home/widgets/go_customer_home_view.dart test/go_home_wallet_test.dart test/wallet_transfer_test.dart test/wallet_loading_test.dart test/wallet_login_web_test.dart
-      - run: flutter test test/wallet_transfer_test.dart test/wallet_loading_test.dart test/go_home_wallet_test.dart
+      - run: flutter analyze --no-fatal-infos --no-fatal-warnings lib/view/custom_widgets/popups lib/view/custom_widgets/custom_toast lib/helpers/utils lib/view/layout/wallet lib/view/layout/home/screen/go_services_home_screen.dart lib/view/layout/home/widgets/go_home_wallet_card.dart lib/view/layout/home/widgets/go_customer_home_view.dart test/go_home_wallet_test.dart test/wallet_transfer_test.dart test/go_popup_test.dart test/wallet_loading_test.dart test/wallet_login_web_test.dart
+      - run: flutter test test/wallet_transfer_test.dart test/go_popup_test.dart test/wallet_loading_test.dart test/go_home_wallet_test.dart
       - run: flutter test --platform chrome test/wallet_login_web_test.dart
+      - name: Upload actual GO popup previews
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: go-popup-ui-preview
+          path: build/ui-preview
+          if-no-files-found: ignore

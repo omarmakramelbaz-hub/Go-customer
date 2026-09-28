@@ -1,3 +1,4 @@
+import '../../../custom_widgets/popups/go_popups.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -47,60 +48,11 @@ class _ChangePhoneNumberBottomSheetState extends State<ChangePhoneNumberBottomSh
   @override
   Widget build(BuildContext context) {
     final isArabic = Localizations.localeOf(context).languageCode == 'ar';
-    final keyboardInset = MediaQuery.of(context).viewInsets.bottom;
     final currentPhone = context.read<AuthController>().profile?.mobile ?? '';
 
-    return AnimatedPadding(
-      duration: const Duration(milliseconds: 180),
-      curve: Curves.easeOut,
-      padding: EdgeInsets.only(bottom: keyboardInset),
-      child: SafeArea(
-        top: false,
-        child: Material(
-          color: Colors.transparent,
-          child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.fromLTRB(18, 8, 18, 16),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(28),
-                topRight: Radius.circular(28),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Color(0x2A000000),
-                  blurRadius: 24,
-                  offset: Offset(0, -7),
-                ),
-              ],
-            ),
-            child: SingleChildScrollView(
-              physics: const ClampingScrollPhysics(),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Center(
-                      child: Container(
-                        width: 42,
-                        height: 4,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFD7D9DD),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 9),
-                    _PhoneHeader(
-                      title: 'changePhoneNumber'.tr,
-                      subtitle: isArabic
-                          ? 'حدّث الرقم المرتبط بحسابك بسهولة وأمان'
-                          : 'Update the phone number linked to your account securely',
-                    ),
-                    const SizedBox(height: 12),
+    return GoSheet(title: 'changePhoneNumber'.tr, subtitle: isArabic ? 'حدّث رقم الهاتف المرتبط بحسابك' : 'Update the phone number linked to your account', icon: Icons.phone_iphone_rounded, includeKeyboardInset: true,
+      child: Form(key: _formKey, child: Column(mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch, children: [
                     if (currentPhone.isNotEmpty) ...[
                       _CurrentNumberCard(
                         phone: currentPhone,
@@ -195,83 +147,13 @@ class _ChangePhoneNumberBottomSheetState extends State<ChangePhoneNumberBottomSh
                       ),
                     ),
                     const SizedBox(height: 4),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
+
+      ])),
     );
   }
 }
 
-class _PhoneHeader extends StatelessWidget {
-  const _PhoneHeader({required this.title, required this.subtitle});
 
-  final String title;
-  final String subtitle;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        InkWell(
-          onTap: () => Navigator.pop(context),
-          borderRadius: BorderRadius.circular(18),
-          child: Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: const Color(0xFFFFF5EC),
-              shape: BoxShape.circle,
-              border: Border.all(color: const Color(0xFFFFDCC0)),
-            ),
-            child: Icon(Icons.close_rounded, size: 21, color: AppColors.mainAppColor),
-          ),
-        ),
-        const Spacer(),
-        Expanded(
-          flex: 5,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Text(title, style: AppTextStyle.text18BS()),
-                  const SizedBox(width: 8),
-                  Container(
-                    width: 34,
-                    height: 34,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFFF2E7),
-                      borderRadius: BorderRadius.circular(11),
-                    ),
-                    child: Icon(
-                      Icons.phone_iphone_rounded,
-                      size: 20,
-                      color: AppColors.mainAppColor,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 2),
-              Text(
-                subtitle,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.end,
-                style: AppTextStyle.text11RG().copyWith(color: const Color(0xFF8A8E95)),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
 
 class _CurrentNumberCard extends StatelessWidget {
   const _CurrentNumberCard({required this.phone, required this.isArabic});

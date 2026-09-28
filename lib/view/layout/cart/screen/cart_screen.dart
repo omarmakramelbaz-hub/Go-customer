@@ -1,3 +1,4 @@
+import '../../../custom_widgets/popups/go_popups.dart';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -219,7 +220,7 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   Future<void> _showClearCartDialog(CartController controller) async {
-    await showDialog<void>(
+    await showGoDialog<void>(
       context: context,
       barrierDismissible: true,
       builder: (dialogContext) {
