@@ -119,8 +119,11 @@ class HiveMethods {
     await _box.put(_hiddenNotificationsKey(), limited);
   }
 
+  // Actual guest mode, independent of the temporary web-login redirect grace.
+  static bool isGuestMode() => _box.get('isVisitor', defaultValue: false) == true;
+
   static bool isVisitor() {
-    final storedVisitor = _box.get('isVisitor', defaultValue: false) == true;
+    final storedVisitor = isGuestMode();
     if (storedVisitor) return true;
 
     // The web review build fires several API calls immediately after login.

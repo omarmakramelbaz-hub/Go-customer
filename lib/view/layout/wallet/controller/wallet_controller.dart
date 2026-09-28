@@ -11,53 +11,110 @@ import '../model/wallet_transfer.dart';
 import '../../../../helpers/translation/all_translation.dart';
 
 class WalletController extends ChangeNotifier {
+  WalletController({
+    Future<ApiResponse> Function()? fetchWallet,
+    String? Function()? sessionToken,
+    this.requestTimeout = const Duration(seconds: 25),
+  }) : _fetchWallet =
+           fetchWallet ?? (() => ApiHelper.instance.get(Urls.wallet)),
+       _sessionToken =
+           sessionToken ??
+           (() => HiveMethods.isGuestMode() ? null : HiveMethods.getToken());
+
+  final Future<ApiResponse> Function() _fetchWallet;
+  final String? Function() _sessionToken;
+  final Duration requestTimeout;
   final chargeWalletFormKey = GlobalKey<FormState>();
   final chargeAmountEc = TextEditingController();
   final chargeAmountFocusNode = FocusNode();
+  bool _disposed = false;
+  int _loadVersion = 0;
+  String? _requestSession;
+  String? _walletSession;
 
-  bool get _isGuestSession =>
-      HiveMethods.isVisitor() || HiveMethods.getToken() == null;
-
-  void updateWallet({required WalletModel transaction}) {
-    getWallet();
-    notifyListeners();
+  String? get _token {
+    final token = _sessionToken();
+    return token == null || token.isEmpty ? null : token;
   }
 
+  void updateWallet({required WalletModel transaction}) => getWallet();
+
   void initialWallet() {
+    _loadVersion++;
+    _requestSession = null;
+    _walletSession = null;
     _walletResponse = ApiResponse(state: ResponseState.sleep, data: null);
     _wallet = null;
-    notifyListeners();
+    if (!_disposed) notifyListeners();
   }
 
   ApiResponse _walletResponse = ApiResponse(
     state: ResponseState.sleep,
     data: null,
   );
-  ApiResponse get walletResponse => _walletResponse;
+  ApiResponse get walletResponse => _token == _requestSession
+      ? _walletResponse
+      : ApiResponse(state: ResponseState.sleep, data: null);
   WalletResponse? _wallet;
-
-  // Never expose a previously loaded user's wallet during a guest session.
-  // WalletController is provided globally, so its in-memory state can survive
-  // navigation from an authenticated session to guest mode unless we guard it.
-  WalletResponse? get wallet => _isGuestSession ? null : _wallet;
+  WalletResponse? get wallet =>
+      _token != null && _token == _walletSession ? _wallet : null;
 
   Future<void> getWallet() async {
-    if (_isGuestSession) {
-      _walletResponse = ApiResponse(state: ResponseState.sleep, data: null);
-      _wallet = null;
-      notifyListeners();
+    if (_disposed) return;
+    final token = _token;
+    if (token == null) {
+      initialWallet();
       return;
     }
-
+    if (_requestSession == token &&
+        _walletResponse.state == ResponseState.loading)
+      return;
+    final version = ++_loadVersion;
+    _requestSession = token;
+    if (_walletSession != token) _wallet = null;
     _walletResponse = ApiResponse(state: ResponseState.loading, data: null);
-    _wallet = null;
     notifyListeners();
-    _walletResponse = await ApiHelper.instance.get(Urls.wallet);
-    notifyListeners();
-    if (_walletResponse.state == ResponseState.complete) {
-      _wallet = WalletResponse.fromJson(_walletResponse.data['data']);
-      notifyListeners();
+    try {
+      final response = await _fetchWallet().timeout(requestTimeout);
+      if (_disposed || version != _loadVersion || _token != token) return;
+      if (response.state == ResponseState.complete) {
+        final raw = response.data;
+        if (raw is! Map || raw['data'] is! Map || raw['status'] == 'Error') {
+          throw const FormatException('Invalid wallet response');
+        }
+        final parsed = WalletResponse.fromJson(
+          Map<String, dynamic>.from(raw['data']),
+        );
+        if (parsed.balance == null || !parsed.balance!.isFinite) {
+          throw const FormatException('Missing wallet balance');
+        }
+        _wallet = parsed;
+        _walletSession = token;
+      }
+      _walletResponse = response;
+    } catch (_) {
+      if (!_disposed && version == _loadVersion && _token == token) {
+        _walletResponse = ApiResponse(state: ResponseState.error, data: null);
+      }
+    } finally {
+      if (!_disposed && version == _loadVersion) {
+        // A response started by another account must never leave loading active.
+        if (_token != token) {
+          initialWallet();
+        } else {
+          notifyListeners();
+        }
+      }
     }
+  }
+
+  @override
+  void dispose() {
+    _disposed = true;
+    _loadVersion++;
+    chargeAmountEc.dispose();
+    chargeAmountFocusNode.dispose();
+    super.dispose();
   }
 
   String? _selectedPayment;

@@ -6,14 +6,16 @@ class WalletResponse {
   WalletResponse({this.wallet, this.balance, this.profile});
 
   WalletResponse.fromJson(Map<String, dynamic> json) {
-    if (json['wallet'] != null) {
+    if (json['wallet'] is List) {
       wallet = <WalletModel>[];
       json['wallet'].forEach((v) {
         wallet!.add(WalletModel.fromJson(v));
       });
     }
     balance = double.tryParse(json['balance'].toString());
-    profile = json['profile'] != null ? Profile.fromJson(json['profile']) : null;
+    profile = json['profile'] != null
+        ? Profile.fromJson(json['profile'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -57,15 +59,15 @@ class WalletModel {
   });
 
   WalletModel.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    amount = json['amount'];
+    id = int.tryParse('${json['id']}');
+    amount = num.tryParse('${json['amount']}');
     type = json['type'];
-    fromUser = json['from_user'];
+    fromUser = int.tryParse('${json['from_user']}');
     fromUserName = json['from_user_name'];
-    toUser = json['to_user'];
+    toUser = int.tryParse('${json['to_user']}');
     toUserName = json['to_user_name'];
-    orderId = json['order_id'];
-    orderNo = json['order_no'];
+    orderId = int.tryParse('${json['order_id']}');
+    orderNo = json['order_no']?.toString();
     payment = json['payment'];
     createdAt = json['created_at'];
   }
@@ -129,7 +131,7 @@ class Profile {
   });
 
   Profile.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
+    id = int.tryParse('${json['id']}');
     name = json['name'];
     email = json['email'];
     accountType = json['account_type'];
@@ -139,7 +141,7 @@ class Profile {
     lat = json['lat'];
     lng = json['lng'];
     mobileCode = json['mobile_code'];
-    areaId = json['area_id'];
+    areaId = int.tryParse('${json['area_id']}');
     areaTitle = json['area_title'];
     cart = json['cart'];
     photoProfile = json['photo_profile'];

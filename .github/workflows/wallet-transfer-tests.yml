@@ -15,5 +15,6 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get
-      - run: flutter analyze --no-fatal-infos --no-fatal-warnings lib/view/layout/wallet test/wallet_transfer_test.dart
-      - run: flutter test test/wallet_transfer_test.dart
+      - run: flutter analyze --no-fatal-infos --no-fatal-warnings lib/view/layout/wallet test/wallet_transfer_test.dart test/wallet_loading_test.dart test/wallet_login_web_test.dart
+      - run: flutter test test/wallet_transfer_test.dart test/wallet_loading_test.dart
+      - run: flutter test --platform chrome test/wallet_login_web_test.dart
