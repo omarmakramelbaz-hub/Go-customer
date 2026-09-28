@@ -51,7 +51,7 @@ class _GoServicesShellState extends State<_GoServicesShell> {
           GoServicesHomeScreen(onOpenNotifications: _openNotifications),
           if (_visited.contains(1) && authenticated) const DelegateOrdersScreen() else const SizedBox.shrink(),
           if (_visited.contains(2) && authenticated)
-            ChangeNotifierProvider(create: (_) => WalletController()..initialWallet()..getWallet(), child: const WalletScreen())
+            ChangeNotifierProvider(create: (_) => WalletController()..initialWallet()..getWallet(), child: WalletScreen(active: nav.screenIndex == 2))
           else const SizedBox.shrink(),
           if (_visited.contains(3) && authenticated) const FavoriteScreen() else const SizedBox.shrink(),
           if (_visited.contains(4)) const MyAccountScreen() else const SizedBox.shrink(),
