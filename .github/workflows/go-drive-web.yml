@@ -25,7 +25,7 @@ jobs:
       - name: Verify approved identity and active home route
         run: python3 tool/verify_approved_identity.py
       - name: Test approved identity and customer legal pages
-        run: flutter test test/go_customer_identity_test.dart test/go_customer_legal_test.dart test/go_auth_ui_test.dart test/go_home_commerce_test.dart test/go_store_signup_test.dart
+        run: flutter test test/go_customer_identity_test.dart test/go_customer_legal_test.dart test/go_auth_ui_test.dart test/go_home_commerce_test.dart test/go_home_wallet_test.dart test/go_store_signup_test.dart
       - name: Upload actual Flutter UI previews
         if: always()
         uses: actions/upload-artifact@v4
