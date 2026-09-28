@@ -15,9 +15,10 @@ import '../model/delegate_on_map_model.dart';
 import '../model/request_delegate_order_model.dart';
 
 class RequestDelegateController extends ChangeNotifier {
-  String _selectedPayment = 'cash';
+  String _selectedPayment = '';
   String get selectedPayment => _selectedPayment;
   void setSelectedPayment(String value) {
+    if (!const ['online', 'v_cash'].contains(value)) return;
     _selectedPayment = value;
     notifyListeners();
   }
@@ -315,7 +316,7 @@ class RequestDelegateController extends ChangeNotifier {
   }
 
   void reset() {
-    _selectedPayment = 'cash';
+    _selectedPayment = '';
     _priceEC.clear();
     // _fromController.clear();
     _toController.clear();

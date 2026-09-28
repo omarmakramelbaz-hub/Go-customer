@@ -133,8 +133,8 @@ class _SplashScreenState extends State<SplashScreen> {
                         size: 84,
                         isArabic: ar,
                         tagline: ar
-                            ? 'معًا نصنع الفرص'
-                            : 'Creating opportunities together',
+                            ? 'احتياجاتك في مكان واحد'
+                            : 'Everything you need in one place',
                       ),
                     ),
                   ),

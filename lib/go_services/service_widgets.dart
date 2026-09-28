@@ -260,6 +260,7 @@ class _AcceptOfferState extends State<_AcceptOffer> {
   Widget build(BuildContext context) => AlertDialog(title: Text(st(widget.ar, 'مراجعة الاتفاق', 'Review agreement')), content: SingleChildScrollView(child: Column(mainAxisSize: MainAxisSize.min, children: [
     Text('${widget.offer['name']} · ${widget.offer['price']} EGP', style: const TextStyle(fontWeight: FontWeight.bold)), serviceText('${widget.offer['scope']}'),
     serviceText(widget.offer['materials_included'] == true ? st(widget.ar, 'الخامات المذكورة مشمولة', 'Stated materials included') : st(widget.ar, 'الخامات غير مشمولة', 'Materials excluded')),
+    if (widget.methods.isEmpty) serviceText(st(widget.ar, 'الدفع الإلكتروني لهذه الخدمة غير متاح حاليًا. حاول لاحقًا أو تواصل مع الدعم.', 'Electronic payment for this service is currently unavailable. Try later or contact support.')),
     for (final item in widget.methods) RadioListTile<String>(value: item, groupValue: method, onChanged: (v) => setState(() => method = v), title: Text(paymentLabel(item, widget.ar))),
     if (method == 'wallet') serviceText(st(widget.ar, 'سيتم حجز كامل قيمة الشغل من محفظتك لحين تأكيد الإتمام.', 'The full price will be held from your wallet until completion.')),
     if (method != null && !['cash', 'wallet'].contains(method)) serviceText(st(widget.ar, 'بعد الاتفاق افتح صفحة الدفع وأكمل العملية قبل انتهاء المهلة.', 'After booking, open checkout and pay before the deadline.')),

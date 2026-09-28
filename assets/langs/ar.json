@@ -146,7 +146,7 @@
   "delivery": "التوصيل",
   "paymentThrough": "الدفع من خلال",
   "cash": "نقدًا",
-  "creditCard": "بطاقة ائتمان",
+  "creditCard": "بطاقات بنكية",
   "vodafoneCash": "فودافون كاش",
   "doYouWantToScheduleYourOrder": "هل تريد جدولة طلبك",
   "changeLanguage": "تغيير اللغة",
@@ -372,7 +372,7 @@
   "thereIsANewOrderWithStatus": "لديك تحديث علي حالة طلب رقم ",
   "restaurantClosedOrBusy": "عفوا هذا المطعم (مغلق/ مشغول)",
   "appWalletBalance": "رصيد محفظة التطبيق",
-  "digitalWalletAndInstaPay": "محافظ إلكترونية وإنستاباي",
+  "digitalWalletAndInstaPay": "محافظ إلكترونية",
   "cantDlever": "لايمكن توصيل الطلب لهذا العنوان",
   "currentLocation": "العنوان الحالي",
   "didYouForgetPassword": " هل نسيت كلمة المرور ؟",
@@ -415,5 +415,6 @@
   "walletChargeIntro": "أضف رصيدًا لمحفظتك بخطوات بسيطة.",
   "walletChargeMinimum": "الحد الأدنى للشحن 50 ج.م",
   "walletChargeMethod": "طريقة الدفع",
-  "popupChoosePhoto": "إضافة صورة"
+  "popupChoosePhoto": "إضافة صورة",
+  "choosePaymentMethod": "اختر طريقة الدفع"
 }

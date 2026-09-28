@@ -45,41 +45,15 @@ class _ChooseVCashOrVisaWidgetState extends State<ChooseVCashOrVisaWidget> {
     final methods = <_PaymentOptionData>[
       if (walletEnabled)
         _PaymentOptionData(
-          keyName: 'orange_cash',
-          label: isArabic ? 'أورنج' : 'Orange',
+          keyName: 'electronic_wallet',
+          label: isArabic ? 'محافظ إلكترونية' : 'Electronic wallets',
           backendMethod: 'v_cash',
-          brand: const _BrandMark(
-            text: 'orange',
-            fontSize: 8.5,
-            fontWeight: FontWeight.w800,
-          ),
-        ),
-      if (walletEnabled)
-        _PaymentOptionData(
-          keyName: 'etisalat_cash',
-          label: isArabic ? 'اتصالات' : 'Etisalat',
-          backendMethod: 'v_cash',
-          brand: const _BrandMark(
-            text: 'e&',
-            fontSize: 15,
-            fontWeight: FontWeight.w800,
-          ),
-        ),
-      if (walletEnabled)
-        _PaymentOptionData(
-          keyName: 'vodafone_cash',
-          label: isArabic ? 'فودافون' : 'Vodafone',
-          backendMethod: 'v_cash',
-          brand: Image.asset(
-            AppImages.vfCash,
-            height: 18,
-            fit: BoxFit.contain,
-          ),
+          brand: const Icon(Icons.account_balance_wallet_outlined),
         ),
       if (cardEnabled)
         _PaymentOptionData(
           keyName: 'bank_card',
-          label: isArabic ? 'فيزا / ماستر' : 'Visa / MC',
+          label: isArabic ? 'بطاقات بنكية' : 'Bank cards',
           backendMethod: 'online',
           brand: SvgPicture.asset(
             AppImages.visaIcon,

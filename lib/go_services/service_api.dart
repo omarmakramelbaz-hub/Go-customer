@@ -23,7 +23,7 @@ class ServiceCapabilities {
   factory ServiceCapabilities.fromMap(Map<String, dynamic> data) => ServiceCapabilities(
     ready: data['schema_ready'] == true && data['version'] == 1,
     enabled: data['enabled'] == true,
-    methods: (data['payment_methods'] as List? ?? const []).whereType<String>().where(paymentLabels.containsKey).toList(),
+    methods: (data['payment_methods'] as List? ?? const []).whereType<String>().where((method) => const ['mobile_wallet', 'card'].contains(method)).toList(),
   );
 }
 

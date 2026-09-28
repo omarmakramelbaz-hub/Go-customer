@@ -77,7 +77,7 @@ class GlobalTranslations {
 
   static Future<void> init() async {
     if (locale == null) {
-      await setNewLanguage(currentLanguage, false);
+      await setNewLanguage(await getPreferredLanguage(), false);
     }
     return;
   }
@@ -94,7 +94,7 @@ class GlobalTranslations {
   ]) async {
     String language = newLanguage ?? currentLanguage;
 
-    if (language.isEmpty) {
+    if (!_supportedLanguages.contains(language)) {
       language = 'ar';
     }
 

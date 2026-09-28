@@ -309,8 +309,8 @@ class CustomMapAnimatedContainer extends StatelessWidget {
       'wallet' => _isArabic(context) ? 'المحفظة' : 'Wallet',
       'online' => _isArabic(context) ? 'بطاقة بنكية' : 'Bank card',
       'v_cash' => _isArabic(context)
-          ? 'محفظة إلكترونية / إنستا باي'
-          : 'Digital wallet',
+          ? 'محافظ إلكترونية'
+          : 'Electronic wallets',
       'cash' => _isArabic(context) ? 'نقدًا' : 'Cash',
       _ => _isArabic(context) ? 'اختر طريقة الدفع' : 'Choose payment method',
     };

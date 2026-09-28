@@ -22,27 +22,6 @@ class ChoosePaymentMethodWidget extends StatelessWidget {
         builder: (context, myAccountController, _) {
           return Column(
             children: [
-              PaymentMethodWidget(
-                label: 'cash'.tr,
-                selectedPayment: 'cash',
-                leading: CustomImage(
-                  path: AppImages.cashIcon,
-                  type: ImageType.svg,
-                  color: AppColors.mainAppColor,
-                  height: 22,
-                ),
-              ),
-              const SizedBox(height: 10),
-              PaymentMethodWidget(
-                label: 'appWalletBalance'.tr,
-                selectedPayment: 'wallet',
-                leading: CustomImage(
-                  path: AppImages.payWalletIcon,
-                  type: ImageType.svg,
-                  color: AppColors.mainAppColor,
-                  height: 21,
-                ),
-              ),
               if (myAccountController.setting?.paymentCardActivate == 'true') ...[
                 const SizedBox(height: 10),
                 PaymentMethodWidget(

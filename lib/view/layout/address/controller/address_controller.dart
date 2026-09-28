@@ -7,6 +7,7 @@ import '../../../../helpers/translation/all_translation.dart';
 import '../../../../helpers/utils/common_methods.dart';
 import '../../../../helpers/utils/utils.dart';
 import '../model/address_model.dart';
+import '../../../../helpers/hive/hive_methods.dart';
 
 class AddressController extends ChangeNotifier {
   void initialAddress() {
@@ -115,6 +116,14 @@ class AddressController extends ChangeNotifier {
       'address': address,
     });
     final response = await ApiHelper.instance.post('${Urls.updateAddress}$id', body: body);
+    final userId = HiveMethods.getUserId();
+    if (response.state == ResponseState.complete && userId != null && HiveMethods.getDeliveryAddress(userId)?['id'] == id) {
+      final saved = AddressModel(id: id, areaName: areaName, apartmentNo: apartmentNo, floorNo: floorNo,
+        streetName: streetName, mobile: mobile, badge: badge, addressName: addressName, type: type,
+        lat: '$lat', lng: '$lang', countryName: countryName, cityName: cityName, address: address);
+      await HiveMethods.saveDeliveryAddress(userId, saved.toJson());
+      HiveMethods.updateLat(lat); HiveMethods.updateLan(lang);
+    }
 
     if (response.state == ResponseState.complete) {
       Utils.loadingOff();
@@ -130,6 +139,10 @@ class AddressController extends ChangeNotifier {
     Utils.loading();
 
     final response = await ApiHelper.instance.delete('${Urls.deleteAddress}$id');
+    final userId = HiveMethods.getUserId();
+    if (response.state == ResponseState.complete && userId != null && HiveMethods.getDeliveryAddress(userId)?['id'] == id) {
+      await HiveMethods.clearDeliveryAddress(userId);
+    }
     Utils.loadingOff();
     if (response.state == ResponseState.complete) {
       CommonMethods.showToast(message: response.data['message']);

@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:rxdart/rxdart.dart';
 
 import 'all_translation.dart';
@@ -16,21 +14,11 @@ class MainAppBloc {
   }
 
   Future<void> getShared() async {
-    log('Saved Language ==> ${await GlobalTranslations.getPreferredLanguage()}');
-
-    String? lang;
-
-    if (await GlobalTranslations.getPreferredLanguage() == '') {
-      lang = 'en';
-      await GlobalTranslations.setNewLanguage(lang);
-      updateLang(lang);
-      log('First getShared Lang............. $lang');
-    } else {
-      lang = await GlobalTranslations.getPreferredLanguage();
-      updateLang(lang);
-      await GlobalTranslations.setNewLanguage(lang);
-      log('Second getShared Lang............. $lang');
-    }
+    await GlobalTranslations.setNewLanguage(
+      await GlobalTranslations.getPreferredLanguage(),
+      false,
+    );
+    updateLang(GlobalTranslations.currentLanguage);
   }
 }
 

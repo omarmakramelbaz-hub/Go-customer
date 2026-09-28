@@ -12,6 +12,8 @@ import '../../../../helpers/theme/go_design_tokens.dart';
 import '../../../../helpers/translation/all_translation.dart';
 import '../../../custom_widgets/go_drive_brand.dart';
 import '../../auth/controller/auth_controller.dart';
+import '../../address/screen/address_screen.dart';
+import '../../address/model/address_model.dart';
 import '../../bottom_navigation/controller/bottom_navigation_controller.dart';
 import '../../partner_search/screen/profession_partners_screen.dart';
 import '../../request_delegate/screen/request_delegate_screen.dart';
@@ -151,13 +153,12 @@ class _GoServicesHomeScreenState extends State<GoServicesHomeScreen>
     final ar = context.languageCode == 'ar';
     var city = (profile?.cityName ?? HiveMethods.getCity() ?? '').trim();
     var address = (profile?.address ?? profile?.areaTitle ?? '').trim();
-    final selectedId = HiveMethods.getSelectedCity();
-    for (final item in profile?.userAddresses ?? []) {
-      if (selectedId != null && item.id == selectedId) {
-        city = (item.cityName ?? city).trim();
-        address = (item.streetName ?? item.addressName ?? item.areaName ?? item.address ?? address).trim();
-        break;
-      }
+    final savedAddress = profile?.id == null ? null : HiveMethods.getDeliveryAddress(profile!.id!);
+    if (savedAddress != null) {
+      final selected = AddressModel.fromJson(savedAddress);
+      city = (selected.cityName ?? selected.cityname ?? city).trim();
+      address = [selected.address, selected.streetName, selected.areaName, selected.addressName]
+          .whereType<String>().map((value) => value.trim()).firstWhere((value) => value.isNotEmpty, orElse: () => address);
     }
     final name = (profile?.name ?? '').trim();
     final photo = profile?.photoProfile?.trim() ?? '';
@@ -168,7 +169,21 @@ class _GoServicesHomeScreenState extends State<GoServicesHomeScreen>
       }
       context.read<BottomNavigationController>().updateIndex(index);
     }
-    void openAddress() => NamedNavigatorImpl.push(signedIn ? 'AddressScreen' : 'LoginScreen');
+    Future<void> openAddress() async {
+      if (!signedIn) { await Navigator.of(context).pushNamed('LoginScreen'); return; }
+      final selected = await Navigator.of(context).push<AddressModel>(MaterialPageRoute(
+        builder: (_) => const AddressScreen(selectForDelivery: true),
+      ));
+      if (!mounted) return;
+      if (selected == null || profile?.id == null) { setState(() {}); return; }
+      await HiveMethods.saveDeliveryAddress(profile!.id!, selected.toJson());
+      final lat = double.tryParse(selected.lat ?? '');
+      final lng = double.tryParse(selected.lng ?? '');
+      if (lat != null && lng != null && lat.abs() <= 90 && lng.abs() <= 180) {
+        HiveMethods.updateLat(lat); HiveMethods.updateLan(lng);
+      }
+      if (mounted) setState(() {});
+    }
     Future<void> signOut() async {
       final confirmed = await showGoDialog<bool>(context: context, builder: (dialog) => AlertDialog(
         title: Text(ar ? 'تسجيل الخروج؟' : 'Sign out?'),

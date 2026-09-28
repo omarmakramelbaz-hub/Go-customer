@@ -105,8 +105,13 @@ class GoHomeWalletCard extends StatelessWidget {
                                 key: const ValueKey('go-home-wallet-balance'),
                                 textDirection: TextDirection.ltr,
                                 style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 42,
+                                  color: Color(0xFF161719),
+                                  shadows: [
+                                    Shadow(color: Color(0xFF030405), offset: Offset(0, -0.8), blurRadius: 0.6),
+                                    Shadow(color: Color(0xBB969696), offset: Offset(0, 1.0), blurRadius: 0.7),
+                                  ],
+                                  letterSpacing: 0.5,
+                                  fontSize: 38,
                                   height: 1.1,
                                   fontWeight: FontWeight.w800,
                                 ),

@@ -22,7 +22,7 @@ class HiveMethods {
 
   static String getLang() => _box.get('lang', defaultValue: 'ar');
 
-  static void updateLang(String lang) => _box.put('lang', lang);
+  static Future<void> updateLang(String lang) async => await _box.put('lang', lang);
 
   static String? getToken() {
     if (_tokenCacheInitialized) return _tokenCache;
@@ -56,6 +56,18 @@ class HiveMethods {
   static bool isFirstTime() => _box.get('isFirstTime', defaultValue: true);
 
   static void updateFirstTime() => _box.put('isFirstTime', false);
+
+  static Map<String, dynamic>? getDeliveryAddress(int userId) {
+    final raw = _box.get('goDeliveryAddress:$userId');
+    return raw is Map ? Map<String, dynamic>.from(raw) : null;
+  }
+  static Future<void> saveDeliveryAddress(int userId, Map<String, dynamic> address) async {
+    await _box.put('goDeliveryAddress:$userId', address);
+  }
+
+  static Future<void> clearDeliveryAddress(int userId) async {
+    await _box.delete('goDeliveryAddress:$userId');
+  }
 
   static double? getLat() => _box.get('lat');
 
