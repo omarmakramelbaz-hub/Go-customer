@@ -120,6 +120,7 @@ class WalletController extends ChangeNotifier {
   String? _selectedPayment;
   String? get selectedPayment => _selectedPayment;
   void setSelectedPayment(String value) {
+    if (!const ['v_cash', 'online'].contains(value)) return;
     _selectedPayment = value;
     notifyListeners();
   }

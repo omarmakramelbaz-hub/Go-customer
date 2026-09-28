@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../helpers/theme/app_colors.dart';
+import '../../../../helpers/networking/api_helper.dart';
 import '../../../../helpers/translation/all_translation.dart';
 import '../../my_account/controller/my_account_controller.dart';
 import '../controller/request_delegate_controller.dart';
@@ -26,20 +27,7 @@ class PaymentRDBottomSheet extends StatelessWidget {
             animation: requestDelegateController,
             builder: (context, _) {
               final isAr = _isArabic(context);
-              final options = <_PaymentOption>[
-                _PaymentOption(
-                  value: 'cash',
-                  title: 'cash'.tr,
-                  subtitle: isAr ? 'الدفع نقدًا عند الاستلام' : 'Pay cash on delivery',
-                  icon: Icons.payments_outlined,
-                ),
-                _PaymentOption(
-                  value: 'wallet',
-                  title: 'appWalletBalance'.tr,
-                  subtitle: isAr ? 'الدفع من رصيد المحفظة داخل التطبيق' : 'Pay from your app wallet balance',
-                  icon: Icons.account_balance_wallet_outlined,
-                ),
-              ];
+              final options = <_PaymentOption>[];
 
               if (accountController.setting?.paymentCardActivate == 'true') {
                 options.add(
@@ -56,8 +44,8 @@ class PaymentRDBottomSheet extends StatelessWidget {
                 options.add(
                   _PaymentOption(
                     value: 'v_cash',
-                    title: 'digitalWalletAndInstaPay'.tr,
-                    subtitle: isAr ? 'محفظة إلكترونية أو إنستا باي' : 'Digital wallet or InstaPay',
+                    title: isAr ? 'محافظ إلكترونية' : 'Electronic wallets',
+                    subtitle: isAr ? 'الدفع عبر محفظتك الإلكترونية' : 'Pay using your electronic wallet',
                     icon: Icons.phone_android_rounded,
                   ),
                 );
@@ -67,6 +55,11 @@ class PaymentRDBottomSheet extends StatelessWidget {
                 subtitle: isAr ? 'يمكنك تغيير طريقة الدفع قبل تأكيد الطلب' : 'You can change it before confirming the order',
                 icon: Icons.account_balance_wallet_outlined,
                 child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                        if (options.isEmpty) Padding(padding: const EdgeInsets.all(16), child:
+                          accountController.settingResponse.state == ResponseState.loading
+                            ? const Center(child: CircularProgressIndicator())
+                            : Column(children: [Text(isAr ? 'وسائل الدفع غير متاحة حاليًا' : 'Payment methods are currently unavailable'),
+                                TextButton(onPressed: () => accountController.getSetting(), child: Text(isAr ? 'إعادة المحاولة' : 'Retry'))])),
                         ...options.map(
                           (option) => Padding(
                             padding: const EdgeInsets.only(bottom: 10),
@@ -81,7 +74,7 @@ class PaymentRDBottomSheet extends StatelessWidget {
                         SizedBox(
                           height: 52,
                           child: ElevatedButton(
-                            onPressed: () => Navigator.pop(context),
+                            onPressed: options.any((option) => option.value == requestDelegateController.selectedPayment) ? () => Navigator.pop(context) : null,
                             style: ElevatedButton.styleFrom(
                               elevation: 0,
                               backgroundColor: AppColors.mainAppColor,

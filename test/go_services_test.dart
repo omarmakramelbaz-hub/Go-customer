@@ -125,8 +125,8 @@ void main() {
     expect(serviceCanQuote({...job, 'search_until': 'invalid'}), isFalse);
   });
   test('only advertised recognized methods are visible', () {
-    final caps = ServiceCapabilities.fromMap({'schema_ready': true, 'version': 1, 'enabled': false, 'payment_methods': ['cash', 'wallet', 'unsupported']});
-    expect(caps.ready, isTrue); expect(caps.enabled, isFalse); expect(caps.methods, ['cash', 'wallet']);
+    final caps = ServiceCapabilities.fromMap({'schema_ready': true, 'version': 1, 'enabled': false, 'payment_methods': ['cash', 'wallet', 'mobile_wallet', 'card', 'apple_pay', 'google_pay', 'unsupported']});
+    expect(caps.ready, isTrue); expect(caps.enabled, isFalse); expect(caps.methods, ['mobile_wallet', 'card']);
     expect(ServiceCapabilities.fromMap({'schema_ready': true, 'version': 99}).ready, isFalse);
   });
   test('old backend 404 permits fallback, server failures do not', () async {
@@ -137,9 +137,9 @@ void main() {
   });
   test('acceptance posts only the chosen payment method; server owns money', () async {
     final adapter = MemoryAdapter((_) => reply(exampleJob())); final client = api(adapter);
-    await client.accept(7, 3, 'cash');
+    await client.accept(7, 3, 'card');
     expect(adapter.requests.single.path, endsWith('/go-services/jobs/7/offers/3/accept'));
-    expect(adapter.requests.single.method, 'POST'); expect(adapter.requests.single.data, {'payment_method': 'cash'});
+    expect(adapter.requests.single.method, 'POST'); expect(adapter.requests.single.data, {'payment_method': 'card'});
     expect(adapter.requests.single.headers['X-App-Scope'], 'go');
     expect(adapter.requests.single.headers['Authorization'], 'Bearer test-token-not-real'); client.close();
   });

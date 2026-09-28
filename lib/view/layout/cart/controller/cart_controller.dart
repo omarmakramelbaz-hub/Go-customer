@@ -250,9 +250,10 @@ class CartController extends ChangeNotifier {
     }
   }
 
-  String _selectedPayment = 'cash';
+  String _selectedPayment = '';
   String get selectedPayment => _selectedPayment;
   void setSelectedPayment(String value) {
+    if (!const ['online', 'v_cash'].contains(value)) return;
     _selectedPayment = value;
     notifyListeners();
   }

@@ -105,7 +105,9 @@ class ExecuteOrderButton extends StatelessWidget {
       child: CustomButton(
         onPressed: () {
           log(selectedDateZone.toString());
-          if (cartController.isSwitchedscheduleDate == true && selectedDate == null && selectedTime == null) {
+          if (!const ['online', 'v_cash'].contains(cartController.selectedPayment)) {
+            CommonMethods.showError(message: 'choosePaymentMethod'.tr);
+          } else if (cartController.isSwitchedscheduleDate == true && selectedDate == null && selectedTime == null) {
             CommonMethods.showError(message: 'chooseReDeliveryOrder'.tr);
           } else if (cartController.isSwitchedscheduleDate == true && selectedDate != null && selectedTime == null) {
             CommonMethods.showError(message: 'chooseReDeliveryOrder'.tr);

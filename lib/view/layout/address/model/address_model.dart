@@ -47,8 +47,8 @@ class AddressModel {
     badge = json['badge'];
     addressName = json['address_name'];
     type = json['type'];
-    lat = json['lat'];
-    lng = json['lng'];
+    lat = json['lat']?.toString();
+    lng = json['lng']?.toString();
     countryName = json['country_name'];
     cityName = json['city_name'];
     address = json['address'];
