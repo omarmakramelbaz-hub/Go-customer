@@ -2,9 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 
-import '../lib/helpers/hive/hive_methods.dart';
-import '../lib/helpers/networking/api_helper.dart';
-import '../lib/view/layout/wallet/controller/wallet_controller.dart';
+import 'package:go_drive_customer/helpers/hive/hive_methods.dart';
+import 'package:go_drive_customer/helpers/networking/api_helper.dart';
+import 'package:go_drive_customer/view/layout/wallet/controller/wallet_controller.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

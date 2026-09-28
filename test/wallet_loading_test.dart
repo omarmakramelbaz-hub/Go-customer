@@ -3,12 +3,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../lib/helpers/networking/api_helper.dart';
-import '../lib/helpers/translation/all_translation.dart';
-import '../lib/view/custom_widgets/custom_loading/custom_shimmer.dart';
-import '../lib/view/layout/wallet/controller/wallet_controller.dart';
-import '../lib/view/layout/wallet/model/wallet_model.dart';
-import '../lib/view/layout/wallet/widget/my_current_balance_widget.dart';
+import 'package:go_drive_customer/helpers/networking/api_helper.dart';
+import 'package:go_drive_customer/helpers/translation/all_translation.dart';
+import 'package:go_drive_customer/view/custom_widgets/custom_loading/custom_shimmer.dart';
+import 'package:go_drive_customer/view/layout/wallet/controller/wallet_controller.dart';
+import 'package:go_drive_customer/view/layout/wallet/model/wallet_model.dart';
+import 'package:go_drive_customer/view/layout/wallet/widget/my_current_balance_widget.dart';
 
 ApiResponse response(Object? balance) => ApiResponse(
   state: ResponseState.complete,
