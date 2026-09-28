@@ -1,8 +1,7 @@
 // These wire values identify the recipient app, never the sender's app.
 enum TransferWallet {
   goCustomer('go_customer', 'walletGoCustomer'),
-  goPartner('go_partner', 'walletGoPartner'),
-  fasakhanstaCustomer('fasakhansta_customer', 'walletFasakhanstaCustomer');
+  goPartner('go_partner', 'walletGoPartner');
 
   const TransferWallet(this.value, this.labelKey);
   final String value;

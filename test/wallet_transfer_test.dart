@@ -3,6 +3,12 @@ import 'package:flutter_test/flutter_test.dart';
 import '../lib/view/layout/wallet/model/wallet_transfer.dart';
 
 void main() {
+  test('GO Customer offers only GO user and GO Partner wallets', () {
+    expect(
+      TransferWallet.values.map((wallet) => wallet.value),
+      ['go_customer', 'go_partner'],
+    );
+  });
   test(
     'same phone stays bound to the chosen wallet and confirmed recipient',
     () {
