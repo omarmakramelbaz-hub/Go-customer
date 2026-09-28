@@ -70,7 +70,7 @@ class GoCustomerHomeView extends StatefulWidget {
       required this.onAddress,
       required this.onNotifications,
       required this.onService,
-      this.drawer});
+      this.drawer, this.wallet});
   final bool isArabic;
   final String firstName;
   final String locationTitle;
@@ -80,6 +80,7 @@ class GoCustomerHomeView extends StatefulWidget {
   final VoidCallback onNotifications;
   final ValueChanged<GoService> onService;
   final Widget? drawer;
+  final Widget? wallet;
   @override
   State<GoCustomerHomeView> createState() => _GoCustomerHomeViewState();
 }
@@ -178,6 +179,53 @@ class _GoCustomerHomeViewState extends State<GoCustomerHomeView> {
             )),
           ));
 
+  Widget _hero() => Padding(
+    padding: const EdgeInsets.fromLTRB(16, 6, 16, 20),
+    child: LayoutBuilder(
+      builder: (context, box) {
+        final copy = Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              t('كل اللي تحتاجه، عندك', 'Everything you need, nearby'),
+              key: const ValueKey('go-home-headline'),
+              style: const TextStyle(
+                color: GoDesign.paper,
+                fontSize: 24,
+                fontWeight: FontWeight.w800,
+                height: 1.35,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              t(
+                'مشترياتك وخدماتك اليومية في مكان واحد',
+                'Your everyday shopping and services in one place',
+              ),
+              style: const TextStyle(
+                color: Color(0xFFC0C5CB),
+                fontSize: 13,
+                height: 1.5,
+              ),
+            ),
+          ],
+        );
+        if (widget.wallet == null) return copy;
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(child: copy),
+            const SizedBox(width: 12),
+            SizedBox(
+              width: ((box.maxWidth - 12) * .5).clamp(0.0, 260.0),
+              child: widget.wallet,
+            ),
+          ],
+        );
+      },
+    ),
+  );
+
   @override
   Widget build(BuildContext context) {
     final search = _search.trim().toLowerCase();
@@ -221,32 +269,7 @@ class _GoCustomerHomeViewState extends State<GoCustomerHomeView> {
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
                                   _header(),
-                                  if (search.isEmpty)
-                                    Padding(
-                                        padding: const EdgeInsets.fromLTRB(
-                                            20, 6, 20, 20),
-                                        child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                  t('كل اللي تحتاجه، عندك',
-                                                      'Everything you need, nearby'),
-                                                  style: const TextStyle(
-                                                      color: GoDesign.paper,
-                                                      fontSize: 24,
-                                                      fontWeight:
-                                                          FontWeight.w800,
-                                                      height: 1.35)),
-                                              const SizedBox(height: 6),
-                                              Text(
-                                                  t('مشترياتك وخدماتك اليومية في مكان واحد',
-                                                      'Your everyday shopping and services in one place'),
-                                                  style: const TextStyle(
-                                                      color: Color(0xFFC0C5CB),
-                                                      fontSize: 13,
-                                                      height: 1.5)),
-                                            ])),
+                                  if (search.isEmpty) _hero(),
                                   _searchField(),
                                 ])),
                         Padding(

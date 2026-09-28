@@ -48,7 +48,7 @@ class _GoServicesShellState extends State<_GoServicesShell> {
       onPopInvokedWithResult: (didPop, _) { if (!didPop) nav.updateIndex(0); },
       child: Scaffold(backgroundColor: GoDesign.paper,
         body: IndexedStack(index: nav.screenIndex, children: [
-          GoServicesHomeScreen(onOpenNotifications: _openNotifications),
+          GoServicesHomeScreen(onOpenNotifications: _openNotifications, active: nav.screenIndex == 0),
           if (_visited.contains(1) && authenticated) const DelegateOrdersScreen() else const SizedBox.shrink(),
           if (_visited.contains(2) && authenticated)
             ChangeNotifierProvider(create: (_) => WalletController()..initialWallet()..getWallet(), child: WalletScreen(active: nav.screenIndex == 2))
