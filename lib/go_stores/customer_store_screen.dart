@@ -68,7 +68,9 @@ class _StoreState extends State<CustomerStoreScreen> {
   void initState() {
     super.initState();
     final userId = HiveMethods.getUserId();
-    final saved = userId == null ? null : HiveMethods.getDeliveryAddress(userId);
+    final token = HiveMethods.getToken();
+    final saved = userId == null || HiveMethods.isGuestMode() || token == null || token.isEmpty
+        ? null : HiveMethods.getDeliveryAddress(userId);
     if (saved != null) selectedAddress = AddressModel.fromJson(saved);
     load();
   }

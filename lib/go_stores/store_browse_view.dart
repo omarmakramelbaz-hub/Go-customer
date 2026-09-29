@@ -52,7 +52,8 @@ class StoreBrowseView extends StatelessWidget {
   final List<Map<String, dynamic>> items, nearby;
   final TextEditingController search;
   final Future<void> Function() onRefresh;
-  final VoidCallback onAddress, onRetry, onMore;
+  final Future<void> Function() onAddress;
+  final VoidCallback onRetry, onMore;
   final ValueChanged<String> onSearch, onSort;
   final ValueChanged<Map<String, dynamic>> onOpen;
 
@@ -90,7 +91,7 @@ class StoreBrowseView extends StatelessWidget {
             const SizedBox(height: 112, child: Center(child: CircularProgressIndicator()))
           else if (nearby.isEmpty)
             _EmptySection(icon: Icons.delivery_dining_rounded,
-              title: hasAddress ? tr(context, 'لا توجد متاجر قريبة من عنوانك حالياً', 'No nearby stores at this address yet') : tr(context, 'حدد عنوان التوصيل', 'Choose a delivery address'),
+              title: failed ? tr(context, 'تعذّر تحميل المتاجر القريبة', 'Could not load nearby stores') : hasAddress ? tr(context, 'لا توجد متاجر قريبة من عنوانك حالياً', 'No nearby stores at this address yet') : tr(context, 'حدد عنوان التوصيل', 'Choose a delivery address'),
               subtitle: tr(context, 'جرّب تغيير عنوان التوصيل أو تصفح كل المتاجر بالأسفل', 'Change your address or browse all stores below'))
           else
             SizedBox(height: 278 + math.max(0.0, MediaQuery.textScalerOf(context).scale(14) - 14) * 5,

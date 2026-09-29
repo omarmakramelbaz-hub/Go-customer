@@ -31,8 +31,9 @@ void main() {
       ..addFont(rootBundle.load('assets/font/Tajawal/Tajawal-Regular.ttf'))
       ..addFont(rootBundle.load('assets/font/Tajawal/Tajawal-Bold.ttf'));
     await fonts.load();
+    await (FontLoader('MaterialIcons')..addFont(rootBundle.load('fonts/MaterialIcons-Regular.otf'))).load();
   });
-  setUp(() async { await Hive.box('app').clear(); });
+  setUp(() async { await Hive.box('app').clear(); await HiveMethods.deleteToken(); });
   tearDownAll(() async { await Hive.close(); await hiveDirectory.delete(recursive: true); });
 
   test('unknown delivery and rating data are never interpreted as zero', () {
@@ -49,8 +50,11 @@ void main() {
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
-      HiveMethods.updateUserId(77);
-      await HiveMethods.saveDeliveryAddress(77, AddressModel(address: ar ? 'مدينة مبارك، المنصورة' : 'Mubarak City, Mansoura', lat: '31.04', lng: '31.38').toJson());
+      await tester.runAsync(() async {
+        await Hive.box('app').put('userId', 77);
+        await HiveMethods.updateToken('local-preview-only');
+        await HiveMethods.saveDeliveryAddress(77, AddressModel(address: ar ? 'مدينة مبارك، المنصورة' : 'Mubarak City, Mansoura', lat: '31.04', lng: '31.38').toJson());
+      });
       final boundary = GlobalKey();
       final first = {'id': 1, 'name': ar ? 'ماركت الأميرة' : 'Al Amira Market', 'address': ar ? 'مدينة مبارك' : 'Mubarak City', 'distance_km': 1.2, 'nearby': true};
       await tester.pumpWidget(app(RepaintBoundary(key: boundary, child: CustomerStoreScreen(
@@ -74,14 +78,15 @@ void main() {
   }
 
   testWidgets('address selection reloads nearby stores and persists per account', (tester) async {
-    HiveMethods.updateUserId(21);
+    await tester.runAsync(() async { await Hive.box('app').put('userId', 21); });
     final queries = <Map<String, dynamic>>[];
     await tester.pumpWidget(app(CustomerStoreScreen(kind: 'supermarket', title: 'المتاجر',
       selectAddress: (_) async => AddressModel(id: 10, address: 'العنوان الجديد', lat: '30', lng: '31'),
       read: (_, query) async { queries.add(Map.of(query)); return {'stores': [], 'nearby_stores': query.containsKey('lat') ? [{'id': 9, 'name': 'أقرب متجر', 'distance_km': 1.0, 'nearby': true}] : []}; },
     )));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('تغيير العنوان'));
+    expect(find.text('تغيير العنوان'), findsOneWidget);
+    await tester.runAsync(() => tester.widget<StoreBrowseView>(find.byType(StoreBrowseView)).onAddress());
     await tester.pumpAndSettle();
     expect(queries.last['lat'], 30);
     expect(queries.last['lng'], 31);
