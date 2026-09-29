@@ -77,54 +77,63 @@ class GoHomeWalletCard extends StatelessWidget {
                       excludeFromSemantics: true,
                     ),
                     Positioned(
-                      left: box.maxWidth * .17,
-                      right: box.maxWidth * .30,
-                      top: box.maxHeight * .24,
-                      bottom: box.maxHeight * .23,
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        alignment: Alignment.centerLeft,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              label,
-                              style: debossed.copyWith(
-                                color: hasError ? GoDesign.orange : null,
-                                fontSize: 14,
-                              ),
-                            ),
-                            const SizedBox(height: 3),
-                            if (signedIn && amount == null && isLoading)
-                              const Padding(
-                                padding: EdgeInsets.symmetric(vertical: 8),
-                                child: SizedBox(
-                                  width: 26,
-                                  height: 26,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: GoDesign.orange,
+                      left: box.maxWidth * .145,
+                      right: box.maxWidth * .315,
+                      top: box.maxHeight * .20,
+                      bottom: box.maxHeight * .29,
+                      child: CustomPaint(
+                        painter: const _BalanceStitchingPainter(),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 5,
+                          ),
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            alignment: Alignment.centerLeft,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  label,
+                                  style: debossed.copyWith(
+                                    color: hasError ? GoDesign.orange : null,
+                                    fontSize: 14,
                                   ),
                                 ),
-                              )
-                            else
-                              Text(
-                                amount ?? '—',
-                                key: const ValueKey('go-home-wallet-balance'),
-                                textDirection: TextDirection.ltr,
-                                style: debossed.copyWith(
-                                  letterSpacing: 0.5,
-                                  fontSize: 38,
-                                  height: 1.1,
-                                ),
-                              ),
-                            if (amount != null)
-                              Text(
-                                ar ? 'ج.م' : 'EGP',
-                                style: debossed.copyWith(fontSize: 14),
-                              ),
-                          ],
+                                const SizedBox(height: 3),
+                                if (signedIn && amount == null && isLoading)
+                                  const Padding(
+                                    padding: EdgeInsets.symmetric(vertical: 8),
+                                    child: SizedBox(
+                                      width: 26,
+                                      height: 26,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: GoDesign.orange,
+                                      ),
+                                    ),
+                                  )
+                                else
+                                  Text(
+                                    amount ?? '—',
+                                    key: const ValueKey('go-home-wallet-balance'),
+                                    textDirection: TextDirection.ltr,
+                                    style: debossed.copyWith(
+                                      letterSpacing: 0.5,
+                                      fontSize: 38,
+                                      height: 1.1,
+                                    ),
+                                  ),
+                                if (amount != null)
+                                  Text(
+                                    ar ? 'ج.م' : 'EGP',
+                                    style: debossed.copyWith(fontSize: 14),
+                                  ),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -214,4 +223,57 @@ class GoHomeWalletCard extends StatelessWidget {
       ),
     );
   }
+}
+
+/// A sewn inset on the leather, with a recessed seam and a fine thread highlight.
+class _BalanceStitchingPainter extends CustomPainter {
+  const _BalanceStitchingPainter();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (size.shortestSide <= 3) return;
+    final outline = Path()
+      ..addRRect(
+        RRect.fromRectAndRadius(
+          (Offset.zero & size).deflate(1.5),
+          const Radius.circular(7),
+        ),
+      );
+    final stitches = Path();
+    for (final edge in outline.computeMetrics()) {
+      final count = (edge.length / 4.8).round().clamp(1, 10000);
+      final spacing = edge.length / count;
+      for (var i = 0; i < count; i++) {
+        final start = i * spacing;
+        stitches.addPath(
+          edge.extractPath(start, start + spacing * .55),
+          Offset.zero,
+        );
+      }
+    }
+    final thread = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+    canvas.drawPath(
+      stitches.shift(const Offset(0, .5)),
+      thread
+        ..color = const Color(0xCC080808)
+        ..strokeWidth = 1.8,
+    );
+    canvas.drawPath(
+      stitches,
+      thread
+        ..color = GoDesign.orange
+        ..strokeWidth = 1,
+    );
+    canvas.drawPath(
+      stitches.shift(const Offset(0, -.2)),
+      thread
+        ..color = const Color(0xBBFFBF78)
+        ..strokeWidth = .35,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _BalanceStitchingPainter oldDelegate) => false;
 }
