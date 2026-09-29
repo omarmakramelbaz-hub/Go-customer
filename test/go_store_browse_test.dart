@@ -116,7 +116,12 @@ void main() {
     old.complete({'stores': [{'id': 100, 'name': 'نتيجة قديمة'}]});
     await tester.pumpAndSettle();
     expect(find.text('نتيجة قديمة'), findsNothing);
+    FocusManager.instance.primaryFocus?.unfocus();
+    await tester.pumpAndSettle();
     await tester.scrollUntilVisible(find.text('عرض المزيد'), 180, scrollable: find.byType(Scrollable).first);
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('عرض المزيد'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('عرض المزيد'));
     await tester.pumpAndSettle();
     expect(queries.last['search'], 'جديد');

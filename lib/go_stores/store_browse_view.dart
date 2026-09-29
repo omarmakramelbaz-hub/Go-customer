@@ -78,7 +78,7 @@ class StoreBrowseView extends StatelessWidget {
     body: SafeArea(child: Column(children: [
       _TopBar(title: title, onBack: () => Navigator.maybePop(context)),
       Expanded(child: RefreshIndicator(color: AppColors.mainAppColor, onRefresh: onRefresh,
-        child: ListView(physics: const AlwaysScrollableScrollPhysics(), padding: const EdgeInsets.fromLTRB(16, 4, 16, 28), children: [
+        child: ListView(physics: const AlwaysScrollableScrollPhysics(), keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag, padding: const EdgeInsets.fromLTRB(16, 4, 16, 28), children: [
           Text(tr(context, 'اطلب من أقرب متجر أو تصفح كل المتاجر', 'Find nearby stores or browse them all'), textAlign: TextAlign.center,
             style: AppTextStyle.text13RG(color: const Color(0xFF777777))),
           const SizedBox(height: 16),
@@ -94,7 +94,7 @@ class StoreBrowseView extends StatelessWidget {
               title: failed ? tr(context, 'تعذّر تحميل المتاجر القريبة', 'Could not load nearby stores') : hasAddress ? tr(context, 'لا توجد متاجر قريبة من عنوانك حالياً', 'No nearby stores at this address yet') : tr(context, 'حدد عنوان التوصيل', 'Choose a delivery address'),
               subtitle: tr(context, 'جرّب تغيير عنوان التوصيل أو تصفح كل المتاجر بالأسفل', 'Change your address or browse all stores below'))
           else
-            SizedBox(height: 278 + math.max(0.0, MediaQuery.textScalerOf(context).scale(14) - 14) * 5,
+            SizedBox(height: 252 + math.max(0.0, MediaQuery.textScalerOf(context).scale(14) - 14) * 6,
               child: ListView.separated(scrollDirection: Axis.horizontal, padding: EdgeInsets.zero,
                 itemCount: nearby.length, separatorBuilder: (_, __) => const SizedBox(width: 12),
                 itemBuilder: (_, i) { final item = GoStoreSummary(nearby[i]); return KeyedSubtree(key: ValueKey('go-nearby-store-${nearby[i]['id']}'),
