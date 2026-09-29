@@ -1,3 +1,4 @@
+import '../lib/view/layout/request_delegate/model/request_delegate_order_model.dart';
 import 'dart:convert';
 import 'dart:io';
 
@@ -31,6 +32,15 @@ Widget app(Widget child, bool ar) => MaterialApp(
   home: child,
 );
 void main() {
+  test('courier payment state and fractional agreed fare come from server', () {
+    final order = RequestDelegateOrderModel.fromJson({'id': 20, 'actual_price': 125.75, 'payment_type': 'online', 'payment_status': 'pending', 'payment_required': true, 'payment_deferred': true});
+    expect(order.actualPrice, 125.75);
+    expect(order.paymentRequired, isTrue);
+    expect(order.paymentDeferred, isTrue);
+    expect(order.paymentStatus, 'pending');
+    expect(order.toJson()['payment_required'], isTrue);
+  });
+
   TestWidgetsFlutterBinding.ensureInitialized();
   late Directory directory;
   setUpAll(() async {
@@ -89,15 +99,15 @@ void main() {
       expect(HiveMethods.getDeliveryAddress(1), isNull);
     },
   );
-  test('courier booking requires an explicit electronic payment choice', () {
+  test('courier booking supports all four explicit payment choices', () {
     final controller = RequestDelegateController();
     expect(controller.selectedPayment, isEmpty);
     controller.setSelectedPayment('cash');
-    expect(controller.selectedPayment, isEmpty);
+    expect(controller.selectedPayment, 'cash');
     controller.setSelectedPayment('online');
     expect(controller.selectedPayment, 'online');
     controller.setSelectedPayment('wallet');
-    expect(controller.selectedPayment, 'online');
+    expect(controller.selectedPayment, 'wallet');
     controller.setSelectedPayment('v_cash');
     expect(controller.selectedPayment, 'v_cash');
     controller.dispose();

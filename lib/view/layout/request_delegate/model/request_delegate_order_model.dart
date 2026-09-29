@@ -14,6 +14,9 @@ class RequestDelegateOrderModel {
   String? type;
   String? orderType;
   String? paymentType;
+  String? paymentStatus;
+  bool paymentRequired = false;
+  bool paymentDeferred = false;
   String? createdAt;
   String? updatedAt;
   String? description;
@@ -23,8 +26,8 @@ class RequestDelegateOrderModel {
   String? toLng;
   String? fromAddress;
   String? toAddress;
-  int? actualPrice;
-  int? expectedPrice;
+  num? actualPrice;
+  num? expectedPrice;
   int? admin;
   String? settingMobile;
   String? resturantVendorFcmId;
@@ -48,6 +51,9 @@ class RequestDelegateOrderModel {
     this.type,
     this.orderType,
     this.paymentType,
+    this.paymentStatus,
+    this.paymentRequired = false,
+    this.paymentDeferred = false,
     this.createdAt,
     this.updatedAt,
     this.description,
@@ -83,6 +89,9 @@ class RequestDelegateOrderModel {
     type = json['type'];
     orderType = json['order_type'];
     paymentType = json['payment_type'];
+    paymentStatus = json['payment_status'];
+    paymentRequired = json['payment_required'] == true;
+    paymentDeferred = json['payment_deferred'] == true;
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
     description = json['description'];
@@ -92,8 +101,8 @@ class RequestDelegateOrderModel {
     toLng = json['to_lng'];
     fromAddress = json['from_address'];
     toAddress = json['to_address'];
-    actualPrice = json['actual_price'];
-    expectedPrice = json['expected_price'];
+    actualPrice = num.tryParse('${json['actual_price']}');
+    expectedPrice = num.tryParse('${json['expected_price']}');
     admin = json['admin'];
     settingMobile = json['setting_mobile'];
     resturantVendorFcmId = json['resturant_vendor_fcm_id'];
@@ -119,6 +128,9 @@ class RequestDelegateOrderModel {
     data['type'] = type;
     data['order_type'] = orderType;
     data['payment_type'] = paymentType;
+    data['payment_status'] = paymentStatus;
+    data['payment_required'] = paymentRequired;
+    data['payment_deferred'] = paymentDeferred;
     data['created_at'] = createdAt;
     data['updated_at'] = updatedAt;
     data['description'] = description;

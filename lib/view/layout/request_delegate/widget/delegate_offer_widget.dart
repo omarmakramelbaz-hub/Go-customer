@@ -9,7 +9,7 @@ import '../../../../helpers/theme/app_text_style.dart';
 import '../../../../helpers/translation/all_translation.dart';
 import '../../../custom_widgets/buttons/custom_button.dart';
 import '../../../custom_widgets/custom_image/custom_image.dart';
-import '../../bottom_navigation/bottom_navigation_bar_screen.dart';
+import '../screen/tracking_delegate_order_screen.dart';
 import '../controller/request_delegate_controller.dart';
 import '../model/accepted_delegate_model.dart';
 
@@ -152,7 +152,8 @@ class _DelegateOfferWidgetState extends State<DelegateOfferWidget> {
                                 widget.cancelReCall?.call();
                                 NamedNavigatorImpl.push(
                                   clean: true,
-                                  BottomNavigationBarScreen.routeName,
+                                  TrackingDelegateOrderScreen.routeName,
+                                  arguments: TrackingDelegateOrderArgs(id: requestDelegateController.orderId!),
                                 );
                               },
                               onError: () {},

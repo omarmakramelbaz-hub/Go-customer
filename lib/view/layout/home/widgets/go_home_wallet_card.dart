@@ -24,6 +24,18 @@ class GoHomeWalletCard extends StatelessWidget {
   final bool hasError;
   final bool canTopUp;
   final ValueChanged<GoHomeWalletAction> onAction;
+  static const debossed = TextStyle(
+    color: Color(0xFF161719),
+    fontWeight: FontWeight.w800,
+    shadows: [
+      Shadow(
+        color: Color(0xFF030405),
+        offset: Offset(0, -0.8),
+        blurRadius: 0.6,
+      ),
+      Shadow(color: Color(0xBB969696), offset: Offset(0, 1), blurRadius: 0.7),
+    ],
+  );
   static const artwork = 'assets/brand/go_home_wallet.webp';
 
   @override
@@ -78,12 +90,9 @@ class GoHomeWalletCard extends StatelessWidget {
                           children: [
                             Text(
                               label,
-                              style: TextStyle(
-                                color: hasError
-                                    ? GoDesign.orange
-                                    : Colors.white,
+                              style: debossed.copyWith(
+                                color: hasError ? GoDesign.orange : null,
                                 fontSize: 14,
-                                fontWeight: FontWeight.w700,
                               ),
                             ),
                             const SizedBox(height: 3),
@@ -104,26 +113,16 @@ class GoHomeWalletCard extends StatelessWidget {
                                 amount ?? '—',
                                 key: const ValueKey('go-home-wallet-balance'),
                                 textDirection: TextDirection.ltr,
-                                style: const TextStyle(
-                                  color: Color(0xFF161719),
-                                  shadows: [
-                                    Shadow(color: Color(0xFF030405), offset: Offset(0, -0.8), blurRadius: 0.6),
-                                    Shadow(color: Color(0xBB969696), offset: Offset(0, 1.0), blurRadius: 0.7),
-                                  ],
+                                style: debossed.copyWith(
                                   letterSpacing: 0.5,
                                   fontSize: 38,
                                   height: 1.1,
-                                  fontWeight: FontWeight.w800,
                                 ),
                               ),
                             if (amount != null)
                               Text(
                                 ar ? 'ج.م' : 'EGP',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                                style: debossed.copyWith(fontSize: 14),
                               ),
                           ],
                         ),

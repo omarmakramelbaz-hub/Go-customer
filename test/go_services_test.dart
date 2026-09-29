@@ -126,7 +126,7 @@ void main() {
   });
   test('only advertised recognized methods are visible', () {
     final caps = ServiceCapabilities.fromMap({'schema_ready': true, 'version': 1, 'enabled': false, 'payment_methods': ['cash', 'wallet', 'mobile_wallet', 'card', 'apple_pay', 'google_pay', 'unsupported']});
-    expect(caps.ready, isTrue); expect(caps.enabled, isFalse); expect(caps.methods, ['mobile_wallet', 'card']);
+    expect(caps.ready, isTrue); expect(caps.enabled, isFalse); expect(caps.methods, ['cash', 'wallet', 'mobile_wallet', 'card']);
     expect(ServiceCapabilities.fromMap({'schema_ready': true, 'version': 99}).ready, isFalse);
   });
   test('old backend 404 permits fallback, server failures do not', () async {

@@ -1062,8 +1062,7 @@ class _RequestDelegateScreenState extends State<RequestDelegateScreen>
           expectedPrice: expectedPrice,
           paymentType: controller.selectedPayment,
           onSuccess: () {
-            if (controller.selectedPayment == 'cash' ||
-                controller.selectedPayment == 'wallet') {
+            if (controller.orderId != null) {
               NamedNavigatorImpl.push(
                 ShowDelegateOnMapScreen.routeName,
                 arguments: ShowDelegateOnMapArgs(
