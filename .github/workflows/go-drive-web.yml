@@ -24,6 +24,12 @@ jobs:
       - run: flutter pub get
       - name: Verify approved identity and active home route
         run: python3 tool/verify_approved_identity.py
+      - name: Verify store images on a cross-origin host without CORS
+        run: |
+          python3 -m http.server 8931 --bind 127.0.0.1 --directory assets/brand > /tmp/go-store-image-fixture.log 2>&1 &
+          fixture_pid=$!
+          trap 'kill "$fixture_pid"' EXIT
+          flutter test --platform chrome --dart-define=GO_STORE_IMAGE_TEST_URL=http://127.0.0.1:8931/go_home_wallet.webp test/go_store_images_web_test.dart
       - name: Test approved identity and customer legal pages
         run: flutter test test/go_customer_identity_test.dart test/go_customer_legal_test.dart test/go_auth_ui_test.dart test/go_home_commerce_test.dart test/go_home_wallet_test.dart test/go_store_signup_test.dart test/go_app_fixes_test.dart test/go_store_browse_test.dart
       - name: Upload actual Flutter UI previews

@@ -187,6 +187,7 @@ class _StoreState extends State<CustomerStoreScreen> {
             )
           : Image.network(
               url,
+              webHtmlElementStrategy: WebHtmlElementStrategy.fallback,
               fit: BoxFit.cover,
               errorBuilder: (_, __, ___) =>
                   const Icon(Icons.image_not_supported_outlined),
