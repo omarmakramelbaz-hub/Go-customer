@@ -42,7 +42,7 @@ void _onNotificationTaped(RemoteMessage message) {
   var body = json.decode(msg);
   if (body['notification_type']?.toString() == '12') {
     final id = int.tryParse('${body['go_store_order_id']}');
-    final context = AppRouters.navigatorKey.currentContext;
+    final context = NamedNavigatorImpl.navigatorState.currentContext;
     if (id != null && context != null) Navigator.of(context).push(MaterialPageRoute(builder: (_) => CustomerStoreOrderScreen(orderId: id)));
     return;
   }
