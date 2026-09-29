@@ -7,10 +7,18 @@ void main() {
   const fixture = String.fromEnvironment('GO_STORE_IMAGE_TEST_URL');
   testWidgets('store image loads from a different origin without CORS headers', (tester) async {
     var tapped = false;
-    await tester.pumpWidget(MaterialApp(home: Scaffold(body: Center(
-      child: GestureDetector(onTap: () => tapped = true,
-        child: const StoreImage(imageUrl: fixture, height: 180, width: 240)),
-    )))));
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: GestureDetector(
+              onTap: () => tapped = true,
+              child: const StoreImage(imageUrl: fixture, height: 180, width: 240),
+            ),
+          ),
+        ),
+      ),
+    );
 
     // The fixture server has no Access-Control-Allow-Origin header. Canvas
     // loading must fail, and the real browser must load the HTML image instead.
