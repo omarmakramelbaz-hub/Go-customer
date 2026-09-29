@@ -45,7 +45,8 @@ class StoreBrowseView extends StatelessWidget {
     required this.onAddress, required this.items, required this.nearby, required this.total, required this.nearbyTotal,
     required this.loading, required this.failed, required this.onRefresh, required this.onRetry,
     required this.search, required this.onSearch, required this.sort, required this.onSort,
-    required this.onOpen, required this.hasMore, required this.onMore});
+    required this.onOpen, required this.hasMore, required this.onMore, this.cartButton});
+  final Widget? cartButton;
   final String title, address, sort;
   final bool hasAddress, loading, failed, hasMore;
   final int total, nearbyTotal;
@@ -75,6 +76,7 @@ class StoreBrowseView extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
     backgroundColor: const Color(0xFFF9FAFB),
+    floatingActionButton: cartButton,
     body: SafeArea(child: Column(children: [
       _TopBar(title: title, onBack: () => Navigator.maybePop(context)),
       Expanded(child: RefreshIndicator(color: AppColors.mainAppColor, onRefresh: onRefresh,
