@@ -8,6 +8,9 @@ import '../view/custom_widgets/popups/go_popups.dart';
 import '../view/layout/address/model/address_model.dart';
 import '../view/layout/address/screen/address_screen.dart';
 import 'store_browse_view.dart';
+import 'store_cart.dart';
+import 'store_cart_screen.dart';
+import 'product_cart_sheet.dart';
 
 typedef StoreRead = Future<Map<String, dynamic>> Function(
   String path,
@@ -195,34 +198,31 @@ class _StoreState extends State<CustomerStoreScreen> {
     ),
   );
   void openProduct(Map<String, dynamic> product) => showGoModalBottomSheet(
-    context: context,
-    isScrollControlled: true,
-    builder: (_) => GoSheet(
-      title: '${product['name']}',
-      icon: Icons.shopping_bag_outlined,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Center(child: photo(product['image_url']?.toString(), size: 220)),
-          const SizedBox(height: 16),
-          Text(
-            '${product['price']} ${ar ? 'ج.م' : 'EGP'} / ${product['unit'] ?? ''}',
-            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-          ),
-          if ('${product['description'] ?? ''}'.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              child: Text('${product['description']}'),
-            ),
-          for (final option in product['options'] as List? ?? [])
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              title: Text('${option['label']}'),
-              trailing: Text('${option['price']} ${ar ? 'ج.م' : 'EGP'}'),
-            ),
-        ],
-      ),
-    ),
+    context: context, isScrollControlled: true,
+    builder: (_) => ProductCartSheet(product: product, onAdd: (option, quantity) async {
+      if (HiveMethods.isGuestMode() || HiveMethods.getToken() == null) {
+        await Navigator.of(context).pushNamed('LoginScreen');
+        return false;
+      }
+      final cart = GoStoreCart.session();
+      if (cart.locked) {
+        await Navigator.push(context, MaterialPageRoute(builder: (_) => const StoreCartScreen()));
+        return false;
+      }
+      var replace = false;
+      if (cart.lines.isNotEmpty && cart.store?['id'] != widget.storeId) {
+        replace = await showGoDialog<bool>(context: context, builder: (c) => AlertDialog(
+          title: Text(ar ? 'بدء سلة جديدة؟' : 'Start a new cart?'),
+          content: Text(ar ? 'السلة فيها منتجات من متجر آخر. هل تريد استبدالها بمنتجات هذا المتجر؟' : 'Your cart contains products from another store. Replace it with products from this store?'),
+          actions: [TextButton(onPressed: () => Navigator.pop(c, false), child: Text(ar ? 'احتفظ بالسلة' : 'Keep cart')),
+            FilledButton(onPressed: () => Navigator.pop(c, true), child: Text(ar ? 'استبدال السلة' : 'Replace cart'))],
+        )) ?? false;
+        if (!replace) return false;
+      }
+      await cart.add({'id': widget.storeId, 'name': store?['name'] ?? widget.title, 'address': store?['address'] ?? ''}, product, option, quantity, replace: replace);
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(ar ? 'تمت الإضافة للسلة' : 'Added to cart')));
+      return true;
+    }),
   );
   void openStore(Map<String, dynamic> item) {
     final id = int.tryParse('${item['id']}');
@@ -234,6 +234,7 @@ class _StoreState extends State<CustomerStoreScreen> {
   }
   @override
   Widget build(BuildContext context) => detail ? buildDetails(context) : StoreBrowseView(
+    cartButton: const StoreCartButton(floating: true),
     title: widget.title, address: addressLabel, hasAddress: selectedAddress != null,
     onAddress: changeAddress, items: items, nearby: nearby, total: total, nearbyTotal: nearbyTotal,
     loading: loading, failed: failed, onRefresh: load, onRetry: () => load(),
@@ -243,7 +244,8 @@ class _StoreState extends State<CustomerStoreScreen> {
   );
 
   Widget buildDetails(BuildContext context) => Scaffold(
-    appBar: AppBar(title: Text(store?['name']?.toString() ?? widget.title)),
+    appBar: AppBar(title: Text(store?['name']?.toString() ?? widget.title), actions: const [StoreCartButton()]),
+    floatingActionButton: const StoreCartButton(floating: true),
     body: RefreshIndicator(
       onRefresh: load,
       child: ListView(

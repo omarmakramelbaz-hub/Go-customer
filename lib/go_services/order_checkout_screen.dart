@@ -6,8 +6,9 @@ import '../helpers/translation/all_translation.dart';
 import 'hosted_checkout.dart';
 
 class GoOrderCheckoutScreen extends StatefulWidget {
-  const GoOrderCheckoutScreen({super.key, required this.orderId, required this.url, required this.onPaid});
+  const GoOrderCheckoutScreen({super.key, required this.orderId, required this.url, required this.onPaid, this.storeOrder = false});
   final int orderId;
+  final bool storeOrder;
   final String url;
   final VoidCallback onPaid;
   @override
@@ -33,13 +34,13 @@ class _GoOrderCheckoutScreenState extends State<GoOrderCheckoutScreen> {
     if (checking || done) return;
     checking = true;
     try {
-      final response = await ApiHelper.instance.get('${Urls.baseUrl}go-orders/${widget.orderId}/payment-status');
+      final response = await ApiHelper.instance.get(widget.storeOrder ? '${Urls.baseUrl}go-stores/orders/${widget.orderId}' : '${Urls.baseUrl}go-orders/${widget.orderId}/payment-status');
       if (!mounted) return;
       if (response.state != ResponseState.complete) {
         setState(() => error = response.data['message']?.toString());
         return;
       }
-      setState(() { status = response.data['data']['status']?.toString(); error = null; });
+      setState(() { status = (widget.storeOrder ? response.data['data']['order']['payment_status'] : response.data['data']['status'])?.toString(); error = null; });
       if (status == 'paid' && !opening) {
         done = true; timer?.cancel();
         Navigator.of(context).pop();

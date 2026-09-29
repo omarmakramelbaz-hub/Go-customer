@@ -1,3 +1,4 @@
+import '../../../go_stores/store_cart_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -47,6 +48,7 @@ class _GoServicesShellState extends State<_GoServicesShell> {
     return PopScope(canPop: nav.screenIndex == 0,
       onPopInvokedWithResult: (didPop, _) { if (!didPop) nav.updateIndex(0); },
       child: Scaffold(backgroundColor: GoDesign.paper,
+        floatingActionButton: const StoreCartButton(floating: true),
         body: IndexedStack(index: nav.screenIndex, children: [
           GoServicesHomeScreen(onOpenNotifications: _openNotifications, active: nav.screenIndex == 0),
           if (_visited.contains(1) && authenticated) const DelegateOrdersScreen() else const SizedBox.shrink(),
