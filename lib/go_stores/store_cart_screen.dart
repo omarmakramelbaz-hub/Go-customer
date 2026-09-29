@@ -82,7 +82,7 @@ class _StoreCartScreenState extends State<StoreCartScreen> {
     } on ServiceFailure catch (e) {
       // A definitive validation rejection can be edited. A lost/5xx response
       // must keep the original idempotency key and exact cart for recovery.
-      if ([400, 401, 403, 404, 409, 422].contains(e.status)) { await cart.rejected(); quote = null; }
+      if ([400, 409, 422].contains(e.status)) { await cart.rejected(); quote = null; }
       if (mounted) setState(() => error = e.message);
     } catch (e) { if (mounted) setState(() => error = '$e'); }
     finally { if (mounted) setState(() => busy = false); }

@@ -10,6 +10,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import '../lib/go_services/service_api.dart';
+import '../lib/helpers/theme/theme.dart' as go_theme;
+import '../lib/helpers/translation/all_translation.dart';
 import '../lib/go_stores/product_cart_sheet.dart';
 import '../lib/go_stores/store_cart.dart';
 import '../lib/go_stores/store_cart_screen.dart';
@@ -40,8 +42,12 @@ class FixtureApi extends StoreOrderApi {
     return {'order': {'id': 24, 'status': 'pending', 'payment_status': 'cash_due'}};
   }
 }
-Widget app(Widget child, {bool ar = true}) => MaterialApp(locale: Locale(ar ? 'ar' : 'en'), supportedLocales: const [Locale('ar'), Locale('en')],
-  localizationsDelegates: GlobalMaterialLocalizations.delegates, theme: ThemeData(fontFamily: 'Tajawal'), home: child);
+Widget app(Widget child, {bool ar = true}) {
+  GlobalTranslations.locale = Locale(ar ? 'ar' : 'en');
+  return MaterialApp(locale: Locale(ar ? 'ar' : 'en'), supportedLocales: const [Locale('ar'), Locale('en')],
+    localizationsDelegates: GlobalMaterialLocalizations.delegates,
+    home: Builder(builder: (context) => Theme(data: go_theme.theme(context), child: child)));
+}
 
 class RecordingAdapter implements HttpClientAdapter {
   RequestOptions? request;
@@ -58,6 +64,8 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   setUpAll(() async {
     await (FontLoader('Tajawal')..addFont(rootBundle.load('assets/font/Tajawal/Tajawal-Regular.ttf'))..addFont(rootBundle.load('assets/font/Tajawal/Tajawal-Bold.ttf'))).load();
+    await (FontLoader('MaterialIcons')..addFont(rootBundle.load('fonts/MaterialIcons-Regular.otf'))).load();
+    await (FontLoader('Roboto')..addFont(rootBundle.load('assets/font/Roboto/Roboto-Regular.ttf'))..addFont(rootBundle.load('assets/font/Roboto/Roboto-Bold.ttf'))).load();
   });
   test('cart merges option quantities, requires store replacement, persists and freezes uncertain checkout', () async {
     Map<String, dynamic>? saved;

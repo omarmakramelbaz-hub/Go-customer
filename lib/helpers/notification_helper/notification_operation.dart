@@ -40,6 +40,12 @@ void handlePath(NotificationResponse dataMap) {
 void _onNotificationTaped(RemoteMessage message) {
   final msg = json.encode(message.data);
   var body = json.decode(msg);
+  if (body['notification_type']?.toString() == '12') {
+    final id = int.tryParse('${body['go_store_order_id']}');
+    final context = AppRouters.navigatorKey.currentContext;
+    if (id != null && context != null) Navigator.of(context).push(MaterialPageRoute(builder: (_) => CustomerStoreOrderScreen(orderId: id)));
+    return;
+  }
   final data = NotificationFromFirebaseMode.fromJson(body);
 
   switch (data.notificationType.toString()) {
