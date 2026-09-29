@@ -215,6 +215,7 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(find.byKey(const ValueKey('go-store-item-2')), 220, scrollable: find.byType(Scrollable).first);
       await tester.tap(find.byKey(const ValueKey('go-store-item-2')));
       await tester.pumpAndSettle();
       expect(find.text('Consultation'), findsOneWidget);
@@ -243,9 +244,11 @@ void main() {
           ),
         );
         await tester.pumpAndSettle();
+        await tester.scrollUntilVisible(find.text(ar ? 'إعادة المحاولة' : 'Retry'), 220, scrollable: find.byType(Scrollable).first);
         await tester.tap(find.text(ar ? 'إعادة المحاولة' : 'Retry'));
         await tester.pumpAndSettle();
         expect(attempts, 2);
+        await tester.scrollUntilVisible(find.text(ar ? 'لا توجد متاجر مسجلة في هذا القسم حاليًا' : 'No stores are listed in this department yet'), 180, scrollable: find.byType(Scrollable).first);
         expect(
           find.text(
             ar

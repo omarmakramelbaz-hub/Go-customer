@@ -1,8 +1,13 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 
+import '../helpers/hive/hive_methods.dart';
 import '../helpers/networking/api_helper.dart';
 import '../helpers/networking/urls.dart';
 import '../view/custom_widgets/popups/go_popups.dart';
+import '../view/layout/address/model/address_model.dart';
+import '../view/layout/address/screen/address_screen.dart';
+import 'store_browse_view.dart';
 
 typedef StoreRead = Future<Map<String, dynamic>> Function(
   String path,
@@ -31,17 +36,27 @@ class CustomerStoreScreen extends StatefulWidget {
     required this.title,
     this.storeId,
     this.read = readGoStores,
+    this.selectAddress,
   });
   final String kind;
   final String title;
   final int? storeId;
   final StoreRead read;
+  final Future<AddressModel?> Function(BuildContext)? selectAddress;
   @override
   State<CustomerStoreScreen> createState() => _StoreState();
 }
 
 class _StoreState extends State<CustomerStoreScreen> {
   final items = <Map<String, dynamic>>[];
+  final nearby = <Map<String, dynamic>>[];
+  final search = TextEditingController();
+  Timer? debounce;
+  int generation = 0;
+  int total = 0;
+  int nearbyTotal = 0;
+  String sort = 'name';
+  AddressModel? selectedAddress;
   bool loading = false;
   bool failed = false;
   int page = 0;
@@ -52,21 +67,84 @@ class _StoreState extends State<CustomerStoreScreen> {
   @override
   void initState() {
     super.initState();
+    final userId = HiveMethods.getUserId();
+    final token = HiveMethods.getToken();
+    final saved = userId == null || HiveMethods.isGuestMode() || token == null || token.isEmpty
+        ? null : HiveMethods.getDeliveryAddress(userId);
+    if (saved != null) selectedAddress = AddressModel.fromJson(saved);
     load();
   }
 
+  @override
+  void dispose() {
+    generation++;
+    debounce?.cancel();
+    search.dispose();
+    super.dispose();
+  }
+
+  Future<void> changeAddress() async {
+    AddressModel? address;
+    if (widget.selectAddress != null) {
+      address = await widget.selectAddress!(context);
+    } else {
+      final token = HiveMethods.getToken();
+      if (HiveMethods.isGuestMode() || token == null || token.isEmpty) {
+        await Navigator.of(context).pushNamed('LoginScreen');
+        return;
+      }
+      address = await Navigator.of(context).push<AddressModel>(MaterialPageRoute(
+        builder: (_) => const AddressScreen(selectForDelivery: true),
+      ));
+    }
+    if (!mounted || address == null) return;
+    final userId = HiveMethods.getUserId();
+    if (userId != null) await HiveMethods.saveDeliveryAddress(userId, address.toJson());
+    if (!mounted) return;
+    setState(() { selectedAddress = address; nearby.clear(); nearbyTotal = 0; });
+    final lat = double.tryParse(address.lat ?? '');
+    final lng = double.tryParse(address.lng ?? '');
+    if (lat != null && lng != null && lat.abs() <= 90 && lng.abs() <= 180) {
+      HiveMethods.updateLat(lat);
+      HiveMethods.updateLan(lng);
+    }
+    await load();
+  }
+
+  String get addressLabel => [selectedAddress?.address, selectedAddress?.streetName, selectedAddress?.areaName, selectedAddress?.cityName]
+      .whereType<String>().map((e) => e.trim()).firstWhere((e) => e.isNotEmpty,
+        orElse: () => ar ? 'حدد عنوان التوصيل لعرض المتاجر القريبة' : 'Choose an address to see nearby stores');
+
+  void searchChanged(String value) {
+    debounce?.cancel();
+    // Invalidate previous responses immediately, including while typing.
+    generation++;
+    setState(() { loading = true; failed = false; items.clear(); });
+    debounce = Timer(const Duration(milliseconds: 300), () => load());
+  }
+
   Future<void> load({bool more = false}) async {
-    if (loading) return;
+    if (more && loading) return;
+    debounce?.cancel();
+    final request = ++generation;
+    final lat = double.tryParse(selectedAddress?.lat ?? '');
+    final lng = double.tryParse(selectedAddress?.lng ?? '');
     setState(() {
       loading = true;
       failed = false;
+      if (!more) items.clear();
     });
     try {
       final result = await widget.read(detail ? '/${widget.storeId}' : '', {
         'kind': widget.kind,
         'page': more ? page + 1 : 1,
+        if (!detail) ...{
+          'search': search.text.trim(),
+          'sort': sort,
+          if (lat != null && lng != null && lat.abs() <= 90 && lng.abs() <= 180) ...{'lat': lat, 'lng': lng},
+        },
       });
-      if (!mounted) return;
+      if (!mounted || request != generation) return;
       setState(() {
         if (!more) items.clear();
         items.addAll(
@@ -76,14 +154,20 @@ class _StoreState extends State<CustomerStoreScreen> {
         );
         page = (result['page'] as num?)?.toInt() ?? 1;
         lastPage = (result['last_page'] as num?)?.toInt() ?? 1;
+        total = (result['total'] as num?)?.toInt() ?? items.length;
+        if (!detail) {
+          nearby.clear();
+          nearby.addAll((result['nearby_stores'] as List? ?? []).map((e) => Map<String, dynamic>.from(e)));
+          nearbyTotal = (result['nearby_total'] as num?)?.toInt() ?? nearby.length;
+        }
         store = result['store'] is Map
             ? Map<String, dynamic>.from(result['store'])
             : null;
       });
     } catch (_) {
-      if (mounted) setState(() => failed = true);
+      if (mounted && request == generation) setState(() => failed = true);
     } finally {
-      if (mounted) setState(() => loading = false);
+      if (mounted && request == generation) setState(() => loading = false);
     }
   }
 
@@ -139,8 +223,25 @@ class _StoreState extends State<CustomerStoreScreen> {
       ),
     ),
   );
+  void openStore(Map<String, dynamic> item) {
+    final id = int.tryParse('${item['id']}');
+    if (id == null) return;
+    Navigator.push(context, MaterialPageRoute(builder: (_) => CustomerStoreScreen(
+      kind: widget.kind, title: '${item['name']}', storeId: id, read: widget.read,
+      selectAddress: widget.selectAddress,
+    )));
+  }
   @override
-  Widget build(BuildContext context) => Scaffold(
+  Widget build(BuildContext context) => detail ? buildDetails(context) : StoreBrowseView(
+    title: widget.title, address: addressLabel, hasAddress: selectedAddress != null,
+    onAddress: changeAddress, items: items, nearby: nearby, total: total, nearbyTotal: nearbyTotal,
+    loading: loading, failed: failed, onRefresh: load, onRetry: () => load(),
+    search: search, onSearch: searchChanged, sort: sort,
+    onSort: (value) { setState(() => sort = value); load(); },
+    onOpen: openStore, hasMore: page < lastPage, onMore: () => load(more: true),
+  );
+
+  Widget buildDetails(BuildContext context) => Scaffold(
     appBar: AppBar(title: Text(store?['name']?.toString() ?? widget.title)),
     body: RefreshIndicator(
       onRefresh: load,
