@@ -25,7 +25,7 @@ jobs:
       - name: Verify approved identity and active home route
         run: python3 tool/verify_approved_identity.py
       - name: Test approved identity and customer legal pages
-        run: flutter test test/go_customer_identity_test.dart test/go_customer_legal_test.dart test/go_auth_ui_test.dart test/go_home_commerce_test.dart test/go_home_wallet_test.dart test/go_store_signup_test.dart test/go_app_fixes_test.dart
+        run: flutter test test/go_customer_identity_test.dart test/go_customer_legal_test.dart test/go_auth_ui_test.dart test/go_home_commerce_test.dart test/go_home_wallet_test.dart test/go_store_signup_test.dart test/go_app_fixes_test.dart test/go_store_browse_test.dart
       - name: Upload actual Flutter UI previews
         if: always()
         uses: actions/upload-artifact@v4
@@ -34,7 +34,7 @@ jobs:
           path: build/ui-preview
           if-no-files-found: ignore
       - name: Analyze store signup and email verification
-        run: flutter analyze --no-fatal-infos --no-fatal-warnings lib/go_stores lib/view/layout/address lib/view/layout/cart lib/view/layout/request_delegate lib/go_store_signup lib/helpers/networking/partner_email_auth.dart lib/view/layout/partner_application/screen/partner_application_screen.dart test/go_store_signup_test.dart test/go_app_fixes_test.dart
+        run: flutter analyze --no-fatal-infos --no-fatal-warnings lib/go_stores lib/view/layout/address lib/view/layout/cart lib/view/layout/request_delegate lib/go_store_signup lib/helpers/networking/partner_email_auth.dart lib/view/layout/partner_application/screen/partner_application_screen.dart test/go_store_signup_test.dart test/go_app_fixes_test.dart test/go_store_browse_test.dart
       - name: Check standalone boundaries
         run: dart run tool/check_standalone.dart
       - name: Configure browser integrations

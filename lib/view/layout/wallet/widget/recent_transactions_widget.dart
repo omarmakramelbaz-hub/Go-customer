@@ -20,8 +20,9 @@ class RecentTransactionsWidget extends StatelessWidget {
       final isFromMe = authId == transaction.fromUser;
       final isCredit = transaction.type == 'charging' || (transaction.toUser == authId && !isFromMe);
       final amount = transaction.amount ?? 0;
+      final opening = transaction.payment == 'opening_balance';
       final color = isCredit ? GoDesign.success : GoDesign.orange;
-      final icon = transaction.type == 'charging' ? Icons.add_card_outlined
+      final icon = opening ? Icons.card_giftcard_rounded : transaction.type == 'charging' ? Icons.add_card_outlined
         : transaction.type == 'transfer' ? Icons.swap_horiz_rounded
         : transaction.type == 'shipping' ? Icons.receipt_long_outlined
         : Icons.account_balance_wallet_outlined;
@@ -37,7 +38,7 @@ class RecentTransactionsWidget extends StatelessWidget {
           const SizedBox(width: 10),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Wrap(alignment: WrapAlignment.spaceBetween, spacing: 12, runSpacing: 6, children: [
-              Text(_label(transaction.type ?? '', ar),
+              Text(opening ? (ar ? 'رصيد افتتاحي' : 'Opening balance') : _label(transaction.type ?? '', ar),
                 style: const TextStyle(color: GoDesign.ink, fontSize: 15, fontWeight: FontWeight.w600)),
               Text('${isCredit ? '+' : '-'} ${amount.toStringAsFixed(2)} ${ar ? 'جنيه' : 'EGP'}',
                 textDirection: TextDirection.ltr,
@@ -47,7 +48,12 @@ class RecentTransactionsWidget extends StatelessWidget {
               const SizedBox(height: 4),
               Text(transaction.orderNo!, style: const TextStyle(color: GoDesign.muted, fontSize: 12)),
             ],
-            if (transaction.fromUserName != null && transaction.toUserName != null) ...[
+            if (opening) ...[
+              const SizedBox(height: 4),
+              Text(ar ? 'رصيد بدء الحساب — يُضاف مرة واحدة' : 'Account opening credit — added once',
+                style: const TextStyle(color: GoDesign.muted, fontSize: 12)),
+            ],
+            if (!opening && transaction.fromUserName != null && transaction.toUserName != null) ...[
               const SizedBox(height: 4),
               Text('${isFromMe ? (ar ? 'من محفظتك' : 'Your wallet') : transaction.fromUserName} ← ${transaction.toUser == authId ? (ar ? 'محفظتك' : 'Your wallet') : transaction.toUserName}',
                 style: const TextStyle(color: GoDesign.muted, fontSize: 12)),
