@@ -34,7 +34,7 @@ class StoreImage extends StatelessWidget {
   Widget build(BuildContext context) {
     Widget placeholder() => ColoredBox(color: const Color(0xFFFFF0E4), child: Center(child: Icon(Icons.storefront_rounded, size: math.min(height * .42, 48), color: AppColors.mainAppColor)));
     return ClipRRect(borderRadius: BorderRadius.circular(radius), child: SizedBox(height: height, width: width,
-      child: imageUrl.trim().isEmpty ? placeholder() : Image.network(imageUrl, fit: fit,
+      child: imageUrl.trim().isEmpty ? placeholder() : Image.network(imageUrl, fit: fit, webHtmlElementStrategy: WebHtmlElementStrategy.fallback,
         errorBuilder: (_, __, ___) => placeholder(), loadingBuilder: (_, child, progress) => progress == null ? child : placeholder())));
   }
 }

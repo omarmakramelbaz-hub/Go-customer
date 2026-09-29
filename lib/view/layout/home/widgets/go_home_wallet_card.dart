@@ -78,9 +78,9 @@ class GoHomeWalletCard extends StatelessWidget {
                     ),
                     Positioned(
                       left: box.maxWidth * .17,
-                      right: box.maxWidth * .32,
-                      top: box.maxHeight * .22,
-                      bottom: box.maxHeight * .28,
+                      right: box.maxWidth * .30,
+                      top: box.maxHeight * .24,
+                      bottom: box.maxHeight * .23,
                       child: FittedBox(
                         fit: BoxFit.scaleDown,
                         alignment: Alignment.centerLeft,
@@ -88,7 +88,7 @@ class GoHomeWalletCard extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            _StitchedWalletText(
+                            Text(
                               label,
                               style: debossed.copyWith(
                                 color: hasError ? GoDesign.orange : null,
@@ -109,7 +109,7 @@ class GoHomeWalletCard extends StatelessWidget {
                                 ),
                               )
                             else
-                              _StitchedWalletText(
+                              Text(
                                 amount ?? '—',
                                 key: const ValueKey('go-home-wallet-balance'),
                                 textDirection: TextDirection.ltr,
@@ -120,7 +120,7 @@ class GoHomeWalletCard extends StatelessWidget {
                                 ),
                               ),
                             if (amount != null)
-                              _StitchedWalletText(
+                              Text(
                                 ar ? 'ج.م' : 'EGP',
                                 style: debossed.copyWith(fontSize: 14),
                               ),
@@ -214,122 +214,4 @@ class GoHomeWalletCard extends StatelessWidget {
       ),
     );
   }
-}
-
-/// Embroidery follows the shaped letters, including Arabic joins and live digits.
-class _StitchedWalletText extends StatelessWidget {
-  const _StitchedWalletText(
-    this.text, {
-    super.key,
-    required this.style,
-    this.textDirection,
-  });
-
-  final String text;
-  final TextStyle style;
-  final TextDirection? textDirection;
-
-  @override
-  Widget build(BuildContext context) {
-    final defaults = DefaultTextStyle.of(context);
-    final resolvedStyle = defaults.style.merge(style);
-    final direction = textDirection ?? Directionality.of(context);
-    final scaler = MediaQuery.textScalerOf(context);
-    final locale = Localizations.maybeLocaleOf(context);
-    return CustomPaint(
-      foregroundPainter: _LetterStitchingPainter(
-        text: text,
-        style: resolvedStyle,
-        direction: direction,
-        scaler: scaler,
-        locale: locale,
-        heightBehavior: defaults.textHeightBehavior,
-      ),
-      child: Text(
-        text,
-        style: resolvedStyle,
-        textDirection: direction,
-        textScaler: scaler,
-        locale: locale,
-        textHeightBehavior: defaults.textHeightBehavior,
-      ),
-    );
-  }
-}
-
-class _LetterStitchingPainter extends CustomPainter {
-  const _LetterStitchingPainter({
-    required this.text,
-    required this.style,
-    required this.direction,
-    required this.scaler,
-    required this.locale,
-    required this.heightBehavior,
-  });
-
-  final String text;
-  final TextStyle style;
-  final TextDirection direction;
-  final TextScaler scaler;
-  final Locale? locale;
-  final TextHeightBehavior? heightBehavior;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    if (size.isEmpty) return;
-    final fontSize = style.fontSize ?? 14;
-    final scale = scaler.scale(fontSize) / fontSize;
-    final pitch = fontSize * .12 * scale;
-    final thread = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = (fontSize * .05).clamp(.85, 1.9) * scale
-      ..strokeJoin = StrokeJoin.round
-      ..strokeCap = StrokeCap.round
-      // Short orange stitches with a lit strand and a gap exposing the leather.
-      // The shader is applied to glyph outlines, never to their bounding box.
-      ..shader = const LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        tileMode: TileMode.repeated,
-        colors: [
-          Color(0xFFC75D13),
-          GoDesign.orange,
-          Color(0xFFFFCB8B),
-          GoDesign.orange,
-          Color(0x00FF7900),
-          Color(0x00FF7900),
-        ],
-        stops: [0, .2, .35, .65, .8, 1],
-      ).createShader(Rect.fromLTWH(0, 0, pitch, pitch));
-    final lettering = TextPainter(
-      text: TextSpan(
-        text: text,
-        style: style.copyWith(
-          foreground: thread,
-          shadows: const [
-            Shadow(
-              color: Color(0xDD090502),
-              offset: Offset(0, .65),
-              blurRadius: .4,
-            ),
-          ],
-        ),
-      ),
-      textDirection: direction,
-      textScaler: scaler,
-      locale: locale,
-      textHeightBehavior: heightBehavior,
-    )..layout(maxWidth: size.width);
-    lettering.paint(canvas, Offset.zero);
-    lettering.dispose();
-  }
-
-  @override
-  bool shouldRepaint(covariant _LetterStitchingPainter oldDelegate) =>
-      text != oldDelegate.text ||
-      style != oldDelegate.style ||
-      direction != oldDelegate.direction ||
-      scaler != oldDelegate.scaler ||
-      locale != oldDelegate.locale ||
-      heightBehavior != oldDelegate.heightBehavior;
 }
