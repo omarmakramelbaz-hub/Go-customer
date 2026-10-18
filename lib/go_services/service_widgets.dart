@@ -146,21 +146,61 @@ class _ServiceJobScreenState extends State<ServiceJobScreen> with WidgetsBinding
   void didChangeAppLifecycleState(AppLifecycleState state) { foreground = state == AppLifecycleState.resumed; if (foreground) load(); }
   Future<void> load() async {
     if (loading || busy) return;
-    loading = true; final epoch = revision;
+    loading = true;
+    final epoch = revision;
     try {
-      final data = await widget.api.job(widget.id); final capabilities = await widget.api.capabilities();
-      if (mounted && epoch == revision && !busy) setState(() { job = data; caps = capabilities; stale = false; error = null; });
-    } catch (e) { if (mounted && epoch == revision) setState(() { error = '$e'; stale = true; }); }
-    finally { loading = false; }
+      final result = await widget.api.refreshJob(widget.id);
+      if (mounted && epoch == revision && !busy) {
+        setState(() {
+          if (result.job != null) job = result.job;
+          final failure = result.jobError;
+          if (failure is ServiceFailure && failure.status == 401) {
+            job = null;
+          }
+          caps = result.capabilities;
+          stale = !result.complete;
+          error = result.error?.toString();
+        });
+      }
+    } catch (failure) {
+      if (mounted && epoch == revision) {
+        setState(() {
+          if (failure is ServiceFailure && failure.status == 401) {
+            job = null;
+          }
+          error = '$failure';
+          stale = true;
+        });
+      }
+    } finally {
+      loading = false;
+    }
   }
   @override
   void dispose() { timer?.cancel(); WidgetsBinding.instance.removeObserver(this); super.dispose(); }
   Future<void> run(Future<Map<String, dynamic>> Function() action) async {
     if (busy || stale) return;
-    revision++; setState(() { busy = true; error = null; });
-    try { final data = await action(); if (mounted) setState(() { job = data; stale = false; }); }
-    catch (e) { if (mounted) setState(() { error = '$e'; stale = true; }); }
-    finally { if (mounted) setState(() => busy = false); }
+    revision++;
+    setState(() { busy = true; error = null; });
+    try {
+      final data = await action();
+      if (mounted) {
+        setState(() { job = data; stale = false; });
+      }
+    } catch (failure) {
+      if (mounted) {
+        setState(() {
+          if (failure is ServiceFailure && failure.status == 401) {
+            job = null;
+            caps = null;
+          }
+          error = '$failure';
+          stale = true;
+        });
+      }
+    } finally {
+      if (mounted) setState(() => busy = false);
+    }
   }
   Future<bool> confirm(String title, String text) async => await showGoDialog<bool>(context: context, builder: (c) => AlertDialog(title: Text(title), content: Text(text), actions: [TextButton(onPressed: () => Navigator.pop(c, false), child: Text(t('رجوع', 'Back'))), FilledButton(onPressed: () => Navigator.pop(c, true), child: Text(t('تأكيد', 'Confirm')))])) ?? false;
   Future<void> chooseOffer(Map<String, dynamic> offer) async {
