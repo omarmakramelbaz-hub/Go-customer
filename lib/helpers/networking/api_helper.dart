@@ -2,8 +2,6 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
-import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
 import '../../view/layout/auth/screen/login_screen.dart';
 import '../hive/hive_methods.dart';
@@ -40,23 +38,9 @@ class ApiHelper {
     return _instance!;
   }
 
-  final Dio _dio = Dio()
-    ..interceptors.add(
-      PrettyDioLogger(
-        requestHeader: true,
-        requestBody: true,
-        responseBody: true,
-        responseHeader: false,
-        error: true,
-        compact: true,
-        maxWidth: 90,
-        enabled: kDebugMode,
-        filter: (options, args) {
-          if (options.path.contains('/posts')) return false;
-          return !args.isResponse || !args.hasUint8ListData;
-        },
-      ),
-    );
+  // Authentication and account endpoints carry tokens, passwords, addresses,
+  // and payment details. Keep their headers and payloads out of client logs.
+  final Dio _dio = Dio();
 
   Options _options(Map<String, String>? headers, bool hasToken) {
     return Options(

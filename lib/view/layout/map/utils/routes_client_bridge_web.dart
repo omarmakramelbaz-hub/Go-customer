@@ -39,7 +39,7 @@ Future<List<LatLng>?> getWebRoutePath({
     if (libraryPromise is! js.JsObject) return null;
 
     libraryPromise.callMethod('then', [
-      js.allowInterop((dynamic routesLibrary) {
+      js.JsFunction.withThis((dynamic _, dynamic routesLibrary) {
         try {
           if (routesLibrary is! js.JsObject) {
             if (!completer.isCompleted) completer.complete(null);
@@ -66,14 +66,15 @@ Future<List<LatLng>?> getWebRoutePath({
             'fields': ['path', 'distanceMeters', 'durationMillis'],
           });
 
-          final computePromise = routeClass.callMethod('computeRoutes', [request]);
+          final computePromise =
+              routeClass.callMethod('computeRoutes', [request]);
           if (computePromise is! js.JsObject) {
             if (!completer.isCompleted) completer.complete(null);
             return;
           }
 
           computePromise.callMethod('then', [
-            js.allowInterop((dynamic response) {
+            js.JsFunction.withThis((dynamic _, dynamic response) {
               try {
                 if (response is! js.JsObject) {
                   if (!completer.isCompleted) completer.complete(null);
@@ -115,7 +116,7 @@ Future<List<LatLng>?> getWebRoutePath({
                 if (!completer.isCompleted) completer.complete(null);
               }
             }),
-            js.allowInterop((dynamic _) {
+            js.JsFunction.withThis((dynamic _, dynamic error) {
               if (!completer.isCompleted) completer.complete(null);
             }),
           ]);
@@ -123,7 +124,7 @@ Future<List<LatLng>?> getWebRoutePath({
           if (!completer.isCompleted) completer.complete(null);
         }
       }),
-      js.allowInterop((dynamic _) {
+      js.JsFunction.withThis((dynamic _, dynamic error) {
         if (!completer.isCompleted) completer.complete(null);
       }),
     ]);

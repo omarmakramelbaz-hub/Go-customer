@@ -27,6 +27,37 @@ class ServiceCapabilities {
   );
 }
 
+/// Fresh results from the two independent reads needed by a job screen.
+/// A capabilities failure must not discard a successfully refreshed job.
+class ServiceJobRefresh {
+  const ServiceJobRefresh({
+    this.job,
+    this.capabilities,
+    this.jobError,
+    this.capabilitiesError,
+  });
+
+  final Map<String, dynamic>? job;
+  final ServiceCapabilities? capabilities;
+  final Object? jobError;
+  final Object? capabilitiesError;
+
+  bool get complete =>
+      job != null &&
+      capabilities != null &&
+      jobError == null &&
+      capabilitiesError == null;
+  Object? get error => jobError ?? capabilitiesError;
+}
+
+Future<({T? value, Object? error})> _serviceResult<T>(Future<T> request) async {
+  try {
+    return (value: await request, error: null);
+  } catch (error) {
+    return (value: null, error: error);
+  }
+}
+
 const paymentLabels = <String, List<String>>{
   'cash': ['كاش للصنايعي', 'Cash to professional'],
   'wallet': ['محفظة التطبيق', 'App wallet'],
@@ -38,6 +69,11 @@ const paymentLabels = <String, List<String>>{
 String paymentLabel(String? method, bool ar) => paymentLabels[method]?[ar ? 0 : 1] ?? (ar ? 'غير محدد' : 'Not selected');
 
 class ServiceApi {
+  static const _sessionChanged = ServiceFailure(
+    'تغيّرت جلسة الدخول. حدّث الحالة قبل المتابعة / Session changed. Refresh before continuing.',
+    401,
+  );
+
   ServiceApi({required this.partner, Dio? dio, String? baseUrl, String? Function()? token})
       : _dio = dio ?? Dio(BaseOptions(connectTimeout: const Duration(seconds: 15), receiveTimeout: const Duration(seconds: 30), sendTimeout: const Duration(seconds: 30))),
         _base = (baseUrl ?? Urls.baseUrl).replaceAll(RegExp(r'/+$'), ''),
@@ -58,6 +94,9 @@ class ServiceApi {
           contentType: body is FormData ? 'multipart/form-data' : 'application/json',
           headers: {'Accept': 'application/json', 'X-App-Scope': partner ? 'go_partner' : 'go',
             if (!public) 'Authorization': 'Bearer $token'}));
+      if (!public && token != _token()) {
+        throw _sessionChanged;
+      }
       final raw = response.data;
       if (response.statusCode != 200 && response.statusCode != 201) {
         // Never treat network/auth failures as an empty marketplace.
@@ -84,6 +123,27 @@ class ServiceApi {
   Future<Map<String, dynamic>> walletStatus() => request('wallet-status');
   Future<Map<String, dynamic>> jobs({String scope = 'open', int page = 1}) => request('jobs', query: {'scope': scope, 'page': page});
   Future<Map<String, dynamic>> job(int id) => request('jobs/$id');
+  Future<ServiceJobRefresh> refreshJob(int id) async {
+    final session = _token();
+    // Start both reads before awaiting either one; no response is cached.
+    final jobRequest = _serviceResult(job(id));
+    final capabilitiesRequest = _serviceResult(capabilities());
+    final jobResult = await jobRequest;
+    final capabilitiesResult = await capabilitiesRequest;
+    if (session != _token()) {
+      return ServiceJobRefresh(
+        capabilities: capabilitiesResult.value,
+        jobError: _sessionChanged,
+        capabilitiesError: capabilitiesResult.error,
+      );
+    }
+    return ServiceJobRefresh(
+      job: jobResult.value,
+      capabilities: capabilitiesResult.value,
+      jobError: jobResult.error,
+      capabilitiesError: capabilitiesResult.error,
+    );
+  }
   Future<Map<String, dynamic>> create(FormData data) => request('jobs', body: data);
   Future<Map<String, dynamic>> quote(int id, Map<String, dynamic> data) => request('jobs/$id/offers', body: data);
   Future<Map<String, dynamic>> accept(int id, int offer, String method) => request('jobs/$id/offers/$offer/accept', body: {'payment_method': method});

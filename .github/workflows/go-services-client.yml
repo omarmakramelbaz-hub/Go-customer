@@ -23,8 +23,8 @@ jobs:
           cache: true
       - run: flutter pub get
       - name: Analyze new client code and integration
-        run: flutter analyze --no-fatal-infos --no-fatal-warnings lib/go_services lib/view/layout/partner_search/screen/profession_partners_screen.dart lib/view/layout/request_delegate/screen/delegats_orders_screen.dart test/go_services_test.dart test/go_services_race_test.dart
+        run: flutter analyze --no-fatal-infos --no-fatal-warnings lib/go_services lib/view/layout/partner_search/screen/profession_partners_screen.dart lib/view/layout/request_delegate/screen/delegats_orders_screen.dart test/go_services_test.dart test/go_services_race_test.dart test/go_services_performance_test.dart
       - name: Run client contract, payment-state and polling-race checks
-        run: flutter test test/go_services_test.dart test/go_services_race_test.dart
+        run: flutter test test/go_services_test.dart test/go_services_race_test.dart test/go_services_performance_test.dart
       - name: Compile without deploying
         run: flutter build web --release --no-web-resources-cdn
