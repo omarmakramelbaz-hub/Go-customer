@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "user_local_snapshot_date": "2026-10-20",
+  "capture_recorded_at": "2026-10-19T23:41:21.815Z",
+  "repository": "omarmakramelbaz-hub/Go-customer",
+  "backup_branch": "backup/2026-10-20-all-apps",
+  "default_branch": "main",
+  "default_branch_commit": "de53c70fdd746b3a11fdffeaf450b56e59c80b69",
+  "default_tree_sha": "8a51d9826a39d5941ada5b448af6fc18d79ec561",
+  "branches": [
+    {
+      "ref": "refs/heads/backup/pre-rollback-20261003-0303",
+      "commit_sha": "4bdfa9a7600eaffe25c1b854b0e51e536d9c5eb1"
+    },
+    {
+      "ref": "refs/heads/codex/code-quality-review-20261018",
+      "commit_sha": "8ee4a93e7608c2a67a5462c61b3bba013fdbd5e2"
+    },
+    {
+      "ref": "refs/heads/codex/customer-partner-fixes-20260929",
+      "commit_sha": "addc8149e581c284465ba00fb48678effd31a081"
+    },
+    {
+      "ref": "refs/heads/codex/go-order-payments-20260929",
+      "commit_sha": "a5e778cbbde5ab6464f13b6179934bfaa3419413"
+    },
+    {
+      "ref": "refs/heads/codex/go-partner-fees-cancellation-20260927",
+      "commit_sha": "6446688e94a45db29a327b510144b41897641c9c"
+    },
+    {
+      "ref": "refs/heads/codex/go-request-contact-privacy-20260927",
+      "commit_sha": "c81fc9aa69ff4367065b639359a8d28a902ad84d"
+    },
+    {
+      "ref": "refs/heads/codex/go-store-checkout-20260930",
+      "commit_sha": "4062f6845fb9ca16095357d71d45d0bc3002c5ff"
+    },
+    {
+      "ref": "refs/heads/codex/go-wallet-destinations-20260928",
+      "commit_sha": "cb22769fbd20e2cb43c92476e54622d07bd15a1a"
+    },
+    {
+      "ref": "refs/heads/codex/home-leather-wallet-20260928",
+      "commit_sha": "6e6b48e498313335418077fe23feda4c01f03f90"
+    },
+    {
+      "ref": "refs/heads/codex/service-quotes-review-20260927",
+      "commit_sha": "a835cfd2a9a5de85666483266ec984e5d08a03bc"
+    },
+    {
+      "ref": "refs/heads/codex/store-onboarding-20260927",
+      "commit_sha": "03b46a00207531706e8838c1e83160647b45dfbd"
+    },
+    {
+      "ref": "refs/heads/codex/store-page-20260929",
+      "commit_sha": "f53b9ba91fb8ee55c1da26261ac3d6335cee83af"
+    },
+    {
+      "ref": "refs/heads/codex/store-signup-60-products",
+      "commit_sha": "1b7ada9230b309cc4927f6c252b1a9246ecdcb58"
+    },
+    {
+      "ref": "refs/heads/codex/unify-go-ui-20260927",
+      "commit_sha": "b46380620aa13c759225d549105988018c138266"
+    },
+    {
+      "ref": "refs/heads/codex/wallet-destination-20260928",
+      "commit_sha": "47e663d5a012d2cfb40a3201fd0fdbd34b42a278"
+    },
+    {
+      "ref": "refs/heads/codex/wallet-embroidered-text-20260929",
+      "commit_sha": "debd7c74714bbc173c7947ba20eb4e7a76a8db5a"
+    },
+    {
+      "ref": "refs/heads/codex/wallet-no-stitching-20260929",
+      "commit_sha": "6c5d8836fdea3e31671d4df49a231a5a18fa5883"
+    },
+    {
+      "ref": "refs/heads/codex/wallet-orange-stitching-20260929",
+      "commit_sha": "6608bce8adf05fdd4673cc95c41cbc2447a48944"
+    },
+    {
+      "ref": "refs/heads/codex/wallet-transfer-ui-20260928",
+      "commit_sha": "050ab319bc62291405b24cab44bafb46693e3488"
+    },
+    {
+      "ref": "refs/heads/design/customer-master-ui-20260926",
+      "commit_sha": "157ea2fe462f6cd2a2e749b6cb4ba869ceff2791"
+    },
+    {
+      "ref": "refs/heads/feat/go-service-marketplace-20260926",
+      "commit_sha": "e8beff53fe63faeccabe3c79fb2ebff1c10f003e"
+    },
+    {
+      "ref": "refs/heads/fix/approved-go-home-20260925",
+      "commit_sha": "65617a1bde7a8949c90bbe20df9ac17201c8a65a"
+    },
+    {
+      "ref": "refs/heads/fix/go-customer-legal-20260926",
+      "commit_sha": "c4d06f20b6ffe3612eb439b92e431995babd0de0"
+    },
+    {
+      "ref": "refs/heads/full-go-customer-3d-brand",
+      "commit_sha": "f72b0f8f20359f6523d6525bc68100a8c0397f86"
+    },
+    {
+      "ref": "refs/heads/full-go-partner-auth-identity",
+      "commit_sha": "64b93bdedaadd6e3c921bddb22a5c66425026598"
+    },
+    {
+      "ref": "refs/heads/main",
+      "commit_sha": "de53c70fdd746b3a11fdffeaf450b56e59c80b69"
+    },
+    {
+      "ref": "refs/heads/unify-go-partner-identity",
+      "commit_sha": "f81a973a0808acc9c60bbb94611569c4d52ccf22"
+    }
+  ],
+  "tags": [],
+  "scope": {
+    "source_commit_histories": true,
+    "unmerged_branch_tips": true,
+    "live_server_working_tree": false,
+    "live_database": false,
+    "server_environment_secrets": false,
+    "server_uploads": false,
+    "external_lfs_payloads": false,
+    "external_submodule_repositories": false,
+    "github_release_assets": false
+  },
+  "preservation_method": "Archival ancestry anchor. The snapshot tree equals the captured default tree plus this manifest. Other branch tips are retained as parents, directly or through grouped archival commits. This is not a merge of their file contents. Do not merge this archival branch into development. Restore a specific source version by checking out its original commit from the branches/tags map.",
+  "verification": "Parent objects, archive tree, manifest and final branch ref are read back after creation. No production deployment or database restore performed."
+}
